@@ -1,0 +1,3066 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#ffffff">
+    <title>助理點數系統</title>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            /* ── 7-step type scale ── */
+            --fs-xs:   10px;    /* meta, timestamps, table-headers, chips */
+            --fs-sm:   11.5px;  /* badges, card-title, status pills, hints */
+            --fs-cap:  12.5px;  /* form-label, captions, info-box, btn-sm */
+            --fs-base: 13px;    /* body — nav, buttons, inputs, tables */
+            --fs-sub:  15px;    /* sub-heading — sec-title, modal-title, sidebar brand */
+            --fs-hd:   18px;    /* heading — page-header h2, setup heading */
+            --fs-disp: 28px;    /* display — stat values, personal pts, logo */
+
+            --bg: #f5f5f2; --surface: #fff; --surface-alt: #f0f0ec;
+            --border: #e2e2dc; --text-primary: #2c2c2a; --text-secondary: #6e6e68; --text-muted: #9e9e96;
+            --accent: #6b7fa3; --accent-light: #eef0f5; --accent-hover: #5a6d8f;
+            --green: #6f9e6f; --green-light: #eef5ee; --green-border: #c2dcc2;
+            --red: #b07068; --red-light: #f8efee; --red-border: #ddc4c0;
+            --gold: #b89c5a; --gold-light: #faf4e4; --gold-border: #ddd0a8;
+            --orange: #c0824a; --orange-light: #fdf2e8;
+            --sw: 220px; --r: 10px; --mnav: 0px;
+            --sh: 0 1px 3px rgba(0,0,0,.06); --shm: 0 4px 16px rgba(0,0,0,.1);
+        }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;font-size:var(--fs-sub);line-height:1.5;}
+
+        /* ── Sidebar ── */
+        .sidebar{width:var(--sw);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+        .sidebar-brand{padding:20px 20px 14px;border-bottom:1px solid var(--border);}
+        .sidebar-brand h1{font-size:var(--fs-sub);font-weight:700;}
+        .sidebar-brand p{font-size:var(--fs-sm);color:var(--text-muted);margin-top:2px;}
+        .sidebar-nav{flex:1;padding:10px 8px;overflow-y:auto;}
+        .nav-sec-label{font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);padding:10px 10px 4px;}
+        .nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--text-secondary);font-size:var(--fs-base);font-weight:500;transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:inherit;}
+        .nav-item:hover{background:var(--surface-alt);color:var(--text-primary);}
+        .nav-item.active{background:var(--accent-light);color:var(--accent);}
+        .nav-icon{width:15px;height:15px;flex-shrink:0;opacity:.85;}
+        .sidebar-footer{padding:10px 14px 14px;border-top:1px solid var(--border);}
+        .conn-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--text-muted);margin-right:6px;vertical-align:middle;}
+        .conn-dot.online{background:var(--green);} .conn-dot.error{background:var(--red);} .conn-dot.connecting{background:var(--gold);}
+        #conn-label{font-size:var(--fs-sm);color:var(--text-muted);}
+        .btn-sidebar{display:block;width:100%;margin-top:6px;padding:6px 10px;font-size:var(--fs-sm);border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;color:var(--text-muted);font-family:inherit;text-align:left;}
+        .btn-sidebar:hover{background:var(--surface-alt);color:var(--text-primary);}
+
+        /* ── Main ── */
+        .main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+        .page-header{background:var(--surface);border-bottom:1px solid var(--border);padding:18px 32px;}
+        .page-header h2{font-size:var(--fs-hd);font-weight:700;}
+        .page-header p{font-size:var(--fs-cap);color:var(--text-muted);margin-top:2px;}
+        .page-content{padding:24px 32px;flex:1;overflow-y:auto;}
+
+        /* ── Cards ── */
+        .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--sh);}
+        .card-title{font-size:var(--fs-sm);font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;}
+
+        /* ── Grid ── */
+        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+        .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+        .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+
+        /* ── Stat card ── */
+        .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh);}
+        .stat-card .lb{font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:5px;}
+        .stat-card .val{font-size:var(--fs-disp);font-weight:700;line-height:1;}
+        .stat-card .sub{font-size:var(--fs-sm);color:var(--text-muted);margin-top:4px;}
+
+        /* ── Buttons ── */
+        .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:var(--fs-base);font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:inherit;}
+        .btn-primary{background:var(--accent);color:#fff;} .btn-primary:hover{background:var(--accent-hover);} .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+        .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-secondary);} .btn-outline:hover{background:var(--surface-alt);}
+        .btn-danger{background:var(--red-light);color:var(--red);border:1px solid var(--red-border);} .btn-danger:hover{background:#f0dbd8;}
+        .btn-success{background:var(--green-light);color:var(--green);border:1px solid var(--green-border);} .btn-success:hover{background:#deeede;}
+        .btn-gold{background:var(--gold-light);color:var(--gold);border:1px solid var(--gold-border);} .btn-gold:hover{background:#f0e8cc;}
+        .btn-sm{padding:5px 11px;font-size:var(--fs-cap);border-radius:6px;}
+
+        /* ── Form ── */
+        .form-group{margin-bottom:14px;}
+        .form-label{display:block;font-size:var(--fs-cap);font-weight:600;color:var(--text-secondary);margin-bottom:5px;}
+        .form-input,.form-select,.form-textarea{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:8px;font-size:var(--fs-base);color:var(--text-primary);background:var(--surface);transition:border-color .15s,box-shadow .15s;font-family:inherit;}
+        .form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(107,127,163,.12);}
+        .form-textarea{resize:vertical;min-height:72px;}
+
+        /* ── Tables ── */
+        .table-wrapper{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);}
+        table{width:100%;border-collapse:collapse;font-size:var(--fs-base);}
+        thead th{background:var(--surface-alt);padding:10px 14px;text-align:left;font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);border-bottom:1px solid var(--border);}
+        tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
+        tbody tr:last-child{border-bottom:none;} tbody tr:hover{background:var(--surface-alt);}
+        tbody td{padding:11px 14px;vertical-align:middle;}
+
+        /* ── Badges ── */
+        .badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-size:var(--fs-sm);font-weight:600;}
+        .bg{background:var(--green-light);color:var(--green);}
+        .br{background:var(--red-light);color:var(--red);}
+        .bb{background:var(--accent-light);color:var(--accent);}
+        .bgo{background:var(--gold-light);color:var(--gold);}
+        .bgr{background:var(--surface-alt);color:var(--text-muted);}
+        .bo{background:var(--orange-light);color:var(--orange);}
+
+        /* ── Points ── */
+        .pp{color:var(--green);font-weight:700;} .pn{color:var(--red);font-weight:700;}
+
+        /* ── Progress ── */
+        .prog-wrap{height:6px;background:var(--surface-alt);border-radius:999px;overflow:hidden;}
+        .prog-fill{height:100%;border-radius:999px;background:var(--accent);transition:width .5s;}
+
+        /* ── Leaderboard ── */
+        .lb-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+        .lb-item:last-child{border-bottom:none;}
+        .rn{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:var(--fs-sm);font-weight:700;flex-shrink:0;}
+        .rn1{background:var(--gold-light);color:var(--gold);} .rn2{background:#f0f0ec;color:#909088;} .rn3{background:#f5ecea;color:#a88878;} .rnn{background:var(--surface-alt);color:var(--text-muted);}
+        .lb-info{flex:1;min-width:0;}
+        .lb-name{font-weight:600;font-size:var(--fs-base);}
+        .lb-bar{margin-top:4px;}
+        .lb-pts{font-size:var(--fs-hd);font-weight:700;}
+
+        /* ── Settle bar ── */
+        .stl-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);}
+        .stl-row:last-child{border-bottom:none;}
+        .stl-name{width:80px;font-weight:500;font-size:var(--fs-base);flex-shrink:0;}
+        .stl-prog{flex:1;}
+        .stl-pct{width:50px;text-align:right;font-weight:700;font-size:var(--fs-base);color:var(--accent);flex-shrink:0;}
+        .stl-pts{width:60px;text-align:right;font-size:var(--fs-cap);color:var(--text-muted);flex-shrink:0;}
+
+        /* ── Month tabs ── */
+        .month-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+        .month-tab{padding:5px 13px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:var(--fs-cap);cursor:pointer;color:var(--text-secondary);transition:all .15s;font-family:inherit;}
+        .month-tab:hover{background:var(--surface-alt);}
+        .month-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+        /* ── Section ── */
+        .section{margin-bottom:24px;}
+        .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+        .sec-title{font-size:var(--fs-sub);font-weight:700;}
+
+        /* ── Filter row ── */
+        .filter-row{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap;}
+        .filter-row .form-select{width:auto;min-width:130px;}
+
+        /* ── Empty state ── */
+        .empty-state{text-align:center;padding:44px 20px;color:var(--text-muted);}
+        .empty-state .icon{font-size:var(--fs-disp);margin-bottom:10px;}
+        .empty-state p{font-size:var(--fs-base);}
+
+        /* ── Modal ── */
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px;}
+        .modal{background:var(--surface);border-radius:14px;width:100%;max-width:480px;box-shadow:var(--shm);max-height:90vh;overflow-y:auto;}
+        .modal-hd{padding:20px 22px 0;display:flex;align-items:center;justify-content:space-between;}
+        .modal-title{font-size:var(--fs-sub);font-weight:700;}
+        .modal-x{width:26px;height:26px;border-radius:6px;border:none;background:var(--surface-alt);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:var(--fs-sub);font-family:inherit;}
+        .modal-x:hover{background:var(--border);}
+        .modal-body{padding:18px 22px;}
+        .modal-ft{padding:0 22px 20px;display:flex;gap:8px;justify-content:flex-end;}
+
+        /* ── Toast ── */
+        .toast{position:fixed;bottom:22px;right:22px;background:#2c2c2a;color:#fff;padding:11px 16px;border-radius:10px;font-size:var(--fs-base);box-shadow:var(--shm);opacity:0;transform:translateY(10px);transition:all .25s;z-index:2000;pointer-events:none;}
+        .toast.show{opacity:1;transform:translateY(0);}
+
+        /* ─── Record Page ─── */
+        .rec-wrap{display:flex;flex-direction:column;height:calc(100vh - 68px);height:calc(100dvh - 68px);overflow:hidden;}
+        .rec-scroll{flex:1;overflow-y:auto;padding:22px 32px;}
+        .asst-picker{display:flex;gap:9px;flex-wrap:wrap;}
+        .asst-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 13px;min-width:70px;border-radius:12px;border:2px solid var(--border);cursor:pointer;transition:all .15s;background:var(--surface);}
+        .asst-card:hover{border-color:var(--accent);background:var(--accent-light);}
+        .asst-card.sel{border-color:var(--accent);background:var(--accent-light);}
+        .asst-avatar{width:40px;height:40px;border-radius:50%;background:var(--surface-alt);color:var(--text-secondary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:var(--fs-sub);}
+        .asst-card.sel .asst-avatar{background:var(--accent);color:#fff;}
+        .asst-card-name{font-size:var(--fs-cap);font-weight:600;white-space:nowrap;}
+        .mode-btns{display:flex;gap:12px;margin-bottom:20px;}
+        .mode-btn{flex:1;padding:16px 12px;border-radius:12px;border:2px solid var(--border);font-size:var(--fs-sub);font-weight:700;cursor:pointer;transition:all .18s;background:var(--surface);font-family:inherit;color:var(--text-secondary);}
+        .mode-btn-add:hover,.mode-btn-add.sel{border-color:var(--green);background:var(--green-light);color:var(--green);}
+        .mode-btn-deduct:hover,.mode-btn-deduct.sel{border-color:var(--red);background:var(--red-light);color:var(--red);}
+        .rule-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;}
+        .rule-card{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;cursor:pointer;transition:all .15s;background:var(--surface);}
+        .rule-card:hover{border-color:var(--accent);background:var(--accent-light);}
+        .rule-card.sel-r{border-color:var(--green);background:var(--green-light);}
+        .rule-card.sel-v{border-color:var(--red);background:var(--red-light);}
+        .rule-card-name{font-size:var(--fs-base);font-weight:500;}
+        .confirm-bar{flex-shrink:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 32px;display:flex;align-items:center;gap:12px;box-shadow:0 -4px 14px rgba(0,0,0,.05);}
+        .confirm-summary{flex:1;font-size:var(--fs-base);font-weight:600;display:flex;align-items:center;gap:8px;min-width:0;}
+        .cs-name{color:var(--accent);}
+        .cs-rule{color:var(--text-secondary);font-weight:500;}
+        .cbar-empty{color:var(--text-muted);font-size:var(--fs-base);}
+        #rec-note{max-width:200px;}
+
+        /* ─── Threshold indicators ─── */
+        .threshold-card{border-radius:var(--r);padding:16px 20px;border:1px solid;margin-bottom:18px;}
+        .tc-bonus{background:#f0f9f0;border-color:var(--green-border);}
+        .tc-penalty{background:var(--red-light);border-color:var(--red-border);}
+        .tc-warning{background:var(--gold-light);border-color:var(--gold-border);}
+        .tc-normal{background:var(--accent-light);border-color:#c8d4e8;}
+        .tc-title{font-size:var(--fs-cap);font-weight:700;margin-bottom:6px;}
+        .tc-desc{font-size:var(--fs-cap);line-height:1.6;}
+        .tc-prog{margin-top:10px;}
+        .flag-pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:var(--fs-sm);font-weight:600;margin-left:6px;}
+        .fp-good{background:#e8f5e8;color:var(--green);}
+        .fp-warn{background:var(--gold-light);color:var(--gold);}
+        .fp-bad{background:var(--red-light);color:var(--red);}
+        .fp-prob{background:var(--surface-alt);color:var(--text-muted);}
+
+        /* ─── Mode chip ─── */
+        .mode-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:var(--fs-xs);font-weight:700;background:var(--surface-alt);color:var(--text-muted);}
+        .mode-chip.admin{background:var(--accent-light);color:var(--accent);}
+        .mode-chip.assistant{background:var(--green-light);color:var(--green);}
+
+        /* ─── Viewer mode overrides ─── */
+        body.viewer-mode .mobile-nav{display:none!important;}
+        body.viewer-mode .page-content{padding-bottom:14px!important;}
+
+        /* ─── Login tabs ─── */
+        .login-tabs{display:flex;margin-bottom:18px;border-bottom:1px solid var(--border);}
+        .login-tab{flex:1;padding:10px 0;border:none;background:none;font-size:var(--fs-base);font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;transition:color .15s,border-color .15s;}
+        .login-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+        /* ─── PIN code display ─── */
+        .pin-code{font-family:'SF Mono','Fira Code',monospace;font-size:var(--fs-base);font-weight:700;letter-spacing:.2em;color:var(--accent);background:var(--accent-light);padding:3px 10px;border-radius:6px;}
+
+        /* ─── Donut chart ─── */
+        .donut-wrap{display:flex;align-items:center;gap:20px;margin-top:10px;flex-wrap:wrap;}
+        .donut-info{flex:1;min-width:120px;}
+        .donut-info-row{font-size:var(--fs-cap);color:var(--text-muted);margin-bottom:4px;}
+
+        /* ─── Manager list in settings ─── */
+        .mgr-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+        .mgr-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface-alt);border-radius:7px;font-size:var(--fs-base);}
+        .mgr-name{flex:1;font-weight:500;}
+
+        /* ─── Personal view ─── */
+        .personal-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;}
+        .personal-pts{font-size:var(--fs-disp);font-weight:800;line-height:1;margin:8px 0;}
+        .personal-rank{font-size:var(--fs-base);color:var(--text-muted);}
+        .personal-txn-list{max-height:320px;overflow-y:auto;}
+
+        /* ─── Setup overlay ─── */
+        #setup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;}
+        .setup-card{background:var(--surface);border-radius:16px;width:100%;max-width:560px;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden;}
+        .setup-hd{background:var(--accent);color:#fff;padding:26px 30px 22px;}
+        .setup-hd h2{font-size:var(--fs-hd);font-weight:700;}
+        .setup-hd p{font-size:var(--fs-cap);opacity:.85;margin-top:3px;}
+        .setup-body{padding:26px 30px;max-height:72vh;overflow-y:auto;}
+        .setup-step{display:flex;gap:12px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border);}
+        .setup-step:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+        .step-num{width:26px;height:26px;border-radius:50%;background:var(--accent-light);color:var(--accent);font-weight:700;font-size:var(--fs-cap);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+        .step-body h4{font-size:var(--fs-base);font-weight:700;margin-bottom:4px;}
+        .step-body p{font-size:var(--fs-cap);color:var(--text-secondary);line-height:1.7;}
+        .step-body a{color:var(--accent);}
+        .setup-code{font-family:'SF Mono','Fira Code',monospace;font-size:var(--fs-sm);background:var(--surface-alt);border:1px solid var(--border);border-radius:6px;padding:9px 11px;margin-top:7px;white-space:pre;overflow-x:auto;color:var(--text-secondary);line-height:1.6;}
+        .setup-ft{padding:0 30px 26px;display:flex;gap:8px;justify-content:flex-end;}
+        .setup-err{background:var(--red-light);color:var(--red);border:1px solid var(--red-border);border-radius:7px;padding:9px 13px;font-size:var(--fs-cap);margin-bottom:14px;display:none;}
+
+        /* ─── Loading ─── */
+        #loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9998;flex-direction:column;gap:14px;}
+        .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+        @keyframes spin{to{transform:rotate(360deg);}}
+        #loading-overlay p{font-size:var(--fs-base);color:var(--text-muted);}
+
+        /* ─── Seed modal ─── */
+        .seed-list{max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:10px 14px;background:var(--surface-alt);font-size:var(--fs-cap);line-height:2;}
+
+        /* misc */
+        .page{display:none;} .page.active{display:flex;flex-direction:column;flex:1;}
+        .hidden{display:none!important;}
+        .info-box{background:var(--accent-light);border:1px solid #c8d4e8;border-radius:8px;padding:11px 14px;font-size:var(--fs-cap);color:var(--accent);line-height:1.6;margin-bottom:16px;}
+        .divider{height:1px;background:var(--border);margin:18px 0;}
+        .tbl-icon-btn{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:3px 7px;border-radius:4px;font-size:var(--fs-base);}
+        .tbl-icon-btn:hover{color:var(--red);}
+
+        /* ─── Mobile bottom nav ─── */
+        .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:101;padding-bottom:env(safe-area-inset-bottom,0px);}
+        .mobile-nav-inner{display:flex;}
+        .mn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 6px;cursor:pointer;color:var(--text-muted);font-size:var(--fs-xs);font-weight:600;border:none;background:none;font-family:inherit;transition:color .15s;-webkit-tap-highlight-color:transparent;}
+        .mn-item.active{color:var(--accent);}
+        .mn-icon{width:21px;height:21px;flex-shrink:0;}
+
+        @media(max-width:900px){.grid-4{grid-template-columns:1fr 1fr;}.grid-3{grid-template-columns:1fr 1fr;}}
+        @media(max-width:700px){
+            :root{--sw:0px;--mnav:calc(52px + env(safe-area-inset-bottom,0px));}
+            .sidebar{display:none;}
+            .mobile-nav{display:block;}
+            .main{margin-left:0;}
+            .grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}
+            .page-content{padding:14px;padding-bottom:calc(14px + var(--mnav));}
+            .rec-scroll{padding:14px;}
+            .page-header{padding:12px 16px;}
+            .confirm-bar{padding:10px 14px;flex-wrap:wrap;}
+            #rec-note{max-width:100%;}
+            .rec-wrap{
+                height:calc(100vh - 57px - var(--mnav));
+                height:calc(100dvh - 57px - var(--mnav));
+            }
+            .donut-wrap{justify-content:center;}
+            body.admin-mode .toast{bottom:calc(22px + var(--mnav));}
+            .mode-btns{gap:8px;}
+            .mode-btn{padding:12px 8px;font-size:var(--fs-sub);}
+            .personal-pts{font-size:var(--fs-disp);}
+            .asst-card{min-width:60px;padding:8px 10px;}
+        }
+
+        /* ─── Login Screen ─── */
+        #login-screen{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:9990;padding:20px;overflow-y:auto;}
+        .ls-card{width:100%;max-width:420px;}
+        .ls-logo{font-size:var(--fs-disp);font-weight:800;color:var(--accent);text-align:center;margin-bottom:3px;}
+        .ls-sub{font-size:var(--fs-cap);color:var(--text-muted);text-align:center;margin-bottom:24px;}
+        .ls-sys-row{display:flex;gap:10px;margin-bottom:20px;}
+        .ls-sys-btn{flex:1;padding:14px 10px;border-radius:12px;border:2px solid var(--border);font-size:var(--fs-base);font-weight:700;cursor:pointer;background:#fff;color:var(--text-secondary);font-family:inherit;transition:all .15s;text-align:center;line-height:1.5;}
+        .ls-sys-btn.sel{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
+        .ls-form-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:22px;box-shadow:0 4px 24px rgba(0,0,0,.09);}
+        .ls-tabs{display:flex;margin-bottom:18px;border-bottom:1px solid var(--border);}
+        .ls-tab{flex:1;padding:9px 0;border:none;background:none;font-size:var(--fs-base);font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;transition:color .15s,border-color .15s;}
+        .ls-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+        .ls-err{background:var(--red-light);color:var(--red);border:1px solid var(--red-border);border-radius:7px;padding:9px 13px;font-size:var(--fs-cap);margin-bottom:12px;display:none;}
+
+        /* ─── Signature pad ─── */
+        .sig-canvas-wrap{border:2px dashed var(--border);border-radius:8px;overflow:hidden;background:#fff;position:relative;cursor:crosshair;}
+        .sig-canvas-wrap canvas{display:block;touch-action:none;-webkit-user-select:none;user-select:none;}
+        .sig-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--text-muted);font-size:var(--fs-cap);pointer-events:none;text-align:center;line-height:1.6;}
+        .sig-display{margin-top:10px;border:1px solid var(--border);border-radius:8px;padding:10px;background:#fff;text-align:center;}
+        .sig-display img{max-height:60px;border-radius:4px;cursor:zoom-in;}
+        .sig-zoomable{cursor:zoom-in;}
+        #img-zoom{display:flex;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.88);cursor:zoom-out;align-items:center;justify-content:center;padding:20px;}
+        #img-zoom.hidden{display:none;}
+        #img-zoom img{max-width:100%;max-height:90vh;border-radius:8px;box-shadow:0 8px 60px rgba(0,0,0,.5);}
+
+        /* ─── Overtime ─── */
+        .ot-shift-row{display:flex;gap:8px;flex-wrap:wrap;}
+        .ot-shift-btn{padding:9px 18px;border-radius:8px;border:2px solid var(--border);font-size:var(--fs-base);font-weight:700;cursor:pointer;background:#fff;color:var(--text-secondary);font-family:inherit;transition:all .15s;}
+        .ot-shift-btn.sm{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
+        .ot-shift-btn.sa{border-color:var(--green);background:var(--green-light);color:var(--green);}
+        .ot-shift-btn.se{border-color:var(--gold);background:var(--gold-light);color:var(--gold);}
+        .ot-record{border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;background:#fff;}
+        .ot-record-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+        .ot-pend{display:inline-flex;padding:2px 8px;border-radius:999px;font-size:var(--fs-sm);font-weight:700;background:var(--gold-light);color:var(--gold);}
+        .ot-appr{display:inline-flex;padding:2px 8px;border-radius:999px;font-size:var(--fs-sm);font-weight:700;background:var(--green-light);color:var(--green);}
+        .ot-sig-img{max-height:50px;border:1px solid var(--border);border-radius:4px;background:#fff;padding:2px;display:block;margin-top:6px;}
+        .ot-result{background:var(--accent-light);border:1px solid #c8d4e8;border-radius:8px;padding:10px 14px;font-size:var(--fs-base);font-weight:700;color:var(--accent);margin-top:10px;}
+
+        /* ─── OT chart & stats ─── */
+        .ot-chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;box-shadow:var(--sh);margin-bottom:18px;}
+        .ot-stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:18px;}
+        .ot-stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh);}
+        .ot-stat-card .sc-name{font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .ot-stat-card .sc-val{font-size:var(--fs-hd);font-weight:700;color:var(--accent);}
+        .ot-stat-card .sc-sub{font-size:var(--fs-sm);color:var(--text-muted);margin-top:1px;}
+        .ot-stat-card.total-card{border-color:#c8d4e8;background:var(--accent-light);}
+        .ot-stat-card.total-card .sc-val{color:#4361ee;}
+
+        /* ─── History multi-select ─── */
+        .sel-bar{display:none;align-items:center;gap:10px;margin-bottom:12px;padding:8px 14px;background:var(--accent-light);border:1px solid #c8d4e8;border-radius:8px;flex-wrap:wrap;}
+        .sel-bar.show{display:flex;}
+        input[type=checkbox].row-chk{width:16px;height:16px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;vertical-align:middle;}
+
+        /* ─── Role-based nav visibility ─── */
+        .nrec,.nfull,.nfull-lbl,.ndoc,.ndoc-lbl,.nasst,.nasst-lbl,.not,.not-lbl{display:none!important}
+        body.principal-mode .nrec,body.principal-mode .nfull,body.principal-mode .ndoc,
+        body.principal-mode .not{display:flex!important}
+        body.principal-mode .nfull-lbl,body.principal-mode .ndoc-lbl,
+        body.principal-mode .not-lbl{display:block!important}
+        body.manager-mode .nrec{display:flex!important}
+        body.doctor-mode .nrec,body.doctor-mode .ndoc{display:flex!important}
+        body.doctor-mode .ndoc-lbl{display:block!important}
+        body.assistant-mode .nasst,body.assistant-mode .not{display:flex!important}
+        body.assistant-mode .nasst-lbl,body.assistant-mode .not-lbl{display:block!important}
+        /* Mobile nav role classes */
+        .mn-nrec,.mn-nfull,.mn-ndoc,.mn-nasst,.mn-not{display:none!important}
+        body.principal-mode .mn-nrec,body.principal-mode .mn-nfull,body.principal-mode .mn-ndoc,
+        body.principal-mode .mn-not{display:flex!important}
+        body.manager-mode .mn-nrec{display:flex!important}
+        body.doctor-mode .mn-nrec,body.doctor-mode .mn-ndoc{display:flex!important}
+        body.assistant-mode .mn-nasst,body.assistant-mode .mn-not{display:flex!important}
+
+        @media(max-width:700px){
+            .ls-card{max-width:100%;}
+            .ls-sys-btn{padding:10px 6px;font-size:var(--fs-cap);}
+            .ls-form-card{padding:16px;}
+            .ot-shift-btn{padding:8px 12px;font-size:var(--fs-cap);}
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══ Login Screen ══ -->
+<div id="login-screen" class="hidden">
+    <div class="ls-card">
+        <div class="ls-logo">助理點數系統</div>
+        <div class="ls-sub">牙醫診所績效管理平台</div>
+        <div class="ls-form-card">
+            <div class="ls-tabs">
+                <button class="ls-tab active" id="lsp-tab-asst" onclick="switchLSTab('asst')">助理</button>
+                <button class="ls-tab" id="lsp-tab-doctor" onclick="switchLSTab('doctor')">醫師</button>
+                <button class="ls-tab" id="lsp-tab-admin" onclick="switchLSTab('admin')">管理者</button>
+            </div>
+            <div id="ls-err" class="ls-err"></div>
+            <!-- 助理 -->
+            <div id="ls-panel-asst">
+                <div class="form-group">
+                    <label class="form-label">4 碼專屬密碼</label>
+                    <input type="password" class="form-input" id="ls-asst-pin" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="輸入 4 位數字" autocomplete="one-time-code">
+                </div>
+                <div style="font-size:11.5px;color:var(--text-muted)">請向管理者取得您的專屬密碼。</div>
+            </div>
+            <!-- 醫師 -->
+            <div id="ls-panel-doctor" class="hidden">
+                <div class="form-group">
+                    <label class="form-label">選擇醫師</label>
+                    <select class="form-select" id="ls-doctor-select"></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">醫師密碼</label>
+                    <input type="password" class="form-input" id="ls-doctor-pw" placeholder="輸入密碼" autocomplete="current-password">
+                </div>
+            </div>
+            <!-- 管理者 / 院長 -->
+            <div id="ls-panel-admin" class="hidden">
+                <div class="form-group">
+                    <label class="form-label">選擇帳號</label>
+                    <select class="form-select" id="ls-admin-select"></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">密碼</label>
+                    <input type="password" class="form-input" id="ls-admin-pw" placeholder="輸入密碼" autocomplete="current-password">
+                </div>
+                <div style="font-size:11.5px;color:var(--text-muted)">院長預設密碼為 <code>0000</code>，可至系統設定變更。</div>
+            </div>
+            <div style="margin-top:16px">
+                <button class="btn btn-primary" style="width:100%" onclick="attemptLoginScreen()">登入</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ Setup overlay ══ -->
+<div id="setup-overlay">
+    <div class="setup-card">
+        <div class="setup-hd">
+            <h2>設定雲端同步</h2>
+            <p>建立 Firebase 專案，讓資料跨裝置即時同步</p>
+        </div>
+        <div class="setup-body">
+            <div id="setup-err" class="setup-err"></div>
+            <div class="setup-step">
+                <div class="step-num">1</div>
+                <div class="step-body"><h4>建立 Firebase 專案</h4>
+                    <p>前往 <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a>，以 Google 帳號登入，點擊「新增專案」完成建立。</p>
+                </div>
+            </div>
+            <div class="setup-step">
+                <div class="step-num">2</div>
+                <div class="step-body"><h4>啟用 Firestore 資料庫</h4>
+                    <p>左側選單 →「Firestore Database」→「建立資料庫」→「以測試模式啟動」→ 選擇地區（建議 asia-east1）。</p>
+                </div>
+            </div>
+            <div class="setup-step">
+                <div class="step-num">3</div>
+                <div class="step-body"><h4>新增 Web 應用程式並取得設定</h4>
+                    <p>專案概覽頁點擊「&lt;/&gt;」→ 完成後複製 <code>firebaseConfig</code> 內的 JSON 內容：</p>
+                    <div class="setup-code">apiKey: "AIzaSy...",
+authDomain: "your-app.firebaseapp.com",
+projectId: "your-app",
+storageBucket: "your-app.appspot.com",
+messagingSenderId: "...",
+appId: "..."</div>
+                </div>
+            </div>
+            <div class="setup-step">
+                <div class="step-num">4</div>
+                <div class="step-body"><h4>貼上設定並連線</h4>
+                    <div class="form-group" style="margin-top:12px">
+                        <label class="form-label">Firebase 設定（貼上 JSON 內容）</label>
+                        <textarea class="form-textarea" id="setup-config-input" rows="5" placeholder='apiKey: "...",
+authDomain: "...",
+projectId: "...",
+storageBucket: "...",
+messagingSenderId: "...",
+appId: "..."'></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">工作區 ID（同一個診所團隊使用相同 ID）</label>
+                        <input type="text" class="form-input" id="setup-ws-input" placeholder="例：clinic-2024" autocomplete="off">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="setup-ft">
+            <button class="btn btn-primary" onclick="connectFirebase()">連線</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ Loading ══ -->
+<div id="loading-overlay" class="hidden">
+    <div class="spinner"></div>
+    <p>正在連線資料庫…</p>
+</div>
+
+<!-- ══ Sidebar ══ -->
+<nav class="sidebar">
+    <div class="sidebar-brand">
+        <h1>助理點數系統</h1>
+        <p id="ws-label">—</p>
+    </div>
+    <div class="sidebar-nav">
+        <div class="nav-sec-label">概覽</div>
+        <button class="nav-item active" onclick="navigate('overview')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>本月總覽
+        </button>
+        <button class="nav-item nrec" onclick="navigate('record')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"/></svg>記錄點數
+        </button>
+        <div class="nav-sec-label nfull-lbl">紀錄</div>
+        <button class="nav-item nfull" onclick="navigate('history')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>歷史紀錄
+        </button>
+        <button class="nav-item nfull" onclick="navigate('settlement')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 00-2 0v2a1 1 0 102 0V9z" clip-rule="evenodd"/></svg>月結算
+        </button>
+        <div class="nav-sec-label nfull-lbl">管理</div>
+        <button class="nav-item nfull" onclick="navigate('assistants')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zM5 17a5 5 0 0110 0H5z"/></svg>助理管理
+        </button>
+        <button class="nav-item nfull" onclick="navigate('rules')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>規定管理
+        </button>
+        <!-- 個人 -->
+        <div class="nav-sec-label nasst-lbl">個人</div>
+        <button class="nav-item nasst" onclick="navigate('myview')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>個人點數
+        </button>
+        <!-- 加班系統 -->
+        <div class="nav-sec-label not-lbl">加班系統</div>
+        <button class="nav-item not" onclick="navigate('overtime-apply')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>申請加班
+        </button>
+        <button class="nav-item not" onclick="navigate('overtime-status')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>加班記錄
+        </button>
+        <div class="nav-sec-label ndoc-lbl">簽核</div>
+        <button class="nav-item ndoc" onclick="navigate('overtime-approve')" style="justify-content:space-between">
+            <span style="display:flex;align-items:center;gap:9px">
+                <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>待簽核申請
+            </span>
+            <span id="doc-pending-badge" class="hidden" style="background:var(--red);color:#fff;border-radius:999px;font-size:10px;font-weight:700;padding:1px 7px;min-width:18px;text-align:center"></span>
+        </button>
+        <div class="nav-sec-label nfull-lbl">報備</div>
+        <button class="nav-item nfull" onclick="navigate('support-report')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>報備支援
+        </button>
+    </div>
+    <div class="sidebar-footer">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div><span class="conn-dot" id="conn-dot"></span><span id="conn-label">未連線</span></div>
+            <span class="mode-chip" id="mode-chip">—</span>
+        </div>
+        <button class="btn-sidebar hidden" id="btn-settings" onclick="openSettings()">⚙ 系統設定</button>
+        <button class="btn-sidebar hidden" id="btn-logout" onclick="logoutAll()">↩ 登出</button>
+        <button class="btn-sidebar" onclick="showSetup()">⚙ 重新設定連線</button>
+    </div>
+</nav>
+
+<!-- ══ Main ══ -->
+<main class="main">
+
+    <!-- ── 本月總覽 ── -->
+    <div id="page-overview" class="page active">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <div><h2>本月總覽</h2><p id="overview-month-label">—</p></div>
+            <div id="overview-mode-btns" style="flex-shrink:0"></div>
+        </div>
+        <div class="page-content">
+            <div class="grid-4 section" id="overview-stats"></div>
+            <div id="overview-threshold" class="section"></div>
+            <div class="grid-2">
+                <div class="card"><div class="card-title">排行榜</div><div id="leaderboard"></div></div>
+                <div class="card"><div class="card-title">本月結算預覽</div><div id="settlement-preview"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 記錄點數 ── -->
+    <div id="page-record" class="page">
+        <div class="page-header"><h2>記錄點數</h2><p>選擇助理，再選取獎勵或違規事項</p></div>
+        <div class="rec-wrap">
+            <div class="rec-scroll">
+                <div class="section">
+                    <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:11px;">選擇助理</div>
+                    <div class="asst-picker" id="rec-asst-picker"></div>
+                </div>
+                <div class="section">
+                    <div class="mode-btns">
+                        <button class="mode-btn mode-btn-add" id="mode-btn-add" onclick="selectMode('add')">＋ 增加點數</button>
+                        <button class="mode-btn mode-btn-deduct" id="mode-btn-deduct" onclick="selectMode('deduct')">－ 扣減點數</button>
+                    </div>
+                    <div id="rec-rule-section" class="hidden">
+                        <div id="rec-rule-label" style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:11px;"></div>
+                        <div class="rule-list" id="rec-rule-list"></div>
+                        <div style="margin-top:14px;display:flex;gap:10px;align-items:center">
+                            <span style="font-size:12.5px;color:var(--text-muted);flex-shrink:0">自訂點數：</span>
+                            <input type="number" class="form-input" id="rec-custom-pts" placeholder="輸入數字" style="max-width:110px">
+                            <button class="btn btn-outline btn-sm" onclick="applyCustomPts()">套用</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" style="max-width:180px">
+                    <label class="form-label">日期</label>
+                    <input type="date" class="form-input" id="rec-date">
+                </div>
+            </div>
+            <div class="confirm-bar">
+                <div class="confirm-summary" id="rec-summary"><span class="cbar-empty">請選擇助理與事項</span></div>
+                <input type="text" class="form-input" id="rec-note" placeholder="備注（可選）">
+                <button class="btn btn-primary" id="rec-submit-btn" onclick="submitRecord()" disabled>確認送出</button>
+                <button class="btn btn-outline" onclick="clearRecord()">清除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 歷史紀錄 ── -->
+    <div id="page-history" class="page">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <div><h2>歷史紀錄</h2><p>最近六個月的點數記錄</p></div>
+            <button class="btn btn-outline btn-sm" onclick="exportToExcel('history')">↓ 匯出 Excel</button>
+        </div>
+        <div class="page-content">
+            <div class="month-tabs" id="history-month-tabs"></div>
+            <div class="filter-row">
+                <select class="form-select" id="history-asst-filter" onchange="renderHistory()"><option value="">所有助理</option></select>
+                <select class="form-select" id="history-type-filter" onchange="renderHistory()">
+                    <option value="">所有類型</option><option value="p">加分</option><option value="n">扣分</option>
+                </select>
+                <span id="history-count" style="color:var(--text-muted);font-size:12.5px;margin-left:auto;"></span>
+            </div>
+            <!-- 批次刪除列 -->
+            <div class="sel-bar" id="history-sel-bar">
+                <input type="checkbox" class="row-chk" id="history-chk-all" onchange="toggleAllHistory()">
+                <label for="history-chk-all" style="font-size:12.5px;font-weight:600;cursor:pointer">全選</label>
+                <span id="history-sel-count" style="font-size:12.5px;color:var(--accent);font-weight:600">已選 0 筆</span>
+                <button class="btn btn-danger btn-sm" onclick="deleteSelectedHistory()">刪除選取</button>
+                <button class="btn btn-outline btn-sm" onclick="clearHistorySelection()">取消</button>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th style="width:32px"></th><th>日期</th><th>助理</th><th>事項</th><th>點數</th><th>操作者</th><th>備注</th><th></th></tr></thead>
+                    <tbody id="history-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 月結算 ── -->
+    <div id="page-settlement" class="page">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <div><h2>月結算</h2><p>點數分配比例 · 季獎金指標</p></div>
+            <button class="btn btn-outline btn-sm" onclick="exportToExcel('settlement')">↓ 匯出 Excel</button>
+        </div>
+        <div class="page-content">
+            <div class="month-tabs" id="stl-month-tabs"></div>
+            <div id="stl-content"></div>
+        </div>
+    </div>
+
+    <!-- ── 助理管理 ── -->
+    <div id="page-assistants" class="page">
+        <div class="page-header"><h2>助理管理</h2><p>新增、編輯、停用助理，設定季獎金資格</p></div>
+        <div class="page-content">
+            <div id="asst-info-box" class="info-box"></div>
+            <div class="section">
+                <div class="sec-header">
+                    <div class="sec-title">助理列表</div>
+                    <button class="btn btn-primary btn-sm" onclick="openAddAssistant()">+ 新增助理</button>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>姓名</th><th>狀態</th><th>季獎金資格</th><th>本月點數</th><th>專屬密碼</th><th>加入日期</th><th>操作</th></tr></thead>
+                        <tbody id="assistants-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 助理個人頁面 ── -->
+    <div id="page-myview" class="page">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <div><h2 id="myview-title">我的點數</h2><p id="myview-month">—</p></div>
+            <div style="display:flex;gap:8px;align-items:center">
+                <button class="btn btn-success btn-sm hidden" id="btn-sign-settle" onclick="openSignatureModal()">✍ 本月簽名確認</button>
+                <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
+            </div>
+        </div>
+        <div class="page-content">
+            <div id="myview-content"></div>
+        </div>
+    </div>
+
+    <!-- ── 規定管理 ── -->
+    <div id="page-rules" class="page">
+        <div class="page-header"><h2>規定管理</h2><p>加扣分規定列表</p></div>
+        <div class="page-content">
+            <div class="section">
+                <div class="sec-header">
+                    <div class="sec-title">規定列表</div>
+                    <button class="btn btn-primary btn-sm" onclick="openAddRule()">+ 新增規定</button>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>規定名稱</th><th>點數</th><th>類別</th><th>說明</th><th>操作</th></tr></thead>
+                        <tbody id="rules-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 加班申請 ── -->
+    <div id="page-overtime-apply" class="page">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <div><h2>申請加班</h2><p>填寫加班申請單</p></div>
+            <button class="btn btn-outline btn-sm" onclick="navigate('overtime-status')">📋 加班記錄</button>
+        </div>
+        <div class="page-content">
+            <div class="section">
+                <div class="form-group"><label class="form-label">日期</label><input type="date" class="form-input" id="ot-date" style="max-width:180px"></div>
+            </div>
+            <div class="section">
+                <div class="form-label" style="margin-bottom:10px">當日班別（可複選）</div>
+                <div class="ot-shift-row" id="ot-worked-shifts"></div>
+            </div>
+            <div class="section" id="ot-overtime-section" style="display:none">
+                <div class="form-label" style="margin-bottom:10px">加班班次</div>
+                <div class="ot-shift-row" id="ot-ot-shift-btns"></div>
+                <div style="margin-top:14px">
+                    <div class="form-label">加班結束時間（24 小時制）</div>
+                    <div style="display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap">
+                        <select class="form-select" id="ot-end-hour" style="width:90px" onchange="updateOTCalc()"></select>
+                        <span style="font-weight:700">時</span>
+                        <select class="form-select" id="ot-end-min" style="width:90px" onchange="updateOTCalc()"></select>
+                        <span style="font-weight:700">分</span>
+                    </div>
+                </div>
+                <div id="ot-calc-result" class="ot-result hidden"></div>
+            </div>
+            <div class="section">
+                <div class="form-group">
+                    <label class="form-label">簽核醫師</label>
+                    <select class="form-select" id="ot-approver" style="max-width:200px"></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">備注（可選）</label>
+                    <input type="text" class="form-input" id="ot-note" placeholder="說明原因...">
+                </div>
+                <button class="btn btn-primary" onclick="submitOvertimeApply()">送出申請</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 加班記錄 ── -->
+    <div id="page-overtime-status" class="page">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <div><h2>加班記錄</h2><p>申請狀態及本月累計</p></div>
+            <button class="btn btn-outline btn-sm" onclick="navigate('overtime-apply')">+ 申請加班</button>
+        </div>
+        <div class="page-content">
+            <div id="ot-status-content"></div>
+        </div>
+    </div>
+
+    <!-- ── 報備支援 ── -->
+    <div id="page-support-report" class="page">
+        <div class="page-header">
+            <h2>報備支援</h2>
+            <p>填寫醫師報備支援登記號碼</p>
+        </div>
+        <div class="page-content">
+            <div class="info-box" style="margin-bottom:20px">
+                請至衛生福利部醫事管理系統完成報備：
+                <a href="https://euservice.mohw.gov.tw" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600;text-decoration:underline">euservice.mohw.gov.tw ↗</a>
+                <br>完成後將 12 位數登記號碼填入下方並儲存。
+            </div>
+            <div id="support-report-content"></div>
+            <div style="margin-top:20px">
+                <button class="btn btn-primary" onclick="saveSupportReport()">儲存登記號碼</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 加班簽核（醫師） ── -->
+    <div id="page-overtime-approve" class="page">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <div><h2 id="approve-title">加班簽核</h2><p id="approve-sub">待簽核申請列表</p></div>
+            <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
+        </div>
+        <div class="page-content">
+            <div id="ot-approve-content"></div>
+        </div>
+    </div>
+
+</main>
+
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mn-item active" onclick="navigate('overview')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      總覽
+    </button>
+    <button class="mn-item mn-nrec" onclick="navigate('record')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      記錄
+    </button>
+    <button class="mn-item mn-nfull" onclick="navigate('history')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+      歷史
+    </button>
+    <button class="mn-item mn-nfull" onclick="navigate('settlement')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+      結算
+    </button>
+    <button class="mn-item mn-nfull" onclick="navigate('assistants')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><line x1="16" y1="11" x2="22" y2="11"/><line x1="19" y1="8" x2="19" y2="14"/></svg>
+      助理
+    </button>
+    <button class="mn-item mn-nfull" onclick="navigate('rules')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+      規定
+    </button>
+    <button class="mn-item mn-nasst" onclick="navigate('myview')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      我的點數
+    </button>
+    <button class="mn-item mn-not" onclick="navigate('overtime-apply')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="7" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="14"/></svg>
+      申請
+    </button>
+    <button class="mn-item mn-not" onclick="navigate('overtime-status')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+      加班記錄
+    </button>
+    <button class="mn-item mn-ndoc" onclick="navigate('overtime-approve')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      簽核
+    </button>
+  </div>
+</nav>
+
+<!-- ══ Modal: 助理 ══ -->
+<div id="modal-assistant" class="modal-overlay hidden">
+    <div class="modal">
+        <div class="modal-hd"><div class="modal-title" id="modal-asst-title">新增助理</div><button class="modal-x" onclick="hideModal('modal-assistant')">×</button></div>
+        <div class="modal-body">
+            <input type="hidden" id="edit-asst-id">
+            <div class="form-group"><label class="form-label">姓名</label><input type="text" class="form-input" id="asst-name-input" placeholder="輸入姓名"></div>
+            <div class="form-group">
+                <label class="form-label">季獎金資格</label>
+                <select class="form-select" id="asst-bonus-input">
+                    <option value="1">正職（參與分配）</option>
+                    <option value="0">試用期 / 不參與分配</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-ft"><button class="btn btn-outline" onclick="hideModal('modal-assistant')">取消</button><button class="btn btn-primary" onclick="saveAssistant()">儲存</button></div>
+    </div>
+</div>
+
+<!-- ══ Modal: 規定 ══ -->
+<div id="modal-rule" class="modal-overlay hidden">
+    <div class="modal">
+        <div class="modal-hd"><div class="modal-title" id="modal-rule-title">新增規定</div><button class="modal-x" onclick="hideModal('modal-rule')">×</button></div>
+        <div class="modal-body">
+            <input type="hidden" id="edit-rule-id">
+            <div class="form-group"><label class="form-label">規定名稱</label><input type="text" class="form-input" id="rule-name-input" placeholder="例：客戶好評、遲到"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="form-group"><label class="form-label">點數（正加/負扣）</label><input type="number" class="form-input" id="rule-pts-input" placeholder="例：5 或 -3"></div>
+                <div class="form-group"><label class="form-label">類別</label>
+                    <select class="form-select" id="rule-cat-input">
+                        <option>個人能力</option><option>好評</option><option>業績</option>
+                        <option>能力</option><option>負評</option><option>感控</option><option>態度</option><option>其他</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group"><label class="form-label">說明（可選）</label><textarea class="form-textarea" id="rule-desc-input" placeholder="說明..."></textarea></div>
+        </div>
+        <div class="modal-ft"><button class="btn btn-outline" onclick="hideModal('modal-rule')">取消</button><button class="btn btn-primary" onclick="saveRule()">儲存</button></div>
+    </div>
+</div>
+
+<!-- ══ Modal: 確認 ══ -->
+<div id="modal-confirm" class="modal-overlay hidden">
+    <div class="modal">
+        <div class="modal-hd"><div class="modal-title">確認操作</div><button class="modal-x" onclick="hideModal('modal-confirm')">×</button></div>
+        <div class="modal-body"><p id="confirm-text" style="color:var(--text-secondary);font-size:13px;line-height:1.7"></p></div>
+        <div class="modal-ft"><button class="btn btn-outline" onclick="hideModal('modal-confirm')">取消</button><button class="btn btn-danger" id="confirm-btn">確認</button></div>
+    </div>
+</div>
+
+<!-- ══ Modal: 月結算執行 ══ -->
+<div id="modal-monthly" class="modal-overlay hidden">
+    <div class="modal">
+        <div class="modal-hd"><div class="modal-title" id="monthly-title">執行月結算</div><button class="modal-x" onclick="hideModal('modal-monthly')">×</button></div>
+        <div class="modal-body">
+            <div id="monthly-info-box" class="info-box" style="margin-bottom:12px"></div>
+            <div id="monthly-preview"></div>
+        </div>
+        <div class="modal-ft"><button class="btn btn-outline" onclick="hideModal('modal-monthly')">取消</button><button class="btn btn-primary" id="monthly-confirm-btn">確認執行</button></div>
+    </div>
+</div>
+
+<!-- ══ Modal: Seed ══ -->
+<div id="modal-seed" class="modal-overlay hidden">
+    <div class="modal">
+        <div class="modal-hd"><div class="modal-title">初始化預設資料</div><button class="modal-x" onclick="hideModal('modal-seed')">×</button></div>
+        <div class="modal-body">
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;line-height:1.7">偵測到工作區目前是空的。是否要初始化預設資料？將會新增以下內容：</p>
+            <div class="seed-list">
+                <strong>8 位正職助理（各+15起始點數）</strong><br>
+                丁毓珉、金孟漪、吳佩宣、謝云馨、陳薏璿、黃莉婷、盧蓓歆、林采霓<br><br>
+                <strong>獎勵規定（9 條）</strong><br>
+                X-guide操作 +3、單獨拍攝口內照 +2、配合排班 +3、個人好評 +5、當班好評 +3、業績成長 +5、全口重建&gt;2 +3、植牙&gt;5 +2、單日現掛&gt;2 +1<br><br>
+                <strong>違規規定（18 條）</strong><br>
+                器械少包 -2、器械少備 -1、設備損傷 -5、器械損傷 -3、不會操作設備 -3、工作不確實 -5、不教學 -10、負評 -5、手套感控 -4、指甲過長/手套破 -6、多請假 -3、與病人爭執 -10、上班吃東西 -3、隱匿違規 -15、上班用手機/去後陽台 -5、討論薪資 -15、忘記打卡 -5、業績退步 -5
+            </div>
+        </div>
+        <div class="modal-ft">
+            <button class="btn btn-outline" onclick="hideModal('modal-seed')">略過</button>
+            <button class="btn btn-primary" onclick="runSeed()">初始化</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ Modal: 系統設定 ══ -->
+<div id="modal-settings" class="modal-overlay hidden">
+    <div class="modal">
+        <div class="modal-hd"><div class="modal-title">系統設定</div><button class="modal-x" onclick="hideModal('modal-settings')">×</button></div>
+        <div class="modal-body">
+            <div class="form-label" style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:12px">季獎金門檻（每人點數係數）</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="form-group">
+                    <label class="form-label">目標係數（全體 &gt; 係數×人數 → +500）</label>
+                    <input type="number" class="form-input" id="setting-bonus-high" min="1" placeholder="預設 25">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">底線係數（全體 ≤ 係數×人數 → -500）</label>
+                    <input type="number" class="form-input" id="setting-bonus-low" min="1" placeholder="預設 7">
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="form-label" style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:12px">起始點數設定</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="form-group">
+                    <label class="form-label">正常起始點數（每月預設）</label>
+                    <input type="number" class="form-input" id="setting-starting-pts" min="1" placeholder="預設 15">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">低分起始點數（上月 &lt; 0 時）</label>
+                    <input type="number" class="form-input" id="setting-starting-pts-low" min="1" placeholder="預設 10">
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="form-label" style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:10px">管理者帳號</div>
+            <div id="mgr-list-ui" class="mgr-list"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <input type="text" class="form-input" id="new-mgr-input" placeholder="帳號名稱" style="flex:1;min-width:100px">
+                <input type="password" class="form-input" id="new-mgr-pw" placeholder="密碼" style="flex:1;min-width:100px">
+                <button class="btn btn-outline btn-sm" onclick="addManagerName()" style="flex-shrink:0">+ 新增</button>
+            </div>
+            <div class="divider"></div>
+            <div class="form-label" style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:10px">醫師帳號（加班系統）</div>
+            <div id="doc-list-ui" class="mgr-list"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <input type="text" class="form-input" id="new-doc-name" placeholder="醫師姓名" style="flex:1;min-width:100px">
+                <input type="password" class="form-input" id="new-doc-pw" placeholder="密碼" style="flex:1;min-width:100px">
+                <button class="btn btn-outline btn-sm" onclick="addDoctorAccount()" style="flex-shrink:0">+ 新增</button>
+            </div>
+            <div class="divider"></div>
+            <div class="form-label" style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:10px">班別設定（加班系統）</div>
+            <div id="shift-list-ui" class="mgr-list"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <input type="text" class="form-input" id="new-shift-name" placeholder="班別名稱（如早班）" style="flex:1;min-width:100px">
+                <input type="text" class="form-input" id="new-shift-segs" placeholder="如 09:00-12:30,14:00-18:00" style="flex:1;min-width:180px">
+                <button class="btn btn-outline btn-sm" onclick="addShiftConfig()" style="flex-shrink:0">+ 新增</button>
+            </div>
+            <div class="divider"></div>
+            <div class="form-label" style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:12px">院長密碼變更</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="form-group">
+                    <label class="form-label">新密碼</label>
+                    <input type="password" class="form-input" id="setting-new-pw" placeholder="留空不變更" autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">確認新密碼</label>
+                    <input type="password" class="form-input" id="setting-confirm-pw" placeholder="再次輸入" autocomplete="new-password">
+                </div>
+            </div>
+        </div>
+        <div class="modal-ft">
+            <button class="btn btn-outline" onclick="hideModal('modal-settings')">取消</button>
+            <button class="btn btn-primary" onclick="saveSettings()">儲存設定</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ Modal: 簽名確認 ══ -->
+<div id="modal-signature" class="modal-overlay hidden">
+    <div class="modal" style="max-width:420px">
+        <div class="modal-hd"><div class="modal-title">本月簽名確認</div><button class="modal-x" onclick="hideModal('modal-signature')">×</button></div>
+        <div class="modal-body">
+            <div class="info-box" style="margin-bottom:14px">簽名後代表確認本月點數記錄，將儲存至雲端。</div>
+            <div class="sig-canvas-wrap">
+                <canvas id="sig-canvas" width="376" height="160" style="width:100%;height:160px"></canvas>
+                <div class="sig-hint" id="sig-hint">請在此處簽名</div>
+            </div>
+        </div>
+        <div class="modal-ft">
+            <button class="btn btn-outline" onclick="clearSigPad('sig-canvas','sig-hint')">清除重簽</button>
+            <button class="btn btn-outline" onclick="hideModal('modal-signature')">取消</button>
+            <button class="btn btn-primary" onclick="saveSettlementSignature()">確認儲存</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ Modal: 加班簽核簽名 ══ -->
+<div id="modal-ot-signature" class="modal-overlay hidden">
+    <div class="modal" style="max-width:420px">
+        <div class="modal-hd"><div class="modal-title">加班簽核確認</div><button class="modal-x" onclick="hideModal('modal-ot-signature')">×</button></div>
+        <div class="modal-body">
+            <div id="ot-sig-record-info" style="background:var(--surface-alt);border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.8;margin-bottom:14px;color:var(--text-secondary)"></div>
+            <div class="sig-canvas-wrap">
+                <canvas id="ot-sig-canvas" width="376" height="160" style="width:100%;height:160px"></canvas>
+                <div class="sig-hint" id="ot-sig-hint">醫師請在此簽名</div>
+            </div>
+        </div>
+        <div class="modal-ft">
+            <button class="btn btn-outline" onclick="clearSigPad('ot-sig-canvas','ot-sig-hint')">清除重簽</button>
+            <button class="btn btn-outline" onclick="hideModal('modal-ot-signature')">取消</button>
+            <button class="btn btn-primary" onclick="confirmOTApproval()">確認簽核</button>
+        </div>
+    </div>
+</div>
+
+<div id="img-zoom" class="hidden" onclick="this.classList.add('hidden')">
+    <img id="img-zoom-src" src="" alt="放大檢視">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ================================================================
+// CONSTANTS & CONFIG
+// ================================================================
+const CFG_KEY = 'asst_pts_cfg_v3';
+const STARTING_PTS = 15;
+const STARTING_PTS_LOW = 10;
+const INDIVIDUAL_HIGH = 35;
+const INDIVIDUAL_ZERO = 0;
+
+let cfg = null, db = null, wsId = null;
+let state = { assistants: [], rules: [], transactions: [], overtime: [], signatures: {} };
+let loaded = { a: false, r: false, t: false, s: false };
+let appReady = false;
+let currentPage = 'overview';
+let recState = { assistantIds: [], mode: null, ruleIds: [], customPoints: null };
+let historyMonth = '';
+let stlMonth = '';
+
+// ── View mode & settings ──────────────────────────────────────────
+let viewMode = 'viewer'; // 'viewer' | 'principal' | 'manager' | 'doctor' | 'assistant'
+let currentOperator = '';
+let currentAssistantView = null;
+let currentDoctor = null; // {name, password} for doctor mode
+let settings = {
+    principalPassword: '0000', bonusHighFactor: 25, bonusLowFactor: 7,
+    managers: [], // [{name, password}]
+    startingPts: 15, startingPtsLow: 10,
+    doctors: [],
+    shifts: [
+        {id:'am', name:'早午班', segments:[{start:'09:00',end:'12:30'},{start:'14:00',end:'18:00'}]},
+        {id:'pm', name:'午晚班', segments:[{start:'13:30',end:'17:00'},{start:'18:00',end:'21:30'}]},
+        {id:'full', name:'全天班', segments:[{start:'09:00',end:'12:30'},{start:'14:00',end:'17:00'},{start:'18:00',end:'21:30'}]}
+    ],
+    doctorSupport: {} // { doctorName: '12-digit number' }
+};
+// ── Overtime state ────────────────────────────────────────────────
+let otState = { workedShifts: [], otSegKey: null }; // otSegKey = 'shiftId:segIdx'
+let currentOTId = null; // for doctor approval
+
+// ── OT multi-select & chart ───────────────────────────────────────
+let otSelected = new Set();
+let _otChart = null;
+const OT_PALETTE = ['#e76f51','#2a9d8f','#e9c46a','#f4a261','#a8dadc','#c77dff','#52b788','#f72585','#023e8a','#6d6875'];
+
+// ── History multi-select ──────────────────────────────────────────
+let historySelected = new Set();
+let _visibleTxnIds = []; // txn ids currently visible in history table
+
+// ── Settings draft ───────────────────────────────────────────────
+let _docDraft = [];   // doctor accounts draft
+let _shiftDraft = []; // shift config draft
+
+// ── Login screen tab state ───────────────────────────────────────
+let lsTab = 'asst'; // 'asst' | 'doctor' | 'admin'
+
+// ================================================================
+// SEED DATA
+// ================================================================
+const SEED_ASSISTANTS = ['丁毓珉','金孟漪','吳佩宣','謝云馨','陳薏璿','黃莉婷','盧蓓歆','林采霓'];
+
+const SEED_RULES = [
+    // 獎勵
+    { name:'X-guide 操作', points:3, category:'個人能力', desc:'完成 X-guide 導航植牙輔助操作' },
+    { name:'單獨拍攝標準口內照', points:2, category:'個人能力', desc:'' },
+    { name:'配合排班（櫃檯及跟診流動）', points:3, category:'個人能力', desc:'能配合不同班別排班' },
+    { name:'助理個人好評', points:5, category:'好評', desc:'指名道姓的客戶好評' },
+    { name:'助理好評（當班全體）', points:3, category:'好評', desc:'未指名，當班全體+3；請勿推銷' },
+    { name:'總業績成長（全體）', points:5, category:'業績', desc:'' },
+    { name:'單月全口重建 > 2 人（全體）', points:3, category:'業績', desc:'' },
+    { name:'單月植牙 > 5 人（全體）', points:2, category:'業績', desc:'達成後+1次' },
+    { name:'單日現掛 > 2 人（該班全體）', points:1, category:'業績', desc:'' },
+    // 違規
+    { name:'器械少包（前一班流動）', points:-2, category:'能力', desc:'' },
+    { name:'器械少備（單獨）', points:-1, category:'能力', desc:'臨時要的不算' },
+    { name:'設備損傷', points:-5, category:'能力', desc:'' },
+    { name:'器械損傷', points:-3, category:'能力', desc:'正常損耗不在此限' },
+    { name:'不會操作設備', points:-3, category:'能力', desc:'' },
+    { name:'工作不確實', points:-5, category:'能力', desc:'例：沒關冷氣、沒洗衣服、空壓機沒開關。該班/全體' },
+    { name:'不教學', points:-10, category:'能力', desc:'' },
+    { name:'< 4 星負評（當日全體）', points:-5, category:'負評', desc:'' },
+    { name:'手套感控違規', points:-4, category:'感控', desc:'手套摸診療椅及貼膠膜以外的範圍；滑鼠一律反戴手套' },
+    { name:'指甲過長或手套破', points:-6, category:'感控', desc:'' },
+    { name:'多請假', points:-3, category:'態度', desc:'' },
+    { name:'與病人起爭執', points:-10, category:'態度', desc:'' },
+    { name:'上班時間吃東西', points:-3, category:'態度', desc:'' },
+    { name:'隱匿違規', points:-15, category:'態度', desc:'' },
+    { name:'上班使用手機或去後陽台', points:-5, category:'態度', desc:'' },
+    { name:'討論薪資', points:-15, category:'態度', desc:'' },
+    { name:'忘記打卡', points:-5, category:'態度', desc:'' },
+    { name:'業績退步（全體）', points:-5, category:'業績', desc:'' },
+];
+
+const SEED_DOCTORS = ['黃敏琪','陳宥宇','張詠竣','王泓仁','陳啓榮','沈換喬','吳佳澤'];
+
+// ================================================================
+// FIREBASE INIT
+// ================================================================
+function init() {
+    // Apply viewer mode immediately so admin nav items are hidden by default
+    document.body.classList.add('viewer-mode');
+    const saved = localStorage.getItem(CFG_KEY);
+    if (saved) {
+        try { cfg = JSON.parse(saved); hideSetup(); showLoading(); doConnect(); }
+        catch { showSetup(); }
+    } else { showSetup(); }
+}
+
+function parseConfig(raw) {
+    let s = raw.trim();
+    // 移除 const firebaseConfig = { ... }; 外殼
+    s = s.replace(/\/\/[^\n]*/g, '');           // 刪除 // 註解
+    s = s.replace(/const\s+\w+\s*=\s*/g, '');  // 刪除 const xxx =
+    s = s.replace(/;\s*$/, '').trim();           // 刪除結尾分號
+    // 確保有大括號包裹
+    if (!s.startsWith('{')) s = '{' + s + '}';
+    // 1. 直接試 JSON.parse
+    try { return JSON.parse(s); } catch {}
+    // 2. 用 Function 執行 JS 物件字面量（最相容 Firebase 格式）
+    try { return Function('return (' + s + ')')(); } catch {}
+    return null;
+}
+
+function connectFirebase() {
+    const raw = document.getElementById('setup-config-input').value.trim();
+    const wsInput = document.getElementById('setup-ws-input').value.trim();
+    if (!raw || !wsInput) { setupErr('請填寫 Firebase 設定和工作區 ID'); return; }
+    const parsed = parseConfig(raw);
+    if (!parsed || !parsed.apiKey || !parsed.projectId) {
+        setupErr('格式有誤或設定不完整。請確認有包含 apiKey 和 projectId。');
+        return;
+    }
+    cfg = { firebaseConfig: parsed, workspaceId: wsInput };
+    localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+    hideSetup(); showLoading(); doConnect();
+}
+
+function doConnect() {
+    try {
+        if (!firebase.apps.length) firebase.initializeApp(cfg.firebaseConfig);
+        db   = firebase.firestore();
+        wsId = cfg.workspaceId;
+        document.getElementById('ws-label').textContent = wsId;
+        db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+        subscribeData();
+        setConn('connecting', '連線中…');
+    } catch (e) { hideLoading(); showSetup('初始化失敗：' + e.message); }
+}
+
+function col(n) { return `workspaces/${wsId}/${n}`; }
+
+function subscribeData() {
+    const sixAgo = new Date(); sixAgo.setMonth(sixAgo.getMonth()-6);
+    const sixAgoStr = `${sixAgo.getFullYear()}-${String(sixAgo.getMonth()+1).padStart(2,'0')}-01`;
+
+    db.collection(col('assistants')).orderBy('createdAt')
+      .onSnapshot(snap => { state.assistants = snap.docs.map(d=>({id:d.id,...d.data()})); loaded.a=true; tryReady(); },
+        e => { console.error(e); setConn('error','連線錯誤'); });
+
+    db.collection(col('rules')).orderBy('createdAt')
+      .onSnapshot(snap => { state.rules = snap.docs.map(d=>({id:d.id,...d.data()})); loaded.r=true; tryReady(); },
+        e => { console.error(e); setConn('error','連線錯誤'); });
+
+    db.collection(col('transactions')).where('date','>=',sixAgoStr).orderBy('date','desc')
+      .onSnapshot(snap => {
+          state.transactions = snap.docs.map(d=>({id:d.id,...d.data()}));
+          loaded.t=true; setConn('online','已同步'); tryReady();
+      }, e => { console.error(e); setConn('error','連線錯誤'); });
+
+    // Settings
+    db.collection(col('settings')).doc('main')
+      .onSnapshot(snap => {
+          if (snap.exists) {
+              const d = snap.data();
+              if (d.bonusHighFactor !== undefined) settings.bonusHighFactor = d.bonusHighFactor;
+              if (d.bonusLowFactor  !== undefined) settings.bonusLowFactor  = d.bonusLowFactor;
+              if (d.startingPts     !== undefined) settings.startingPts     = d.startingPts;
+              if (d.startingPtsLow  !== undefined) settings.startingPtsLow  = d.startingPtsLow;
+              if (d.doctors         !== undefined) settings.doctors         = d.doctors;
+              if (d.doctorSupport   !== undefined) settings.doctorSupport   = d.doctorSupport;
+              // Shifts: only load if new segment format
+              if (d.shifts?.length && d.shifts[0].segments) settings.shifts = d.shifts;
+              // principalPassword: prefer new field, fall back to old adminPassword
+              if (d.principalPassword !== undefined) settings.principalPassword = d.principalPassword;
+              else if (d.adminPassword !== undefined) settings.principalPassword = d.adminPassword;
+              // Managers: migrate string[] to object[] format
+              if (d.managers !== undefined) {
+                  if (Array.isArray(d.managers) && d.managers.length && typeof d.managers[0] === 'string') {
+                      const pw = d.adminPassword || settings.principalPassword || '0000';
+                      settings.managers = d.managers.filter(n=>n!=='院長').map(n=>({name:n, password:pw}));
+                  } else if (Array.isArray(d.managers)) {
+                      settings.managers = d.managers;
+                  }
+              }
+          }
+          loaded.s = true; tryReady();
+      }, () => { loaded.s = true; tryReady(); });
+
+    // Overtime records
+    db.collection(col('overtime')).orderBy('date','desc').limit(200)
+      .onSnapshot(snap => {
+          state.overtime = snap.docs.map(d=>({id:d.id,...d.data()}));
+          if (currentPage==='overtime-apply'||currentPage==='overtime-status'||currentPage==='overtime-approve') refreshPage();
+          updateDocBadge();
+      }, e => console.error('overtime', e));
+
+    // Signatures
+    db.collection(col('signatures'))
+      .onSnapshot(snap => {
+          state.signatures = {};
+          snap.docs.forEach(d => { state.signatures[d.id] = d.data(); });
+          if (currentPage==='myview') refreshPage();
+      }, e => console.error('signatures', e));
+}
+
+function tryReady() {
+    if (loaded.a && loaded.r && loaded.t && loaded.s) {
+        hideLoading();
+        applyViewMode();
+        if (!appReady) {
+            appReady = true;
+            autoGenerateMissingPins();
+            navigate('overview');
+            showLoginScreen();
+        } else {
+            refreshPage();
+        }
+    }
+}
+
+async function autoGenerateMissingPins() {
+    const needPin = state.assistants.filter(a => !a.pin);
+    if (!needPin.length) return;
+    const batch = db.batch();
+    needPin.forEach(a => batch.update(db.collection(col('assistants')).doc(a.id), { pin: generatePin() }));
+    try { await batch.commit(); } catch(e) { console.error('autoPin', e); }
+}
+
+// ================================================================
+// CRUD
+// ================================================================
+function addDoc(c, data) { return db.collection(col(c)).add({...data, createdAt:new Date().toISOString()}); }
+function updDoc(c, id, data) { return db.collection(col(c)).doc(id).update(data); }
+async function delDoc(c, id) { await db.collection(col(c)).doc(id).delete(); }
+async function delAssistantCascade(id) {
+    await delDoc('assistants', id);
+    const snap = await db.collection(col('transactions')).where('assistantId','==',id).get();
+    if (!snap.empty) { const b=db.batch(); snap.docs.forEach(d=>b.delete(d.ref)); await b.commit(); }
+}
+
+// ================================================================
+// SEED
+// ================================================================
+async function runSeed() {
+    hideModal('modal-seed');
+    showLoading();
+    const todayStr = today();
+    const batch1 = db.batch();
+    const aRefs = [];
+
+    for (const name of SEED_ASSISTANTS) {
+        const ref = db.collection(col('assistants')).doc();
+        batch1.set(ref, { name, active:true, bonusEligible:true, pin:generatePin(), createdAt:new Date().toISOString() });
+        aRefs.push({ ref, name });
+    }
+    await batch1.commit();
+
+    // Starting transactions +15
+    const batch2 = db.batch();
+    const snap = await db.collection(col('assistants')).get();
+    snap.docs.forEach(d => {
+        const tref = db.collection(col('transactions')).doc();
+        batch2.set(tref, { assistantId:d.id, ruleId:null, points:settings.startingPts, date:todayStr, note:'月初起始點數', createdAt:new Date().toISOString() });
+    });
+    await batch2.commit();
+
+    // Rules
+    let rulesWritten = 0;
+    for (const r of SEED_RULES) {
+        await addDoc('rules', r);
+        rulesWritten++;
+    }
+
+    hideLoading();
+    toast(`已初始化：${SEED_ASSISTANTS.length} 位助理 + ${rulesWritten} 條規定`);
+
+    // Seed doctors into settings
+    const seedDoctors = SEED_DOCTORS.map(name=>({name, password: String(10000+Math.floor(Math.random()*90000))}));
+    const seedShifts = settings.shifts; // use current default shifts
+    try {
+        await db.collection(col('settings')).doc('main').set({
+            principalPassword: '0000', managers: [],
+            doctors: seedDoctors, shifts: seedShifts,
+            bonusHighFactor: settings.bonusHighFactor, bonusLowFactor: settings.bonusLowFactor,
+            startingPts: settings.startingPts, startingPtsLow: settings.startingPtsLow
+        }, {merge: true});
+    } catch(e) { console.warn('seed settings failed', e); }
+}
+
+// ================================================================
+// UTILS
+// ================================================================
+function uid() { return '_'+Math.random().toString(36).slice(2,9); }
+function generatePin() { return String(Math.floor(1000 + Math.random() * 9000)); }
+
+// Donut SVG — pct: 0-100+, returns SVG string
+function donutSVG(pct, size=110) {
+    const r=38, cx=size/2, cy=size/2, circ=2*Math.PI*r;
+    const filled = Math.min(1, Math.max(0, pct/100)) * circ;
+    const c = pct < 30 ? 'var(--red)' : pct < 70 ? 'var(--gold)' : pct < 100 ? 'var(--accent)' : 'var(--green)';
+    const label = pct > 999 ? '>999' : Math.round(pct)+'%';
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--border)" stroke-width="11"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${c}" stroke-width="11"
+            stroke-dasharray="${filled} ${circ}" stroke-linecap="round"
+            transform="rotate(-90 ${cx} ${cy})" style="transition:stroke-dasharray .6s,stroke .4s"/>
+        <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central"
+            font-size="${pct>=100?13:15}" font-weight="700" fill="${c}" font-family="-apple-system,sans-serif">${label}</text>
+    </svg>`;
+}
+
+function today() { return new Date().toISOString().split('T')[0]; }
+function currentMonth() { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+function nextMonthStr() { const d=new Date(); d.setMonth(d.getMonth()+1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+function last6Months() {
+    const arr=[]; const d=new Date();
+    for(let i=0;i<6;i++){ arr.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`); d.setMonth(d.getMonth()-1); }
+    return arr;
+}
+function monthLabel(ym) { const [y,m]=ym.split('-'); return `${y}年${parseInt(m)}月`; }
+function txnMonth(t) { return t.date.slice(0,7); }
+function fmtDate(s) { const d=new Date(s); return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`; }
+function fmtTimestamp(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function findA(id) { return state.assistants.find(a=>a.id===id); }
+function findR(id) { return state.rules.find(r=>r.id===id); }
+function initials(name) { return name?name.slice(0,1):'?'; }
+
+function monthlyPoints(month) {
+    const pts={};
+    state.assistants.forEach(a=>pts[a.id]=0);
+    state.transactions.filter(t=>txnMonth(t)===month)
+        .forEach(t=>{if(pts[t.assistantId]!==undefined) pts[t.assistantId]+=t.points;});
+    return pts;
+}
+
+function calcSettlement(month) {
+    const pts = monthlyPoints(month);
+    const allActive = state.assistants.filter(a=>a.active);
+    const eligible  = allActive.filter(a=>a.bonusEligible!==false);
+    const n = allActive.length;
+    const totalAll  = allActive.reduce((s,a)=>s+(pts[a.id]||0), 0);
+    const eligiblePosTotal = eligible.reduce((s,a)=>s+Math.max(0, pts[a.id]||0), 0);
+
+    const highThr = settings.bonusHighFactor * n;
+    const lowThr  = settings.bonusLowFactor  * n;
+
+    const items = allActive.map(a => {
+        const p = pts[a.id]||0;
+        const isEligible = a.bonusEligible!==false;
+        const pct = isEligible && eligiblePosTotal>0 ? Math.max(0,p)/eligiblePosTotal*100 : 0;
+        return { id:a.id, name:a.name, points:p, pct, isEligible };
+    }).sort((a,b)=>b.points-a.points);
+
+    const bonusStatus = totalAll >= highThr ? 'bonus' : totalAll <= lowThr ? 'penalty' : 'normal';
+
+    return { items, totalAll, eligiblePosTotal, n, highThr, lowThr, bonusStatus };
+}
+
+// ================================================================
+// EXCEL EXPORT
+// ================================================================
+function exportToExcel(source) {
+    if (typeof XLSX === 'undefined') { toast('Excel 模組載入中，請稍後再試'); return; }
+    const wb = XLSX.utils.book_new();
+    if (source === 'history') {
+        const m = historyMonth || currentMonth();
+        const txns = state.transactions.filter(t=>txnMonth(t)===m)
+            .sort((a,b)=>new Date(b.date)-new Date(a.date));
+        const data = txns.map(t=>{
+            const a=findA(t.assistantId); const r=t.ruleId?findR(t.ruleId):null;
+            return {'日期':t.date,'助理':a?.name||'—','事項':r?.name||t.note||'自訂','點數':t.points,'操作者':t.operator||'','備注':t.note||''};
+        });
+        const ws = XLSX.utils.json_to_sheet(data.length ? data : [{'日期':'','助理':'','事項':'','點數':'','操作者':'','備注':''}]);
+        XLSX.utils.book_append_sheet(wb, ws, '歷史記錄');
+        XLSX.writeFile(wb, `助理點數記錄_${m}.xlsx`);
+    } else if (source === 'settlement') {
+        const m = stlMonth || currentMonth();
+        const s = calcSettlement(m);
+        const data = s.items.map((item,i)=>({'排名':i+1,'助理':item.name,'點數':item.points,'分配比例':item.isEligible?item.pct.toFixed(1)+'%':'—','資格':item.isEligible?'正職':'試用'}));
+        const ws = XLSX.utils.json_to_sheet(data);
+        XLSX.utils.book_append_sheet(wb, ws, '月結算');
+        XLSX.writeFile(wb, `助理結算_${m}.xlsx`);
+    } else if (source === 'overtime') {
+        const records = source === 'overtime' ? state.overtime : [];
+        const data = records.map(r=>({'日期':r.date,'助理':r.assistantName,'班別':r.otShiftName,'加班分鐘':r.overtimeMinutes,'簽核醫師':r.approverName,'狀態':r.status==='approved'?'已簽核':'待簽核'}));
+        const ws = XLSX.utils.json_to_sheet(data);
+        XLSX.utils.book_append_sheet(wb, ws, '加班記錄');
+        XLSX.writeFile(wb, `加班記錄_${currentMonth()}.xlsx`);
+    }
+}
+
+// ================================================================
+// MULTI-SELECT HISTORY DELETE
+// ================================================================
+function toggleHistoryRow(id, chk) {
+    if (chk.checked) historySelected.add(id);
+    else historySelected.delete(id);
+    updateHistorySelBar();
+}
+
+function toggleAllHistory() {
+    const allChk = document.getElementById('history-chk-all');
+    _visibleTxnIds.forEach(id => {
+        if (allChk.checked) historySelected.add(id);
+        else historySelected.delete(id);
+    });
+    // sync individual checkboxes
+    document.querySelectorAll('.row-chk[data-id]').forEach(c=>{
+        c.checked = historySelected.has(c.dataset.id);
+    });
+    updateHistorySelBar();
+}
+
+function updateHistorySelBar() {
+    const bar = document.getElementById('history-sel-bar');
+    const count = historySelected.size;
+    bar?.classList.toggle('show', count > 0 || document.getElementById('history-chk-all')?.checked);
+    const el = document.getElementById('history-sel-count');
+    if (el) el.textContent = `已選 ${count} 筆`;
+    const allChk = document.getElementById('history-chk-all');
+    if (allChk) allChk.checked = _visibleTxnIds.length > 0 && _visibleTxnIds.every(id=>historySelected.has(id));
+}
+
+function clearHistorySelection() {
+    historySelected.clear();
+    document.querySelectorAll('.row-chk').forEach(c=>c.checked=false);
+    document.getElementById('history-sel-bar')?.classList.remove('show');
+}
+
+function deleteSelectedHistory() {
+    const ids = [...historySelected];
+    if (!ids.length) { toast('請先選取記錄'); return; }
+    confirm2(`確定要刪除選取的 ${ids.length} 筆記錄嗎？此操作無法復原。`, async () => {
+        const batch = db.batch();
+        ids.forEach(id => batch.delete(db.collection(col('transactions')).doc(id)));
+        try { await batch.commit(); clearHistorySelection(); toast(`已刪除 ${ids.length} 筆記錄`); }
+        catch(e) { toast('刪除失敗：'+e.message); }
+    });
+}
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+const FULL_PAGES = ['history','settlement','assistants','rules'];
+const REC_PAGES  = ['record'];
+const DOC_PAGES  = ['overtime-approve'];
+const ASST_PAGES = ['myview','overtime-apply','overtime-status'];
+
+function navigate(p) {
+    if (viewMode === 'viewer' && p !== 'overview') { showLoginScreen(); return; }
+    if (viewMode === 'manager'   && !['overview','record'].includes(p)) return;
+    if (viewMode === 'doctor'    && !['overview','record','overtime-approve'].includes(p)) return;
+    if (viewMode === 'assistant' && !['overview','myview','overtime-apply','overtime-status'].includes(p)) return;
+    // principal can go anywhere
+    const el = document.getElementById('page-'+p);
+    if (!el) return;
+    document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(el=>{ if(el.getAttribute('onclick')?.includes("'"+p+"'")) el.classList.add('active'); });
+    document.querySelectorAll('.mn-item').forEach(el=>{ el.classList.toggle('active', el.getAttribute('onclick')?.includes("'"+p+"'")); });
+    currentPage=p; renderPage(p);
+}
+function renderPage(p) {
+    ({overview:renderOverview,record:renderRecord,history:renderHistory,
+      settlement:renderSettlementPage,assistants:renderAssistants,rules:renderRules,
+      myview:renderMyView,'overtime-apply':renderOvertimeApply,
+      'overtime-status':renderOvertimeStatus,'overtime-approve':renderOvertimeApprove,
+      'support-report':renderSupportReport})[p]?.();
+}
+function refreshPage() { renderPage(currentPage); }
+
+// ================================================================
+// OVERVIEW
+// ================================================================
+function renderOverview() {
+    const m = currentMonth();
+    document.getElementById('overview-month-label').textContent = monthLabel(m);
+    // Mode button in header (useful on mobile)
+    const modeDiv = document.getElementById('overview-mode-btns');
+    if (modeDiv) {
+        modeDiv.innerHTML = viewMode === 'viewer'
+            ? '<button class="btn btn-outline btn-sm" onclick="showLoginScreen()">🔒 登入</button>'
+            : '<button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>';
+    }
+    const s = calcSettlement(m);
+    const txns = state.transactions.filter(t=>txnMonth(t)===m);
+    const plus  = txns.filter(t=>t.points>0).reduce((x,t)=>x+t.points,0);
+    const minus = txns.filter(t=>t.points<0).reduce((x,t)=>x+t.points,0);
+
+    document.getElementById('overview-stats').innerHTML = `
+        <div class="stat-card"><div class="lb">助理人數</div><div class="val">${state.assistants.filter(a=>a.active).length}</div><div class="sub">啟用中</div></div>
+        <div class="stat-card"><div class="lb">本月記錄</div><div class="val">${txns.length}</div><div class="sub">筆</div></div>
+        <div class="stat-card"><div class="lb">加分合計</div><div class="val" style="color:var(--green)">+${plus}</div><div class="sub">點</div></div>
+        <div class="stat-card"><div class="lb">扣分合計</div><div class="val" style="color:var(--red)">${minus}</div><div class="sub">點</div></div>
+    `;
+
+    // Threshold indicator
+    const tc = s.bonusStatus==='bonus' ? 'tc-bonus' : s.bonusStatus==='penalty' ? 'tc-penalty' : 'tc-normal';
+    const tMsg = s.bonusStatus==='bonus'
+        ? `🎉 達標！全體點數 ${s.totalAll} > ${s.highThr}（${settings.bonusHighFactor}×${s.n}），本月季獎金 +500`
+        : s.bonusStatus==='penalty'
+        ? `⚠️ 未達底線！全體點數 ${s.totalAll} ≤ ${s.lowThr}（${settings.bonusLowFactor}×${s.n}），本月季獎金 -500`
+        : `目前總點數 ${s.totalAll}｜目標 >${s.highThr}（${settings.bonusHighFactor}×${s.n}，季獎金+500）｜底線 ≤${s.lowThr}（${settings.bonusLowFactor}×${s.n}，季獎金-500）`;
+    const pct = s.highThr > 0 ? s.totalAll/s.highThr*100 : 0;
+    document.getElementById('overview-threshold').innerHTML = `
+        <div class="threshold-card ${tc}">
+            <div class="tc-title">季獎金指標 — ${monthLabel(m)}</div>
+            <div class="donut-wrap">
+                ${donutSVG(pct)}
+                <div class="donut-info">
+                    <div class="tc-desc" style="margin-bottom:8px">${tMsg}</div>
+                    <div class="donut-info-row">還需 <strong>${Math.max(0, s.highThr-s.totalAll)}</strong> 點達標</div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Leaderboard
+    const lb = document.getElementById('leaderboard');
+    lb.innerHTML = !s.items.length ? '<div class="empty-state"><p>尚無助理</p></div>'
+        : s.items.map((item,i) => {
+            const rc = i===0?'rn1':i===1?'rn2':i===2?'rn3':'rnn';
+            const bc = i===0?'var(--gold)':i===1?'#aaa':i===2?'var(--red)':'var(--accent)';
+            const flag = item.points >= INDIVIDUAL_HIGH ? '<span class="flag-pill fp-good">優良</span>' : item.points < INDIVIDUAL_ZERO ? '<span class="flag-pill fp-bad">警告</span>' : '';
+            return `<div class="lb-item">
+                <div class="rn ${rc}">${i+1}</div>
+                <div class="lb-info">
+                    <div class="lb-name">${item.name}${flag}<span class="flag-pill ${item.isEligible?'fp-good':'fp-prob'}">${item.isEligible?'正職':'試用'}</span></div>
+                    <div class="lb-bar"><div class="prog-wrap" style="width:130px"><div class="prog-fill" style="width:${item.pct}%;background:${bc}"></div></div></div>
+                </div>
+                <div class="lb-pts ${item.points>=0?'pp':'pn'}">${item.points>=0?'+':''}${item.points}</div>
+            </div>`;
+        }).join('');
+
+    // Settlement preview
+    const sp = document.getElementById('settlement-preview');
+    sp.innerHTML = s.eligiblePosTotal===0
+        ? '<div class="empty-state"><p>本月尚無點數記錄</p></div>'
+        : s.items.filter(i=>i.isEligible).map(item=>`
+            <div class="stl-row">
+                <div class="stl-name">${item.name}</div>
+                <div class="stl-prog"><div class="prog-wrap"><div class="prog-fill" style="width:${item.pct}%"></div></div></div>
+                <div class="stl-pct">${item.pct.toFixed(1)}%</div>
+                <div class="stl-pts">${item.points}pt</div>
+            </div>`).join('');
+}
+
+// ================================================================
+// RECORD PAGE
+// ================================================================
+function renderRecord() {
+    // 助理選取
+    const active = state.assistants.filter(a=>a.active);
+    document.getElementById('rec-asst-picker').innerHTML = !active.length
+        ? '<div class="empty-state" style="padding:10px 0"><p>尚無助理</p></div>'
+        : active.map(a=>`
+            <div class="asst-card ${recState.assistantIds.includes(a.id)?'sel':''}" onclick="selectAssistant('${a.id}')">
+                <div class="asst-avatar">${initials(a.name)}</div>
+                <div class="asst-card-name">${a.name}</div>
+            </div>`).join('');
+
+    // 模式按鈕
+    document.getElementById('mode-btn-add').className    = 'mode-btn mode-btn-add'    + (recState.mode==='add'   ? ' sel' : '');
+    document.getElementById('mode-btn-deduct').className = 'mode-btn mode-btn-deduct' + (recState.mode==='deduct' ? ' sel' : '');
+
+    // 規定列表
+    const sec = document.getElementById('rec-rule-section');
+    if (!recState.mode) {
+        sec.classList.add('hidden');
+    } else {
+        sec.classList.remove('hidden');
+        const isAdd = recState.mode === 'add';
+        const rules = state.rules.filter(r => isAdd ? r.points > 0 : r.points < 0);
+        const type  = isAdd ? 'r' : 'v';
+        document.getElementById('rec-rule-label').textContent = isAdd ? '選擇獎勵事項（可多選）' : '選擇違規事項（可多選）';
+        document.getElementById('rec-rule-list').innerHTML = rules.length
+            ? rules.map(r => {
+                const sel = recState.ruleIds.includes(r.id) ? (isAdd?'sel-r':'sel-v') : '';
+                return `<div class="rule-card ${sel}" onclick="selectRule('${r.id}')">
+                    <span class="rule-card-name">${r.name}</span>
+                    <span class="badge ${isAdd?'bg':'br'}">${r.points>0?'+':''}${r.points}</span>
+                </div>`;
+              }).join('')
+            : `<div style="color:var(--text-muted);font-size:12.5px">尚無${isAdd?'獎勵':'違規'}規定</div>`;
+    }
+
+    if (!document.getElementById('rec-date').value) document.getElementById('rec-date').value = today();
+    updateConfirmBar();
+}
+
+function selectAssistant(id) {
+    const idx = recState.assistantIds.indexOf(id);
+    if (idx >= 0) recState.assistantIds.splice(idx, 1);
+    else recState.assistantIds.push(id);
+    renderRecord();
+}
+function selectMode(mode) {
+    recState.mode = recState.mode === mode ? null : mode;
+    recState.ruleIds = [];
+    recState.customPoints = null;
+    document.getElementById('rec-custom-pts').value = '';
+    renderRecord();
+}
+function selectRule(id) {
+    const idx = recState.ruleIds.indexOf(id);
+    if (idx >= 0) {
+        recState.ruleIds.splice(idx, 1);
+    } else {
+        recState.ruleIds.push(id);
+        recState.customPoints = null;
+        document.getElementById('rec-custom-pts').value = '';
+    }
+    renderRecord();
+}
+function applyCustomPts() {
+    const v = parseInt(document.getElementById('rec-custom-pts').value);
+    if (isNaN(v)) { toast('請輸入有效數字'); return; }
+    recState.ruleIds = [];
+    recState.customPoints = v;
+    renderRecord();
+}
+function updateConfirmBar() {
+    const aCount = recState.assistantIds.length;
+    const rCount = recState.ruleIds.length;
+    const hasItems = rCount > 0 || recState.customPoints !== null;
+    const s = document.getElementById('rec-summary');
+    document.getElementById('rec-submit-btn').disabled = !(aCount > 0 && hasItems);
+
+    if (!aCount && !hasItems) { s.innerHTML = '<span class="cbar-empty">請選擇助理與事項</span>'; return; }
+    if (!aCount) { s.innerHTML = '<span class="cbar-empty">請選擇助理</span>'; return; }
+    if (!hasItems) {
+        const names = aCount <= 2 ? recState.assistantIds.map(id=>findA(id)?.name||'').join('、') : `${aCount} 位助理`;
+        s.innerHTML = `<span class="cs-name">${names}</span><span class="cbar-empty" style="margin-left:6px">請選擇事項</span>`;
+        return;
+    }
+    const aNames = aCount === 1 ? findA(recState.assistantIds[0])?.name
+        : aCount === 2 ? recState.assistantIds.map(id=>findA(id)?.name).join('、')
+        : `${aCount} 位助理`;
+    let itemDesc, totalPts;
+    if (recState.customPoints !== null) {
+        itemDesc = '自訂';
+        totalPts = recState.customPoints;
+    } else {
+        totalPts = recState.ruleIds.reduce((sum, id) => sum + (findR(id)?.points || 0), 0);
+        itemDesc = rCount === 1 ? findR(recState.ruleIds[0])?.name : `${rCount} 項`;
+    }
+    const totalTxns = aCount * (recState.customPoints !== null ? 1 : rCount);
+    const pHtml = `<span class="${totalPts >= 0 ? 'pp' : 'pn'}">${totalPts > 0 ? '+' : ''}${totalPts} 點/人</span>`;
+    const txnNote = totalTxns > 1 ? `<span style="color:var(--text-muted);font-size:12.5px;margin-left:6px">→ ${totalTxns} 筆</span>` : '';
+    s.innerHTML = `<span class="cs-name">${aNames}</span><span class="cs-rule">・${itemDesc}</span>${pHtml}${txnNote}`;
+}
+async function submitRecord() {
+    if (!recState.assistantIds.length) { toast('請選擇助理'); return; }
+    const hasItems = recState.ruleIds.length > 0 || recState.customPoints !== null;
+    if (!hasItems) { toast('請選擇事項'); return; }
+    const date = document.getElementById('rec-date').value || today();
+    const note = document.getElementById('rec-note').value.trim();
+    document.getElementById('rec-submit-btn').disabled = true;
+    try {
+        const batch = db.batch();
+        for (const aId of recState.assistantIds) {
+            if (recState.customPoints !== null) {
+                const ref = db.collection(col('transactions')).doc();
+                batch.set(ref, { assistantId: aId, ruleId: null, points: recState.customPoints, date, note, operator: currentOperator || '', createdAt: new Date().toISOString() });
+            } else {
+                for (const rId of recState.ruleIds) {
+                    const r = findR(rId);
+                    const ref = db.collection(col('transactions')).doc();
+                    batch.set(ref, { assistantId: aId, ruleId: rId, points: r.points, date, note, operator: currentOperator || '', createdAt: new Date().toISOString() });
+                }
+            }
+        }
+        await batch.commit();
+        const aCount = recState.assistantIds.length;
+        const rCount = recState.customPoints !== null ? 1 : recState.ruleIds.length;
+        toast(`已記錄 ${aCount * rCount} 筆（${aCount} 位助理 × ${rCount} 項）`);
+        clearRecord();
+    } catch(e) { toast('儲存失敗：' + e.message); document.getElementById('rec-submit-btn').disabled = false; }
+}
+function clearRecord() {
+    recState = { assistantIds: [], mode: null, ruleIds: [], customPoints: null };
+    document.getElementById('rec-note').value = '';
+    document.getElementById('rec-custom-pts').value = '';
+    renderRecord();
+}
+
+// ================================================================
+// ================================================================
+// SIGNATURE PAD
+// ================================================================
+function openImgZoom(src) {
+    document.getElementById('img-zoom-src').src = src;
+    document.getElementById('img-zoom').classList.remove('hidden');
+}
+
+const _sigPadAbort = {};
+function initSigPad(canvasId, hintId) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    // Abort any previous listeners on this canvas to prevent accumulation
+    _sigPadAbort[canvasId]?.abort();
+    _sigPadAbort[canvasId] = new AbortController();
+    const signal = _sigPadAbort[canvasId].signal;
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    let drawing = false;
+    const getPos = e => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const src = e.touches ? e.touches[0] : e;
+        return { x: (src.clientX - rect.left) * scaleX, y: (src.clientY - rect.top) * scaleY };
+    };
+    const start = e => {
+        e.preventDefault(); drawing = true;
+        const hint = document.getElementById(hintId);
+        if (hint) hint.style.display = 'none';
+        const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y);
+    };
+    const move = e => {
+        if (!drawing) return; e.preventDefault();
+        const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(p.x, p.y);
+    };
+    const end = () => { drawing = false; ctx.beginPath(); };
+    canvas.addEventListener('mousedown', start, {signal});
+    canvas.addEventListener('mousemove', move, {signal});
+    canvas.addEventListener('mouseup', end, {signal});
+    canvas.addEventListener('touchstart', start, {passive:false, signal});
+    canvas.addEventListener('touchmove', move, {passive:false, signal});
+    canvas.addEventListener('touchend', end, {signal});
+}
+
+function clearSigPad(canvasId, hintId) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const hint = document.getElementById(hintId);
+    if (hint) hint.style.display = '';
+}
+
+function isSigEmpty(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return true;
+    return !canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data.some(v => v !== 0);
+}
+
+function sigMonthTarget() {
+    const d = new Date();
+    if (d.getDate() <= 3) {
+        const prev = new Date(d.getFullYear(), d.getMonth() - 1, 1);
+        return `${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,'0')}`;
+    }
+    return currentMonth();
+}
+
+function isSignatureWindowOpen() {
+    const d = new Date().getDate();
+    return d >= 27 || d <= 3;
+}
+
+function openSignatureModal() {
+    showModal('modal-signature');
+    clearSigPad('sig-canvas', 'sig-hint');
+    setTimeout(() => initSigPad('sig-canvas', 'sig-hint'), 50);
+}
+
+async function saveSettlementSignature() {
+    if (isSigEmpty('sig-canvas')) { toast('請先完成簽名'); return; }
+    const a = currentAssistantView; if (!a) return;
+    const m = sigMonthTarget();
+    const dataUrl = document.getElementById('sig-canvas').toDataURL('image/jpeg', 0.9);
+    try {
+        const now = new Date().toISOString();
+        await db.collection(col('signatures')).doc(`${a.id}_${m}`).set({
+            data: dataUrl, assistantId: a.id, month: m, createdAt: now, signedAt: now
+        });
+        hideModal('modal-signature');
+        toast('簽名已儲存');
+        renderMyView();
+    } catch(e) { toast('儲存失敗：'+e.message); }
+}
+
+// ================================================================
+// PERSONAL VIEW (assistant mode)
+// ================================================================
+function renderMyView() {
+    const a = currentAssistantView; if (!a) return;
+    document.getElementById('myview-title').textContent = a.name;
+    const m = currentMonth();
+    document.getElementById('myview-month').textContent = monthLabel(m);
+
+    // Signature button visibility
+    const sigBtnVisible = isSignatureWindowOpen();
+    const sigM = sigMonthTarget();
+    const sigKey = `${a.id}_${sigM}`;
+    const hasSig = !!state.signatures[sigKey];
+    const signBtn = document.getElementById('btn-sign-settle');
+    if (signBtn) {
+        signBtn.classList.toggle('hidden', !sigBtnVisible || hasSig);
+        signBtn.textContent = hasSig ? '✅ 已簽名' : '✍ 本月簽名確認';
+    }
+
+    const s = calcSettlement(m);
+    const myItem = s.items.find(i=>i.id===a.id);
+    const rank = s.items.filter(i=>i.isEligible).findIndex(i=>i.id===a.id)+1;
+    const pts = myItem?.points ?? 0;
+    const pct = s.highThr > 0 ? s.totalAll/s.highThr*100 : 0;
+    const myTxns = state.transactions.filter(t=>t.assistantId===a.id)
+        .sort((x,y)=>new Date(y.date)-new Date(x.date)).slice(0,30);
+
+    // Signature display
+    const sigObj = state.signatures[sigKey];
+    const sigHtml = hasSig
+        ? `<div class="sig-display"><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">${monthLabel(sigM)}已確認簽名 <span style="color:var(--text-muted)">${fmtTimestamp(sigObj?.signedAt||sigObj?.createdAt)}</span></div><img src="${sigObj?.data}" alt="簽名" onclick="openImgZoom(this.src)"></div>`
+        : '';
+
+    document.getElementById('myview-content').innerHTML = `
+        <div class="grid-3 section">
+            <div class="personal-stat">
+                <div style="font-size:11.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em">本月點數</div>
+                <div class="personal-pts ${pts>=0?'pp':'pn'}">${pts>=0?'+':''}${pts}</div>
+                <div class="personal-rank">第 ${rank||'—'} 名</div>
+            </div>
+            <div class="personal-stat" style="text-align:center">
+                <div style="font-size:11.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">季獎金進度</div>
+                <div style="display:flex;justify-content:center">${donutSVG(pct,100)}</div>
+                <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px">${s.bonusStatus==='bonus'?'🎉 本月達標':s.bonusStatus==='penalty'?'⚠️ 未達底線':'進行中'}</div>
+            </div>
+            <div class="personal-stat">
+                <div style="font-size:11.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em">分配比例</div>
+                <div class="personal-pts" style="font-size:28px;color:var(--accent)">${myItem?.isEligible?myItem.pct.toFixed(1)+'%':'—'}</div>
+                <div class="personal-rank">${myItem?.isEligible?'正職參與分配':'試用期'}</div>
+            </div>
+        </div>
+        ${sigHtml}
+        <div class="card">
+            <div class="card-title">最近點數記錄</div>
+            ${myTxns.length===0?'<div class="empty-state"><p>尚無記錄</p></div>':
+            `<div class="personal-txn-list">
+                <table style="width:100%;border-collapse:collapse;font-size:13px">
+                    <thead><tr>
+                        <th style="padding:8px 0;border-bottom:1px solid var(--border);font-size:10px;color:var(--text-muted);font-weight:700;text-align:left">日期</th>
+                        <th style="padding:8px 0;border-bottom:1px solid var(--border);font-size:10px;color:var(--text-muted);font-weight:700;text-align:left">事項</th>
+                        <th style="padding:8px 0;border-bottom:1px solid var(--border);font-size:10px;color:var(--text-muted);font-weight:700;text-align:right">點數</th>
+                    </tr></thead>
+                    <tbody>
+                    ${myTxns.map(t=>{
+                        const r=t.ruleId?findR(t.ruleId):null;
+                        return `<tr>
+                            <td style="padding:9px 0;border-bottom:1px solid var(--border);color:var(--text-muted)">${fmtDate(t.date)}</td>
+                            <td style="padding:9px 0;border-bottom:1px solid var(--border)">${r?r.name:t.note||'自訂'}</td>
+                            <td style="padding:9px 0;border-bottom:1px solid var(--border);text-align:right"><span class="${t.points>=0?'pp':'pn'}">${t.points>0?'+':''}${t.points}</span></td>
+                        </tr>`;
+                    }).join('')}
+                    </tbody>
+                </table>
+            </div>`}
+        </div>`;
+}
+
+// ================================================================
+// HISTORY
+// ================================================================
+function renderHistory() {
+    if(!historyMonth) historyMonth=currentMonth();
+    document.getElementById('history-month-tabs').innerHTML=last6Months().map(m=>
+        `<button class="month-tab ${m===historyMonth?'active':''}" onclick="setHistoryMonth('${m}')">${monthLabel(m)}</button>`
+    ).join('');
+    const af=document.getElementById('history-asst-filter');
+    const curAf=af.value;
+    af.innerHTML='<option value="">所有助理</option>'+state.assistants.map(a=>`<option value="${a.id}" ${a.id===curAf?'selected':''}>${a.name}</option>`).join('');
+    let txns=state.transactions.filter(t=>txnMonth(t)===historyMonth);
+    if(af.value) txns=txns.filter(t=>t.assistantId===af.value);
+    const tf=document.getElementById('history-type-filter').value;
+    if(tf==='p') txns=txns.filter(t=>t.points>0);
+    if(tf==='n') txns=txns.filter(t=>t.points<0);
+    txns.sort((a,b)=>new Date(b.date)-new Date(a.date));
+    document.getElementById('history-count').textContent=`共 ${txns.length} 筆`;
+    _visibleTxnIds = txns.map(t=>t.id);
+    const tbody=document.getElementById('history-tbody');
+    if(!txns.length){
+        tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted)">本月尚無記錄</td></tr>`;
+        clearHistorySelection(); return;
+    }
+    tbody.innerHTML=txns.map(t=>{
+        const a=findA(t.assistantId); const r=t.ruleId?findR(t.ruleId):null;
+        const checked = historySelected.has(t.id) ? 'checked' : '';
+        return `<tr>
+            <td style="padding:8px 6px 8px 14px"><input type="checkbox" class="row-chk" data-id="${t.id}" ${checked} onchange="toggleHistoryRow('${t.id}',this)"></td>
+            <td style="color:var(--text-muted);white-space:nowrap">${fmtDate(t.date)}</td>
+            <td style="font-weight:600">${a?.name??'—'}</td>
+            <td>${r?`<span class="badge ${r.points>=0?'bg':'br'}">${r.name}</span>`:'<span style="color:var(--text-muted);font-size:12.5px">自訂</span>'}</td>
+            <td><span class="${t.points>=0?'pp':'pn'}">${t.points>0?'+':''}${t.points}</span></td>
+            <td style="color:var(--text-muted);font-size:12.5px">${t.operator||'—'}</td>
+            <td style="color:var(--text-muted);font-size:12.5px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.note||''}">${t.note||'—'}</td>
+            <td><button class="tbl-icon-btn" onclick="deleteTxn('${t.id}')" title="刪除">✕</button></td>
+        </tr>`;
+    }).join('');
+    updateHistorySelBar();
+}
+function setHistoryMonth(m){historyMonth=m;clearHistorySelection();renderHistory();}
+function deleteTxn(id){
+    confirm2('確定要刪除這筆記錄嗎？',async()=>{await delDoc('transactions',id);toast('已刪除');});
+}
+
+// ================================================================
+// SETTLEMENT PAGE
+// ================================================================
+function renderSettlementPage() {
+    if(!stlMonth) stlMonth=currentMonth();
+    document.getElementById('stl-month-tabs').innerHTML=last6Months().map(m=>
+        `<button class="month-tab ${m===stlMonth?'active':''}" onclick="setStlMonth('${m}')">${monthLabel(m)}</button>`
+    ).join('');
+    renderStlContent();
+}
+function setStlMonth(m){stlMonth=m;renderSettlementPage();}
+
+function renderStlContent() {
+    const s = calcSettlement(stlMonth);
+    const el = document.getElementById('stl-content');
+    const isCurrentMonth = stlMonth === currentMonth();
+
+    // Threshold card
+    const tc = s.bonusStatus==='bonus'?'tc-bonus':s.bonusStatus==='penalty'?'tc-penalty':'tc-normal';
+    const tMsg = s.bonusStatus==='bonus'
+        ? `🎉 達標！總點數 ${s.totalAll} > ${s.highThr}，本月季獎金全體 +500`
+        : s.bonusStatus==='penalty'
+        ? `⚠️ 未達底線！總點數 ${s.totalAll} ≤ ${s.lowThr}，本月季獎金全體 -500`
+        : `總點數 ${s.totalAll}（${s.n} 人）| 季獎金目標：> ${s.highThr}（${settings.bonusHighFactor}×${s.n}）| 底線：≤ ${s.lowThr}（${settings.bonusLowFactor}×${s.n}）`;
+    const pct = s.highThr > 0 ? s.totalAll/s.highThr*100 : 0;
+
+    const monthlyBtn = isCurrentMonth
+        ? `<button class="btn btn-gold btn-sm" onclick="openMonthlySettle()">執行月結算 →</button>`
+        : '';
+
+    el.innerHTML = `
+        <div class="threshold-card ${tc}">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap">
+                <div class="tc-title" style="margin-bottom:0">季獎金指標</div>
+                ${monthlyBtn}
+            </div>
+            <div class="donut-wrap">
+                ${donutSVG(pct, 120)}
+                <div class="donut-info">
+                    <div class="tc-desc" style="margin-bottom:8px">${tMsg}</div>
+                    <div class="donut-info-row">還需 <strong>${Math.max(0, s.highThr-s.totalAll)}</strong> 點達標</div>
+                </div>
+            </div>
+        </div>
+        <div class="grid-3 section">
+            <div class="stat-card"><div class="lb">總點數（全體）</div><div class="val">${s.totalAll}</div><div class="sub">含試用期</div></div>
+            <div class="stat-card"><div class="lb">分配基準點數</div><div class="val">${s.eligiblePosTotal}</div><div class="sub">正職正分加總</div></div>
+            <div class="stat-card"><div class="lb">參與分配人數</div><div class="val">${s.items.filter(i=>i.isEligible&&i.points>0).length}</div><div class="sub">有正分的正職</div></div>
+        </div>
+        <div class="card">
+            <div class="card-title">${monthLabel(stlMonth)} 結算明細</div>
+            <table style="width:100%;border-collapse:collapse">
+                <thead><tr>
+                    <th style="padding:9px 0;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted)">助理</th>
+                    <th style="padding:9px 0;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted)">分配比例</th>
+                    <th style="padding:9px 0;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);text-align:right">點數</th>
+                    <th style="padding:9px 0;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);text-align:right">百分比</th>
+                    <th style="padding:9px 0;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);text-align:center">狀態</th>
+                    <th style="padding:9px 0;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);text-align:center">簽名確認</th>
+                </tr></thead>
+                <tbody>
+                    ${s.items.map((item,i)=>{
+                        const rc=i===0?'rn1':i===1?'rn2':i===2?'rn3':'rnn';
+                        const flagHtml = item.points>=INDIVIDUAL_HIGH?'<span class="flag-pill fp-good">優良 ≥'+INDIVIDUAL_HIGH+'</span>'
+                            : item.points<INDIVIDUAL_ZERO?'<span class="flag-pill fp-bad">警告 &lt;0</span>':'';
+                        const eligHtml = !item.isEligible?'<span class="flag-pill fp-prob">試用</span>':'<span class="flag-pill fp-good">正職</span>';
+                        return `<tr>
+                            <td style="padding:13px 0;border-bottom:1px solid var(--border)">
+                                <div style="display:flex;align-items:center;gap:9px"><div class="rn ${rc}">${i+1}</div><span style="font-weight:600">${item.name}</span></div>
+                            </td>
+                            <td style="padding:13px 0;border-bottom:1px solid var(--border)">
+                                <div style="display:flex;align-items:center;gap:9px">
+                                    <div class="prog-wrap" style="width:150px"><div class="prog-fill" style="width:${item.pct.toFixed(1)}%"></div></div>
+                                    <span style="font-size:11.5px;color:var(--text-muted)">${item.isEligible?item.pct.toFixed(1)+'%':'—'}</span>
+                                </div>
+                            </td>
+                            <td style="padding:13px 0;border-bottom:1px solid var(--border);text-align:right">
+                                <span class="${item.points>=0?'pp':'pn'}">${item.points>=0?'+':''}${item.points}</span>
+                            </td>
+                            <td style="padding:13px 0;border-bottom:1px solid var(--border);text-align:right">
+                                <span style="font-size:18px;font-weight:700;color:var(--accent)">${item.isEligible?item.pct.toFixed(1)+'%':'—'}</span>
+                            </td>
+                            <td style="padding:13px 0;border-bottom:1px solid var(--border);text-align:center">${flagHtml}${eligHtml}</td>
+                            ${(()=>{const sigKey=item.id+'_'+stlMonth;const sigObj=state.signatures[sigKey];return sigObj?`<td style="padding:13px 0;border-bottom:1px solid var(--border);text-align:center"><span class="badge bg" style="font-size:11.5px">✅ 已確認</span><div style="font-size:10px;color:var(--text-muted);margin-top:2px">${fmtTimestamp(sigObj.signedAt||sigObj.createdAt)}</div><img src="${sigObj.data}" style="max-height:36px;margin-top:4px;border:1px solid var(--border);border-radius:3px;cursor:zoom-in" onclick="openImgZoom(this.src)"></td>`:`<td style="padding:13px 0;border-bottom:1px solid var(--border);text-align:center;color:var(--text-muted);font-size:12.5px">—</td>`;})()}
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>`;
+}
+
+// ── Monthly settle execution ─────────────────────────────────────
+function openMonthlySettle() {
+    const m = currentMonth();
+    const pts = monthlyPoints(m);
+    const nm  = nextMonthStr();
+    const preview = state.assistants.filter(a=>a.active).map(a=>{
+        const p = pts[a.id]||0;
+        const nextPts = p < 0 ? settings.startingPtsLow : settings.startingPts;
+        const warn = p < 0 ? `<span class="flag-pill fp-bad">&lt;0 → +${settings.startingPtsLow}</span>` : '';
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
+            <span style="font-weight:600">${a.name}</span>
+            <span style="display:flex;align-items:center;gap:8px">
+                <span class="${p>=0?'pp':'pn'}">${p>=0?'+':''}${p} 點</span>
+                <span style="color:var(--text-muted)">→</span>
+                <span style="color:var(--accent);font-weight:600">${nm.replace(/^(\d+)-(\d+)$/, '$1年$2月')} +${nextPts}</span>
+                ${warn}
+            </span>
+        </div>`;
+    }).join('');
+    document.getElementById('monthly-title').textContent = `執行 ${monthLabel(m)} 月結算`;
+    document.getElementById('monthly-info-box').innerHTML = `執行後會為每位助理建立下月的起始點數記錄：<br>本月 ≥ 0 → 下月 +${settings.startingPts} 起始；本月 &lt; 0 → 下月 +${settings.startingPtsLow} 起始，且取消季獎金分配需人工確認。`;
+    document.getElementById('monthly-preview').innerHTML = preview;
+    document.getElementById('monthly-confirm-btn').onclick = async () => {
+        await runMonthlySettle();
+        hideModal('modal-monthly');
+    };
+    showModal('modal-monthly');
+}
+
+async function runMonthlySettle() {
+    showLoading();
+    const m  = currentMonth();
+    const pts= monthlyPoints(m);
+    const nm = nextMonthStr();
+    const firstDay = nm+'-01';
+    const batch = db.batch();
+    state.assistants.filter(a=>a.active).forEach(a=>{
+        const p = pts[a.id]||0;
+        const sp = p < 0 ? settings.startingPtsLow : settings.startingPts;
+        const ref = db.collection(col('transactions')).doc();
+        batch.set(ref, { assistantId:a.id, ruleId:null, points:sp, date:firstDay, note:`${monthLabel(nm)} 月初起始點數`, createdAt:new Date().toISOString() });
+    });
+    await batch.commit();
+    hideLoading();
+    toast(`${monthLabel(m)} 月結算完成，已建立 ${monthLabel(nm)} 起始點數`);
+}
+
+// ================================================================
+// ASSISTANTS
+// ================================================================
+function renderAssistants() {
+    document.getElementById('asst-info-box').innerHTML = `起始點數：每月 <strong>${settings.startingPts} 點</strong>（上月個人點數 &lt; 0 者為 <strong>${settings.startingPtsLow} 點</strong>）。新增助理時會自動建立本月起始點數記錄。可於系統設定調整。`;
+    const pts = monthlyPoints(currentMonth());
+    const tbody = document.getElementById('assistants-tbody');
+    if(!state.assistants.length){tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">尚無助理</td></tr>`;return;}
+    tbody.innerHTML=state.assistants.map(a=>`
+        <tr>
+            <td style="font-weight:600">${a.name}</td>
+            <td><span class="badge ${a.active?'bg':'bgr'}">${a.active?'啟用':'停用'}</span></td>
+            <td><span class="badge ${a.bonusEligible!==false?'bb':'bgr'}">${a.bonusEligible!==false?'參與分配':'試用/不分配'}</span></td>
+            <td><span class="${(pts[a.id]||0)>=0?'pp':'pn'}">${(pts[a.id]||0)>=0?'+':''}${pts[a.id]||0}</span></td>
+            <td><span class="pin-code">${a.pin||'—'}</span></td>
+            <td style="color:var(--text-muted);font-size:12.5px">${(a.createdAt||'').slice(0,10)}</td>
+            <td><div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="btn btn-sm btn-outline" onclick="editAssistant('${a.id}')">編輯</button>
+                <button class="btn btn-sm btn-outline" onclick="regenPin('${a.id}')">重設密碼</button>
+                <button class="btn btn-sm ${a.active?'btn-outline':'btn-success'}" onclick="toggleAsst('${a.id}')">${a.active?'停用':'啟用'}</button>
+                <button class="btn btn-sm btn-danger" onclick="delAsst('${a.id}')">刪除</button>
+            </div></td>
+        </tr>`).join('');
+}
+function openAddAssistant() {
+    document.getElementById('edit-asst-id').value='';
+    document.getElementById('asst-name-input').value='';
+    document.getElementById('asst-bonus-input').value='1';
+    document.getElementById('modal-asst-title').textContent='新增助理';
+    showModal('modal-assistant');
+    setTimeout(()=>document.getElementById('asst-name-input').focus(),60);
+}
+function editAssistant(id) {
+    const a=findA(id); if(!a) return;
+    document.getElementById('edit-asst-id').value=id;
+    document.getElementById('asst-name-input').value=a.name;
+    document.getElementById('asst-bonus-input').value=a.bonusEligible!==false?'1':'0';
+    document.getElementById('modal-asst-title').textContent='編輯助理';
+    showModal('modal-assistant');
+    setTimeout(()=>document.getElementById('asst-name-input').focus(),60);
+}
+async function saveAssistant() {
+    const name=document.getElementById('asst-name-input').value.trim();
+    const bonusEligible=document.getElementById('asst-bonus-input').value==='1';
+    if(!name){toast('請輸入姓名');return;}
+    const editId=document.getElementById('edit-asst-id').value;
+    try {
+        if(editId){ await updDoc('assistants',editId,{name,bonusEligible}); toast('已更新'); }
+        else {
+            const pin = generatePin();
+            const ref = await addDoc('assistants',{name,active:true,bonusEligible,pin});
+            await addDoc('transactions',{assistantId:ref.id,ruleId:null,points:settings.startingPts,date:today(),note:'月初起始點數',operator:currentOperator||''});
+            toast(`已新增「${name}」，專屬密碼：${pin}`);
+        }
+        hideModal('modal-assistant');
+    } catch(e){toast('儲存失敗：'+e.message);}
+}
+async function toggleAsst(id) {
+    const a=findA(id); if(!a) return;
+    await updDoc('assistants',id,{active:!a.active});
+    toast(`${a.name} 已${a.active?'停用':'啟用'}`);
+}
+function delAsst(id) {
+    const a=findA(id);
+    confirm2(`確定要刪除助理「${a?.name}」嗎？相關點數記錄也會一併刪除，無法復原。`,async()=>{
+        await delAssistantCascade(id); toast('已刪除助理');
+    });
+}
+async function regenPin(id) {
+    const a=findA(id); if(!a) return;
+    const newPin=generatePin();
+    await updDoc('assistants',id,{pin:newPin});
+    toast(`「${a.name}」新密碼：${newPin}`);
+}
+
+// ================================================================
+// RULES
+// ================================================================
+function renderRules() {
+    const tbody=document.getElementById('rules-tbody');
+    if(!state.rules.length){tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">尚無規定</td></tr>`;return;}
+    // Group by category
+    const catOrder=['個人能力','好評','業績','能力','負評','感控','態度','其他'];
+    const sorted=[...state.rules].sort((a,b)=>{
+        const ai=catOrder.indexOf(a.category); const bi=catOrder.indexOf(b.category);
+        if(ai!==bi) return (ai===-1?99:ai)-(bi===-1?99:bi);
+        return b.points-a.points;
+    });
+    tbody.innerHTML=sorted.map(r=>`
+        <tr>
+            <td style="font-weight:600">${r.name}</td>
+            <td><span class="badge ${r.points>=0?'bg':'br'}">${r.points>0?'+':''}${r.points} 點</span></td>
+            <td><span class="badge bb">${r.category}</span></td>
+            <td style="color:var(--text-muted);font-size:12.5px;max-width:180px">${r.desc||'—'}</td>
+            <td><div style="display:flex;gap:6px">
+                <button class="btn btn-sm btn-outline" onclick="editRule('${r.id}')">編輯</button>
+                <button class="btn btn-sm btn-danger" onclick="delRule('${r.id}')">刪除</button>
+            </div></td>
+        </tr>`).join('');
+}
+function openAddRule() {
+    document.getElementById('edit-rule-id').value='';
+    document.getElementById('rule-name-input').value='';
+    document.getElementById('rule-pts-input').value='';
+    document.getElementById('rule-cat-input').value='個人能力';
+    document.getElementById('rule-desc-input').value='';
+    document.getElementById('modal-rule-title').textContent='新增規定';
+    showModal('modal-rule');
+    setTimeout(()=>document.getElementById('rule-name-input').focus(),60);
+}
+function editRule(id) {
+    const r=findR(id); if(!r) return;
+    document.getElementById('edit-rule-id').value=id;
+    document.getElementById('rule-name-input').value=r.name;
+    document.getElementById('rule-pts-input').value=r.points;
+    document.getElementById('rule-cat-input').value=r.category;
+    document.getElementById('rule-desc-input').value=r.desc;
+    document.getElementById('modal-rule-title').textContent='編輯規定';
+    showModal('modal-rule');
+}
+async function saveRule() {
+    const name=document.getElementById('rule-name-input').value.trim();
+    const points=parseInt(document.getElementById('rule-pts-input').value);
+    const cat=document.getElementById('rule-cat-input').value;
+    const desc=document.getElementById('rule-desc-input').value.trim();
+    if(!name||isNaN(points)){toast('請填寫名稱和點數');return;}
+    const editId=document.getElementById('edit-rule-id').value;
+    try {
+        if(editId){ await updDoc('rules',editId,{name,points,category:cat,desc}); toast('已更新規定'); }
+        else { await addDoc('rules',{name,points,category:cat,desc}); toast(`已新增「${name}」`); }
+        hideModal('modal-rule');
+    } catch(e){toast('儲存失敗：'+e.message);}
+}
+function delRule(id) {
+    const r=findR(id);
+    confirm2(`確定要刪除規定「${r?.name}」嗎？`,async()=>{ await delDoc('rules',id); toast('已刪除規定'); });
+}
+
+// ================================================================
+// OVERTIME SYSTEM
+// ================================================================
+function calcOTMinutes(scheduledEnd, actualEnd) {
+    if (!scheduledEnd || !actualEnd) return 0;
+    const [sh,sm] = scheduledEnd.split(':').map(Number);
+    const [ah,am] = actualEnd.split(':').map(Number);
+    return (ah*60+am) - (sh*60+sm);
+}
+
+function formatOTDuration(mins) {
+    if (mins <= 0) return '0 分鐘';
+    const h = Math.floor(mins/60), m = mins%60;
+    return h>0 ? `${h} 小時 ${m>0?m+' 分':''}` : `${m} 分鐘`;
+}
+
+function getShiftEndTime(sh) { return sh.segments?.length ? sh.segments[sh.segments.length-1].end : (sh.endTime||''); }
+function getSegmentName(seg) {
+    const end = parseInt(seg.end.replace(':',''));
+    const start = parseInt(seg.start.replace(':',''));
+    if (end <= 1400) return '早班';
+    if (start >= 1700) return '晚班';
+    return '午班';
+}
+function getShiftLabel(sh) { return sh.segments?.length ? sh.segments.map(s=>s.start+'-'+s.end).join('，') : (sh.endTime?'下班 '+sh.endTime:''); }
+function getShiftClass(shiftId) { const idx=settings.shifts.findIndex(s=>s.id===shiftId); return idx===0?'sm':idx===1?'sa':'se'; }
+
+function renderOvertimeApply() {
+    // Date — restrict to past 3 days
+    const dateEl = document.getElementById('ot-date');
+    const todayStr = today();
+    const d3 = new Date(); d3.setDate(d3.getDate() - 3);
+    const minStr = `${d3.getFullYear()}-${String(d3.getMonth()+1).padStart(2,'0')}-${String(d3.getDate()).padStart(2,'0')}`;
+    dateEl.max = todayStr; dateEl.min = minStr;
+    if (!dateEl.value || dateEl.value < minStr || dateEl.value > todayStr) dateEl.value = todayStr;
+
+    // Worked shift buttons
+    const wsEl = document.getElementById('ot-worked-shifts');
+    wsEl.innerHTML = settings.shifts.map(sh=>`
+        <button class="ot-shift-btn ${otState.workedShifts.includes(sh.id)?getShiftClass(sh.id):''}"
+            onclick="toggleOTWorkedShift('${sh.id}')">${sh.name}<br><span style="font-size:11.5px;font-weight:400;opacity:.8">${getShiftLabel(sh)}</span></button>
+    `).join('');
+
+    // OT shift section — show individual segments from all selected worked shifts
+    const otSec = document.getElementById('ot-overtime-section');
+    if (!otState.workedShifts.length) { otSec.style.display='none'; return; }
+    otSec.style.display='';
+    const otBtns = document.getElementById('ot-ot-shift-btns');
+    const segments = [];
+    otState.workedShifts.forEach(sid => {
+        const sh = settings.shifts.find(s => s.id === sid);
+        if (!sh?.segments?.length) return;
+        sh.segments.forEach((seg, idx) => {
+            segments.push({ key: `${sid}:${idx}`, label: getSegmentName(seg), time: `${seg.start}-${seg.end}`, shiftId: sid });
+        });
+    });
+    otBtns.innerHTML = segments.map(seg => `
+        <button class="ot-shift-btn ${otState.otSegKey===seg.key?getShiftClass(seg.shiftId):''}"
+            onclick="selectOTSeg('${seg.key}')">${seg.label}<br><span style="font-size:11.5px;font-weight:400;opacity:.8">${seg.time}</span></button>
+    `).join('');
+
+    // Hour/min selects
+    const hourEl = document.getElementById('ot-end-hour');
+    const minEl = document.getElementById('ot-end-min');
+    if (!hourEl.options.length) {
+        for (let h=0;h<24;h++) hourEl.add(new Option(String(h).padStart(2,'0'),h));
+        for (let m=0;m<60;m++) minEl.add(new Option(String(m).padStart(2,'0'),m));
+    }
+
+    // Approver
+    const aprEl = document.getElementById('ot-approver');
+    if (!aprEl.innerHTML || aprEl.dataset.count !== String(settings.doctors.length)) {
+        aprEl.dataset.count = String(settings.doctors.length);
+        aprEl.innerHTML = settings.doctors.length
+            ? settings.doctors.map(d=>`<option value="${d.name}">${d.name}</option>`).join('')
+            : '<option value="">（尚無醫師帳號）</option>';
+    }
+
+    updateOTCalc();
+}
+
+function toggleOTWorkedShift(sid) {
+    const idx = otState.workedShifts.indexOf(sid);
+    if (idx>=0) {
+        otState.workedShifts.splice(idx, 1);
+        if (otState.otSegKey?.startsWith(sid+':')) otState.otSegKey = null;
+    } else otState.workedShifts.push(sid);
+    renderOvertimeApply();
+}
+
+function selectOTSeg(key) {
+    otState.otSegKey = otState.otSegKey === key ? null : key;
+    renderOvertimeApply();
+}
+
+function updateOTCalc() {
+    const resultEl = document.getElementById('ot-calc-result');
+    if (!resultEl) return;
+    if (!otState.otSegKey) { resultEl.classList.add('hidden'); return; }
+    const [shiftId, segIdx] = otState.otSegKey.split(':');
+    const sh = settings.shifts.find(s => s.id === shiftId);
+    const seg = sh?.segments?.[parseInt(segIdx)];
+    if (!seg) { resultEl.classList.add('hidden'); return; }
+    const h = document.getElementById('ot-end-hour')?.value;
+    const m = document.getElementById('ot-end-min')?.value;
+    if (h===undefined||h==='') { resultEl.classList.add('hidden'); return; }
+    const actualEnd = String(h).padStart(2,'0')+':'+String(m||0).padStart(2,'0');
+    const shEnd = seg.end;
+    const mins = calcOTMinutes(shEnd, actualEnd);
+    resultEl.classList.remove('hidden');
+    if (mins <= 0) {
+        resultEl.style.background='var(--red-light)';resultEl.style.color='var(--red)';resultEl.style.borderColor='var(--red-border)';
+        resultEl.textContent = '結束時間早於下班時間，請確認';
+    } else {
+        resultEl.style.background='var(--accent-light)';resultEl.style.color='var(--accent)';resultEl.style.borderColor='#c8d4e8';
+        resultEl.textContent = `加班時數：${formatOTDuration(mins)}（${shEnd} → ${actualEnd}）`;
+    }
+}
+
+async function submitOvertimeApply() {
+    const a = currentAssistantView; if (!a) return;
+    const date = document.getElementById('ot-date').value || today();
+    if (!otState.workedShifts.length) { toast('請選擇當日班別'); return; }
+    if (!otState.otSegKey) { toast('請選擇加班班次'); return; }
+    const [shiftId, segIdx] = otState.otSegKey.split(':');
+    const sh = settings.shifts.find(s => s.id === shiftId);
+    const seg = sh?.segments?.[parseInt(segIdx)];
+    if (!seg) { toast('班次設定異常，請重新選擇'); return; }
+    const segName = getSegmentName(seg);
+    const h = document.getElementById('ot-end-hour').value;
+    const m = document.getElementById('ot-end-min').value||'0';
+    const actualEnd = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+    const shEnd = seg.end;
+    const mins = calcOTMinutes(shEnd, actualEnd);
+    if (mins <= 0) { toast('加班結束時間必須晚於下班時間'); return; }
+    const approver = document.getElementById('ot-approver').value;
+    if (!approver) { toast('請選擇簽核醫師'); return; }
+    const note = document.getElementById('ot-note').value.trim();
+    try {
+        await db.collection(col('overtime')).add({
+            assistantId: a.id, assistantName: a.name, date,
+            workedShifts: otState.workedShifts, otShiftId: shiftId,
+            otShiftName: `${sh.name}－${segName}`, scheduledEnd: shEnd, actualEnd, overtimeMinutes: mins,
+            approverName: approver, status: 'pending', approverSignature: null, note,
+            createdAt: new Date().toISOString()
+        });
+        otState = { workedShifts: [], otSegKey: null };
+        document.getElementById('ot-date').value = today();
+        document.getElementById('ot-note').value = '';
+        renderOvertimeApply();
+        toast('申請已送出，等待醫師簽核');
+    } catch(e) { toast('送出失敗：'+e.message); }
+}
+
+function renderOvertimeStatus() {
+    const a = currentAssistantView; if (!a) return;
+    const myRecords = state.overtime.filter(r=>r.assistantId===a.id)
+        .sort((x,y)=>new Date(y.date)-new Date(x.date));
+    const m = currentMonth();
+    const monthRecords = myRecords.filter(r=>r.date.startsWith(m));
+    const totalMins = monthRecords.filter(r=>r.status==='approved').reduce((s,r)=>s+r.overtimeMinutes,0);
+    const pending = myRecords.filter(r=>r.status==='pending');
+
+    const renderRecord = (r) => {
+        const sig = r.approverSignature ? `<img class="ot-sig-img sig-zoomable" src="${r.approverSignature}" alt="${r.approverName}簽名" onclick="openImgZoom(this.src)"><div style="font-size:10px;color:var(--text-muted);margin-top:3px">${r.approverName} 簽核${r.approvedAt?' · '+fmtTimestamp(r.approvedAt):''}</div>` : '';
+        return `<div class="ot-record">
+            <div class="ot-record-hd">
+                <div>
+                    <span style="font-weight:700;font-size:13px">${r.date}</span>
+                    <span style="color:var(--text-muted);font-size:12.5px;margin-left:8px">${r.otShiftName}</span>
+                </div>
+                <span class="${r.status==='approved'?'ot-appr':r.status==='rejected'?'badge br':'ot-pend'}">${r.status==='approved'?'已簽核':r.status==='rejected'?'已退回':'待簽核'}</span>
+            </div>
+            <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.8">
+                ${r.scheduledEnd} → ${r.actualEnd}
+                <span class="pp" style="margin-left:8px">+${formatOTDuration(r.overtimeMinutes)}</span>
+                <span style="color:var(--text-muted);margin-left:8px">簽核：${r.approverName}</span>
+            </div>
+            ${r.note?`<div style="font-size:12.5px;color:var(--text-muted);margin-top:4px">${r.note}</div>`:''}
+            ${sig}
+        </div>`;
+    };
+
+    document.getElementById('ot-status-content').innerHTML = `
+        <div class="stat-card section">
+            <div class="lb">本月已核加班時數</div>
+            <div class="val" style="color:var(--accent)">${formatOTDuration(totalMins)}</div>
+            <div class="sub">${monthRecords.filter(r=>r.status==='approved').length} 筆已簽核</div>
+        </div>
+        ${pending.length ? `
+        <div class="section">
+            <div class="sec-title" style="margin-bottom:10px">⏳ 待簽核（${pending.length}）</div>
+            ${pending.map(renderRecord).join('')}
+        </div>` : ''}
+        <div class="section">
+            <div class="sec-title" style="margin-bottom:10px">所有申請記錄</div>
+            ${myRecords.length ? myRecords.map(renderRecord).join('') : '<div class="empty-state"><p>尚無申請記錄</p></div>'}
+        </div>`;
+}
+
+function renderOvertimeApprove() {
+    const doc = currentDoctor;
+    const isPrincipal = viewMode === 'principal';
+    const allVisible = state.overtime.filter(r => isPrincipal || !doc || r.approverName === doc.name)
+        .sort((x,y) => new Date(y.date) - new Date(x.date));
+    const pending  = allVisible.filter(r => r.status === 'pending');
+    const approved = allVisible.filter(r => r.status === 'approved');
+    const rejected = allVisible.filter(r => r.status === 'rejected');
+
+    // ── Stats & chart (principal only) ──
+    let statsHtml = '';
+    if (isPrincipal) {
+        const m = currentMonth();
+        const monthApproved = state.overtime.filter(r => r.status === 'approved' && r.date.startsWith(m));
+        const totalMins = monthApproved.reduce((s,r) => s + r.overtimeMinutes, 0);
+        // per-assistant
+        const byAsst = {};
+        monthApproved.forEach(r => {
+            byAsst[r.assistantName] = (byAsst[r.assistantName] || 0) + r.overtimeMinutes;
+        });
+        const asstCards = Object.entries(byAsst).sort((a,b)=>b[1]-a[1]).map(([name,mins])=>`
+            <div class="ot-stat-card">
+                <div class="sc-name">${name}</div>
+                <div class="sc-val">${formatOTDuration(mins)}</div>
+                <div class="sc-sub">${mins} 分鐘</div>
+            </div>`).join('');
+
+        statsHtml = `
+        <div class="section">
+            <div class="sec-header"><div class="sec-title">本月加班統計</div><span style="font-size:12.5px;color:var(--text-muted)">${m}</span></div>
+            <div class="ot-stat-grid">
+                <div class="ot-stat-card total-card">
+                    <div class="sc-name">所有助理合計</div>
+                    <div class="sc-val">${formatOTDuration(totalMins)}</div>
+                    <div class="sc-sub">${totalMins} 分鐘</div>
+                </div>
+                ${asstCards}
+            </div>
+        </div>
+        <div class="section">
+            <div class="sec-title" style="margin-bottom:12px">加班趨勢（近 6 個月）</div>
+            <div class="ot-chart-wrap"><canvas id="ot-trend-chart" height="260"></canvas></div>
+        </div>`;
+    }
+
+    // ── Multi-select bar (principal only) ──
+    const selBarHtml = isPrincipal ? `
+        <div class="sel-bar" id="ot-sel-bar">
+            <input type="checkbox" class="row-chk" id="ot-chk-all" onchange="toggleAllOT()">
+            <label for="ot-chk-all" style="font-size:12.5px;font-weight:600;cursor:pointer">全選</label>
+            <span id="ot-sel-count" style="font-size:12.5px;color:var(--accent);font-weight:600">已選 0 筆</span>
+            <button class="btn btn-danger btn-sm" onclick="deleteSelectedOT()">刪除選取</button>
+            <button class="btn btn-outline btn-sm" onclick="clearOTSelection()">取消</button>
+        </div>` : '';
+
+    const chkHtml = (r) => isPrincipal
+        ? `<input type="checkbox" class="row-chk" data-id="${r.id}" ${otSelected.has(r.id)?'checked':''} onchange="toggleOTRow('${r.id}',this)" style="margin-right:6px;flex-shrink:0">`
+        : '';
+
+    document.getElementById('ot-approve-content').innerHTML = `
+        ${statsHtml}
+        ${selBarHtml}
+        <div class="section">
+            <div class="sec-title" style="margin-bottom:10px">待簽核申請（${pending.length}）</div>
+            ${pending.length ? pending.map(r=>`
+            <div class="ot-record" style="display:flex;gap:8px;align-items:flex-start">
+                ${chkHtml(r)}
+                <div style="flex:1;min-width:0">
+                    <div class="ot-record-hd">
+                        <div>
+                            <span style="font-weight:700;font-size:15px">${r.assistantName}</span>
+                            <span style="color:var(--text-muted);font-size:12.5px;margin-left:8px">${r.date}</span>
+                        </div>
+                        <span class="ot-pend">待簽核</span>
+                    </div>
+                    <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.9">
+                        班別：${r.otShiftName}　下班：${r.scheduledEnd}　實際：${r.actualEnd}<br>
+                        加班：<span class="pp" style="font-weight:700">${formatOTDuration(r.overtimeMinutes)}</span>
+                        ${r.note?`<br>備注：${r.note}`:''}
+                    </div>
+                    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+                        <button class="btn btn-primary btn-sm" onclick="openOTApproval('${r.id}','${r.assistantName}','${r.date}','${r.otShiftName}',${r.overtimeMinutes})">✍ 簽名確認</button>
+                        ${isPrincipal?`<button class="btn btn-danger btn-sm" onclick="rejectOTRecord('${r.id}')">退回申請</button>`:''}
+                    </div>
+                </div>
+            </div>`).join('') : '<div class="empty-state"><p>目前無待簽核申請</p></div>'}
+        </div>
+        ${approved.length ? `
+        <div class="section">
+            <div class="sec-title" style="margin-bottom:10px;color:var(--text-muted)">已簽核記錄（${approved.length}）</div>
+            ${approved.map(r=>`
+            <div class="ot-record" style="opacity:.85;display:flex;gap:8px;align-items:flex-start">
+                ${chkHtml(r)}
+                <div style="flex:1;min-width:0">
+                    <div class="ot-record-hd">
+                        <span style="font-weight:600">${r.assistantName}　${r.date}　${r.otShiftName}</span>
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <span class="ot-appr">已簽核</span>
+                            ${isPrincipal?`<button class="btn btn-outline btn-sm" onclick="unapproveOTRecord('${r.id}')">取消簽核</button>`:''}
+                        </div>
+                    </div>
+                    <div style="font-size:12.5px;color:var(--text-muted)">${formatOTDuration(r.overtimeMinutes)}</div>
+                    ${r.approverSignature?`<img class="ot-sig-img sig-zoomable" src="${r.approverSignature}" alt="簽名" onclick="openImgZoom(this.src)"><div style="font-size:10px;color:var(--text-muted);margin-top:3px">${r.approverName} 簽核${r.approvedAt?' · '+fmtTimestamp(r.approvedAt):''}</div>` : ''}
+                </div>
+            </div>`).join('')}
+        </div>` : ''}
+        ${rejected.length && isPrincipal ? `
+        <div class="section">
+            <div class="sec-title" style="margin-bottom:10px;color:var(--text-muted)">已退回記錄（${rejected.length}）</div>
+            ${rejected.map(r=>`
+            <div class="ot-record" style="opacity:.6;display:flex;gap:8px;align-items:flex-start">
+                ${chkHtml(r)}
+                <div style="flex:1;min-width:0">
+                    <div class="ot-record-hd">
+                        <span style="font-weight:600">${r.assistantName}　${r.date}</span>
+                        <span class="badge br">已退回</span>
+                    </div>
+                    <div style="font-size:12.5px;color:var(--text-muted)">${r.otShiftName}　${formatOTDuration(r.overtimeMinutes)}</div>
+                </div>
+            </div>`).join('')}
+        </div>` : ''}`;
+
+    if (isPrincipal) setTimeout(() => renderOTChart(state.overtime), 50);
+    updateOTSelBar();
+}
+
+function renderOTChart(records) {
+    const canvas = document.getElementById('ot-trend-chart');
+    if (!canvas) return;
+    if (_otChart) { _otChart.destroy(); _otChart = null; }
+
+    const months = last6Months().slice().reverse(); // oldest → newest for chart x-axis
+    const labels = months.map(m => { const [y,mo]=m.split('-'); return `${y}/${mo}`; });
+    const approved = records.filter(r => r.status === 'approved');
+
+    // Unique assistants with approved records in window
+    const aidSet = new Set(approved.filter(r => months.some(m => r.date.startsWith(m))).map(r => r.assistantId));
+    const aids = [...aidSet];
+    const nameMap = Object.fromEntries(state.assistants.map(a => [a.id, a.name]));
+
+    const totalByMonth = months.map(() => 0);
+    const datasets = aids.map((aid, idx) => {
+        const data = months.map((m, mi) => {
+            const sum = approved.filter(r => r.assistantId === aid && r.date.startsWith(m))
+                .reduce((s,r) => s + r.overtimeMinutes, 0);
+            totalByMonth[mi] += sum;
+            return Math.round(sum / 60 * 10) / 10;
+        });
+        return {
+            label: nameMap[aid] || aid,
+            data,
+            borderColor: OT_PALETTE[idx % OT_PALETTE.length],
+            backgroundColor: 'transparent',
+            borderWidth: 2, tension: 0.3, pointRadius: 4,
+        };
+    });
+
+    datasets.push({
+        label: '總計',
+        data: totalByMonth.map(v => Math.round(v / 60 * 10) / 10),
+        borderColor: '#4361ee',
+        backgroundColor: 'rgba(67,97,238,0.07)',
+        borderWidth: 3, tension: 0.3, pointRadius: 5, fill: true,
+    });
+
+    _otChart = new Chart(canvas, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 12, boxWidth: 14 } },
+                tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}h` } }
+            },
+            scales: {
+                x: { grid: { color: '#f0f0ec' }, ticks: { font: { size: 11 } } },
+                y: { grid: { color: '#f0f0ec' }, beginAtZero: true,
+                     ticks: { font: { size: 11 }, callback: v => v + 'h' } }
+            }
+        }
+    });
+}
+
+function toggleOTRow(id, el) {
+    el.checked ? otSelected.add(id) : otSelected.delete(id);
+    updateOTSelBar();
+}
+
+function toggleAllOT() {
+    const allChk = document.getElementById('ot-chk-all');
+    document.querySelectorAll('#ot-approve-content .row-chk[data-id]').forEach(c => {
+        c.checked = allChk.checked;
+        allChk.checked ? otSelected.add(c.dataset.id) : otSelected.delete(c.dataset.id);
+    });
+    updateOTSelBar();
+}
+
+function updateOTSelBar() {
+    const bar = document.getElementById('ot-sel-bar');
+    const count = otSelected.size;
+    bar?.classList.toggle('show', count > 0);
+    const cnt = document.getElementById('ot-sel-count');
+    if (cnt) cnt.textContent = `已選 ${count} 筆`;
+}
+
+function clearOTSelection() {
+    otSelected.clear();
+    document.querySelectorAll('#ot-approve-content .row-chk').forEach(c => c.checked = false);
+    document.getElementById('ot-sel-bar')?.classList.remove('show');
+}
+
+function deleteSelectedOT() {
+    const ids = [...otSelected];
+    if (!ids.length) { toast('請先選取記錄'); return; }
+    confirm2(`確定要刪除選取的 ${ids.length} 筆加班記錄嗎？此操作無法復原。`, async () => {
+        const batch = db.batch();
+        ids.forEach(id => batch.delete(db.collection(col('overtime')).doc(id)));
+        try { await batch.commit(); clearOTSelection(); toast(`已刪除 ${ids.length} 筆加班記錄`); }
+        catch(e) { toast('刪除失敗：'+e.message); }
+    });
+}
+
+function openOTApproval(id, name, date, shiftName, mins) {
+    currentOTId = id;
+    document.getElementById('ot-sig-record-info').innerHTML =
+        `助理：<strong>${name}</strong>　日期：${date}<br>班別：${shiftName}　加班：<strong>${formatOTDuration(mins)}</strong>`;
+    clearSigPad('ot-sig-canvas', 'ot-sig-hint');
+    showModal('modal-ot-signature');
+    setTimeout(() => initSigPad('ot-sig-canvas', 'ot-sig-hint'), 50);
+}
+
+async function confirmOTApproval() {
+    if (isSigEmpty('ot-sig-canvas')) { toast('請先簽名'); return; }
+    if (!currentOTId) return;
+    const dataUrl = document.getElementById('ot-sig-canvas').toDataURL('image/jpeg', 0.9);
+    try {
+        await db.collection(col('overtime')).doc(currentOTId).update({
+            status: 'approved', approverSignature: dataUrl, approvedAt: new Date().toISOString()
+        });
+        hideModal('modal-ot-signature');
+        toast('已完成簽核');
+        renderOvertimeApprove();
+    } catch(e) { toast('儲存失敗：'+e.message); }
+}
+
+async function rejectOTRecord(id) {
+    if (!confirm('確認退回此申請？')) return;
+    try {
+        await db.collection(col('overtime')).doc(id).update({ status: 'rejected' });
+        toast('已退回申請');
+    } catch(e) { toast('操作失敗：'+e.message); }
+}
+
+async function unapproveOTRecord(id) {
+    if (!confirm('確認取消此簽核？將退回至待簽核狀態。')) return;
+    try {
+        await db.collection(col('overtime')).doc(id).update({ status: 'pending', approverSignature: null });
+        toast('已取消簽核，退回待簽核');
+    } catch(e) { toast('操作失敗：'+e.message); }
+}
+
+function updateDocBadge() {
+    const badge = document.getElementById('doc-pending-badge');
+    if (!badge) return;
+    const doc = currentDoctor;
+    const count = state.overtime.filter(r =>
+        r.status === 'pending' && (viewMode === 'principal' || !doc || r.approverName === doc.name)
+    ).length;
+    badge.textContent = count;
+    badge.classList.toggle('hidden', count === 0);
+}
+
+// ================================================================
+// VIEW MODE & SETTINGS
+// ================================================================
+function applyViewMode() {
+    const isPrincipal = viewMode === 'principal';
+    const isManager   = viewMode === 'manager';
+    const isDoctor    = viewMode === 'doctor';
+    const isAsst      = viewMode === 'assistant';
+    const loggedIn    = viewMode !== 'viewer';
+
+    document.body.className = document.body.className.replace(/\b(principal|manager|doctor|assistant|viewer)-mode\b/g, '').trim();
+    document.body.classList.add(viewMode + '-mode');
+
+    document.getElementById('btn-settings').classList.toggle('hidden', !isPrincipal);
+    document.getElementById('btn-logout').classList.toggle('hidden', !loggedIn);
+    updateDocBadge();
+
+    const chip = document.getElementById('mode-chip');
+    if (chip) {
+        chip.textContent = isPrincipal ? '院長'
+            : isManager  ? (currentOperator||'管理者')
+            : isDoctor   ? (currentDoctor?.name||'醫師')
+            : isAsst     ? (currentAssistantView?.name||'助理') : '—';
+        chip.className = 'mode-chip' + (isPrincipal||isManager?' admin':isAsst||isDoctor?' assistant':'');
+    }
+
+    if (isPrincipal) { if (!['overview','record','history','settlement','assistants','rules','overtime-apply','overtime-status','overtime-approve','support-report'].includes(currentPage)) navigate('overview'); else refreshPage(); return; }
+    if (isManager)   { if (currentPage !== 'record' && currentPage !== 'overview') navigate('record'); else refreshPage(); return; }
+    if (isDoctor)    { if (!['record','overtime-approve','overview'].includes(currentPage)) navigate('record'); else refreshPage(); return; }
+    if (isAsst)      { if (!['myview','overtime-apply','overtime-status'].includes(currentPage)) navigate('myview'); else refreshPage(); return; }
+    if (currentPage !== 'overview') navigate('overview'); else refreshPage();
+}
+
+function adminLogout() {
+    viewMode = 'viewer'; currentOperator = '';
+    currentDoctor = null; currentAssistantView = null;
+    navigate('overview');
+    showLoginScreen();
+    toast('已登出');
+}
+
+function logoutAll() {
+    viewMode = 'viewer'; currentOperator = ''; currentAssistantView = null;
+    currentDoctor = null;
+    navigate('overview');
+    showLoginScreen();
+    toast('已登出');
+}
+
+// ── Login Screen ────────────────────────────────────────────────
+function showLoginScreen() {
+    const mgrSel = document.getElementById('ls-admin-select');
+    if (mgrSel) {
+        const mgrOpts = settings.managers.map(m=>`<option value="${m.name}">${m.name}</option>`).join('');
+        mgrSel.innerHTML = `<option value="院長">院長</option>${mgrOpts}`;
+    }
+    const docSel = document.getElementById('ls-doctor-select');
+    if (docSel) {
+        docSel.innerHTML = settings.doctors.length
+            ? settings.doctors.map(d=>`<option value="${d.name}">${d.name}</option>`).join('')
+            : '<option value="">（尚無醫師帳號）</option>';
+    }
+    ['ls-asst-pin','ls-admin-pw','ls-doctor-pw'].forEach(id=>{
+        const el=document.getElementById(id); if(el) el.value='';
+    });
+    const errEl = document.getElementById('ls-err');
+    if (errEl) errEl.style.display='none';
+    switchLSTab(lsTab);
+    document.getElementById('login-screen').classList.remove('hidden');
+    setTimeout(()=>{ document.getElementById('ls-asst-pin')?.focus(); }, 80);
+}
+
+function hideLoginScreen() {
+    document.getElementById('login-screen').classList.add('hidden');
+}
+
+function switchLSTab(tab) {
+    lsTab = tab;
+    ['asst','doctor','admin'].forEach(t=>{
+        document.getElementById('lsp-tab-'+t)?.classList.toggle('active', t===tab);
+        document.getElementById('ls-panel-'+t)?.classList.toggle('hidden', t!==tab);
+    });
+    const errEl = document.getElementById('ls-err');
+    if (errEl) errEl.style.display='none';
+    setTimeout(()=>{
+        const focusMap = {asst:'ls-asst-pin', doctor:'ls-doctor-pw', admin:'ls-admin-pw'};
+        document.getElementById(focusMap[tab])?.focus();
+    }, 60);
+}
+
+function showLSErr(msg) {
+    const el = document.getElementById('ls-err');
+    if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
+
+function attemptLoginScreen() {
+    const errEl = document.getElementById('ls-err');
+    if (errEl) errEl.style.display='none';
+    const showErr = msg => { if(errEl){errEl.textContent=msg;errEl.style.display='block';} };
+
+    if (lsTab === 'asst') {
+        const pin = document.getElementById('ls-asst-pin').value.trim();
+        const asst = state.assistants.find(a => a.active && a.pin === pin);
+        if (!asst) { showErr('密碼錯誤，請確認後重試'); return; }
+        viewMode = 'assistant'; currentAssistantView = asst;
+        hideLoginScreen(); applyViewMode();
+        toast(`歡迎，${asst.name}`);
+    } else if (lsTab === 'doctor') {
+        const docName = document.getElementById('ls-doctor-select').value;
+        const pw = document.getElementById('ls-doctor-pw').value;
+        const doc = settings.doctors.find(d => d.name === docName && d.password === pw);
+        if (!doc) { showErr('醫師密碼錯誤'); document.getElementById('ls-doctor-pw').select(); return; }
+        viewMode = 'doctor'; currentDoctor = doc;
+        hideLoginScreen(); applyViewMode();
+        toast(`歡迎，${doc.name} 醫師`);
+    } else if (lsTab === 'admin') {
+        const mgr = document.getElementById('ls-admin-select').value;
+        const pw = document.getElementById('ls-admin-pw').value;
+        if (mgr === '院長') {
+            if (pw !== settings.principalPassword) { showErr('院長密碼錯誤'); document.getElementById('ls-admin-pw').select(); return; }
+            viewMode = 'principal'; currentOperator = '院長';
+            hideLoginScreen(); applyViewMode();
+            toast('已以院長身份登入');
+            if (state.assistants.length === 0 && state.rules.length === 0) showModal('modal-seed');
+        } else {
+            const mgrObj = settings.managers.find(m => m.name === mgr);
+            if (!mgrObj || pw !== mgrObj.password) { showErr('密碼錯誤，請再試一次'); document.getElementById('ls-admin-pw').select(); return; }
+            viewMode = 'manager'; currentOperator = mgr;
+            hideLoginScreen(); applyViewMode();
+            toast(`已以「${mgr}」身份登入`);
+        }
+    }
+}
+
+let _mgrDraft = []; // temp list edited in settings modal
+
+function openSettings() {
+    document.getElementById('setting-bonus-high').value = settings.bonusHighFactor;
+    document.getElementById('setting-bonus-low').value  = settings.bonusLowFactor;
+    document.getElementById('setting-starting-pts').value     = settings.startingPts;
+    document.getElementById('setting-starting-pts-low').value = settings.startingPtsLow;
+    document.getElementById('setting-new-pw').value = '';
+    document.getElementById('setting-confirm-pw').value = '';
+    document.getElementById('new-mgr-input').value = '';
+    const newMgrPw = document.getElementById('new-mgr-pw');
+    if (newMgrPw) newMgrPw.value = '';
+    document.getElementById('new-doc-name').value = '';
+    document.getElementById('new-doc-pw').value = '';
+    document.getElementById('new-shift-name').value = '';
+    const newShiftSegs = document.getElementById('new-shift-segs');
+    if (newShiftSegs) newShiftSegs.value = '';
+    _mgrDraft   = settings.managers.map(m=>typeof m==='string'?{name:m,password:''}:{...m});
+    _docDraft   = settings.doctors.map(d=>({...d}));
+    _shiftDraft = settings.shifts.map(s=>({...s}));
+    renderMgrListUI(); renderDocListUI(); renderShiftListUI();
+    showModal('modal-settings');
+}
+
+function renderMgrListUI() {
+    document.getElementById('mgr-list-ui').innerHTML = _mgrDraft.map((m,i)=>`
+        <div class="mgr-row">
+            <span class="mgr-name">${m.name} <span style="color:var(--text-muted);font-size:12.5px">(${m.password})</span></span>
+            <button class="btn btn-sm btn-danger" onclick="removeManagerName(${i})">移除</button>
+        </div>`).join('') || '<div style="font-size:12.5px;color:var(--text-muted);padding:4px 0">尚無管理者帳號</div>';
+}
+
+function addManagerName() {
+    const name = document.getElementById('new-mgr-input').value.trim();
+    const pw   = document.getElementById('new-mgr-pw').value.trim();
+    if (!name || !pw) { toast('請輸入帳號名稱與密碼'); return; }
+    if (_mgrDraft.some(m=>m.name===name)) { toast('帳號名稱重複'); return; }
+    _mgrDraft.push({name, password: pw});
+    document.getElementById('new-mgr-input').value = '';
+    document.getElementById('new-mgr-pw').value = '';
+    renderMgrListUI();
+}
+
+function removeManagerName(i) {
+    _mgrDraft.splice(i, 1);
+    renderMgrListUI();
+}
+
+function renderDocListUI() {
+    const el = document.getElementById('doc-list-ui');
+    if (!el) return;
+    el.innerHTML = _docDraft.map((d, i) => `
+        <div class="mgr-row">
+            <span class="mgr-name">${d.name} <span style="color:var(--text-muted);font-size:12.5px">(${d.password})</span></span>
+            <button class="btn btn-sm btn-danger" onclick="removeDoctorAccount(${i})">移除</button>
+        </div>`).join('') || '<div style="font-size:12.5px;color:var(--text-muted);padding:4px 0">尚無醫師帳號</div>';
+}
+
+function addDoctorAccount() {
+    const name = document.getElementById('new-doc-name').value.trim();
+    const pw   = document.getElementById('new-doc-pw').value.trim();
+    if (!name || !pw) { toast('請填寫醫師姓名與密碼'); return; }
+    if (_docDraft.some(d => d.name === name)) { toast('此醫師姓名已存在'); return; }
+    _docDraft.push({ name, password: pw });
+    document.getElementById('new-doc-name').value = '';
+    document.getElementById('new-doc-pw').value = '';
+    renderDocListUI();
+}
+
+function removeDoctorAccount(i) {
+    _docDraft.splice(i, 1);
+    renderDocListUI();
+}
+
+function renderShiftListUI() {
+    const el = document.getElementById('shift-list-ui');
+    if (!el) return;
+    el.innerHTML = _shiftDraft.map((s,i)=>`
+        <div class="mgr-row">
+            <span class="mgr-name">${s.name} <span style="color:var(--text-muted);font-size:12.5px">${getShiftLabel(s)}</span></span>
+            <button class="btn btn-sm btn-danger" onclick="removeShiftConfig(${i})">移除</button>
+        </div>`).join('') || '<div style="font-size:12.5px;color:var(--text-muted);padding:4px 0">尚無班別設定</div>';
+}
+
+function addShiftConfig() {
+    const name = document.getElementById('new-shift-name').value.trim();
+    const segsStr = document.getElementById('new-shift-segs').value.trim();
+    if (!name || !segsStr) { toast('請填寫班別名稱與時段'); return; }
+    const segments = segsStr.split(',').map(s=>{
+        const parts = s.trim().split('-');
+        if (parts.length < 2) return null;
+        return {start: parts[0].trim(), end: parts[1].trim()};
+    }).filter(Boolean);
+    if (!segments.length || !segments[0].start.match(/^\d{2}:\d{2}$/)) { toast('時段格式錯誤，請用 HH:MM-HH:MM，多段以逗號分隔'); return; }
+    if (_shiftDraft.some(s=>s.name===name)) { toast('班別名稱重複'); return; }
+    _shiftDraft.push({id:'shift_'+Date.now(), name, segments});
+    document.getElementById('new-shift-name').value='';
+    document.getElementById('new-shift-segs').value='';
+    renderShiftListUI();
+}
+
+function removeShiftConfig(i) {
+    _shiftDraft.splice(i, 1);
+    renderShiftListUI();
+}
+
+async function saveSettings() {
+    const high = parseInt(document.getElementById('setting-bonus-high').value);
+    const low  = parseInt(document.getElementById('setting-bonus-low').value);
+    const sp   = parseInt(document.getElementById('setting-starting-pts').value);
+    const spLow= parseInt(document.getElementById('setting-starting-pts-low').value);
+    const newPw = document.getElementById('setting-new-pw').value;
+    const confirmPw = document.getElementById('setting-confirm-pw').value;
+    if (isNaN(high) || isNaN(low) || high <= 0 || low <= 0) { toast('請輸入有效的係數（正整數）'); return; }
+    if (high <= low) { toast('目標係數必須大於底線係數'); return; }
+    if (isNaN(sp) || isNaN(spLow) || sp <= 0 || spLow <= 0) { toast('請輸入有效的起始點數（正整數）'); return; }
+    if (newPw && newPw !== confirmPw) { toast('兩次密碼輸入不一致'); return; }
+    if (_shiftDraft.length === 0) { toast('至少需要一個班別設定'); return; }
+    const update = {
+        bonusHighFactor: high, bonusLowFactor: low, managers: _mgrDraft,
+        startingPts: sp, startingPtsLow: spLow,
+        doctors: _docDraft, shifts: _shiftDraft
+    };
+    if (newPw) update.principalPassword = newPw;
+    try {
+        await db.collection(col('settings')).doc('main').set(update, { merge: true });
+        settings.bonusHighFactor = high; settings.bonusLowFactor = low; settings.managers = _mgrDraft;
+        settings.startingPts = sp; settings.startingPtsLow = spLow;
+        settings.doctors = _docDraft; settings.shifts = _shiftDraft;
+        if (newPw) settings.principalPassword = newPw;
+        hideModal('modal-settings');
+        toast('設定已儲存');
+        refreshPage();
+    } catch(e) { toast('儲存失敗：' + e.message); }
+}
+
+// ================================================================
+// UI HELPERS
+// ================================================================
+function showModal(id)  {document.getElementById(id).classList.remove('hidden');}
+function hideModal(id)  {document.getElementById(id).classList.add('hidden');}
+function confirm2(text,onOk) {
+    document.getElementById('confirm-text').textContent=text;
+    document.getElementById('confirm-btn').onclick=()=>{onOk();hideModal('modal-confirm');};
+    showModal('modal-confirm');
+}
+let _tt;
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2800);}
+function setConn(s,l){document.getElementById('conn-dot').className='conn-dot '+s;document.getElementById('conn-label').textContent=l;}
+function showSetup(err){hideLoading();document.getElementById('setup-overlay').style.display='flex';if(err){const e=document.getElementById('setup-err');e.textContent=err;e.style.display='block';}else{document.getElementById('setup-err').style.display='none';}}
+function hideSetup(){document.getElementById('setup-overlay').style.display='none';}
+function showLoading(){document.getElementById('loading-overlay').classList.remove('hidden');}
+function hideLoading(){document.getElementById('loading-overlay').classList.add('hidden');}
+function setupErr(msg){const e=document.getElementById('setup-err');e.textContent=msg;e.style.display='block';}
+
+document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('click',e=>{if(e.target===el)el.classList.add('hidden');});});
+document.getElementById('asst-name-input').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveAssistant();}});
+// ================================================================
+// SUPPORT REPORT
+// ================================================================
+function renderSupportReport() {
+    const el = document.getElementById('support-report-content');
+    if (!el) return;
+    if (!settings.doctors.length) {
+        el.innerHTML = '<div class="empty-state"><p>尚無醫師帳號，請先至系統設定新增醫師。</p></div>';
+        return;
+    }
+    el.innerHTML = settings.doctors.map(d => `
+        <div style="display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--border)">
+            <span style="width:80px;font-weight:600;font-size:13px;flex-shrink:0">${d.name}</span>
+            <input type="text" class="form-input" id="support-num-${CSS.escape(d.name)}"
+                value="${settings.doctorSupport?.[d.name]||''}"
+                maxlength="12" inputmode="numeric" pattern="[0-9]{12}"
+                placeholder="12 位登記號碼" style="max-width:220px">
+        </div>`).join('');
+}
+
+async function saveSupportReport() {
+    const nums = {};
+    settings.doctors.forEach(d => {
+        const val = document.getElementById('support-num-'+CSS.escape(d.name))?.value.trim() || '';
+        if (val) nums[d.name] = val;
+    });
+    // Validate: non-empty fields must be exactly 12 digits
+    for (const [name, val] of Object.entries(nums)) {
+        if (!/^\d{12}$/.test(val)) { toast(`${name} 的號碼必須為 12 位數字`); return; }
+    }
+    try {
+        await db.collection(col('settings')).doc('main').update({ doctorSupport: nums });
+        settings.doctorSupport = nums;
+        toast('登記號碼已儲存');
+    } catch(e) { toast('儲存失敗：'+e.message); }
+}
+
+// Login screen enter-key shortcuts
+['ls-asst-pin','ls-admin-pw','ls-doctor-pw'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();attemptLoginScreen();}});
+});
+document.getElementById('new-doc-pw')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addDoctorAccount();}});
+document.getElementById('new-shift-segs')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addShiftConfig();}});
+
+// ================================================================
+// INIT
+// ================================================================
+init();
+</script>
+</body>
+</html>
