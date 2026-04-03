@@ -371,13 +371,17 @@
         body.doctor-mode .ndoc-lbl{display:block!important}
         body.assistant-mode .nasst,body.assistant-mode .not{display:flex!important}
         body.assistant-mode .nasst-lbl,body.assistant-mode .not-lbl{display:block!important}
+        body.doctor-mode .n-overview,body.assistant-mode .n-overview{display:none!important}
         /* Mobile nav role classes */
         .mn-nrec,.mn-nfull,.mn-ndoc,.mn-nasst,.mn-not{display:none!important}
         body.principal-mode .mn-nrec,body.principal-mode .mn-nfull,body.principal-mode .mn-ndoc,
         body.principal-mode .mn-not{display:flex!important}
         body.manager-mode .mn-nrec{display:flex!important}
         body.doctor-mode .mn-nrec,body.doctor-mode .mn-ndoc{display:flex!important}
+        body.doctor-mode .mn-overview,body.assistant-mode .mn-overview{display:none!important}
         body.assistant-mode .mn-nasst,body.assistant-mode .mn-not{display:flex!important}
+        .mn-nlogin{display:none!important}
+        body.principal-mode .mn-nlogin,body.manager-mode .mn-nlogin,body.doctor-mode .mn-nlogin,body.assistant-mode .mn-nlogin{display:flex!important}
 
         @media(max-width:700px){
             .ls-card{max-width:100%;}
@@ -511,7 +515,7 @@ appId: "..."'></textarea>
     </div>
     <div class="sidebar-nav">
         <div class="nav-sec-label">概覽</div>
-        <button class="nav-item active" onclick="navigate('overview')">
+        <button class="nav-item n-overview active" onclick="navigate('overview')">
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>本月總覽
         </button>
         <button class="nav-item nrec" onclick="navigate('record')">
@@ -539,10 +543,7 @@ appId: "..."'></textarea>
         <!-- 加班系統 -->
         <div class="nav-sec-label not-lbl">加班系統</div>
         <button class="nav-item not" onclick="navigate('overtime-apply')">
-            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>申請加班
-        </button>
-        <button class="nav-item not" onclick="navigate('overtime-status')">
-            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>加班記錄
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>加班
         </button>
         <div class="nav-sec-label ndoc-lbl">簽核</div>
         <button class="nav-item ndoc" onclick="navigate('overtime-approve')" style="justify-content:space-between">
@@ -588,7 +589,10 @@ appId: "..."'></textarea>
 
     <!-- ── 記錄點數 ── -->
     <div id="page-record" class="page">
-        <div class="page-header"><h2>記錄點數</h2><p>選擇助理，再選取獎勵或違規事項</p></div>
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <div><h2>記錄點數</h2><p>選擇助理，再選取獎勵或違規事項</p></div>
+            <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
+        </div>
         <div class="rec-wrap">
             <div class="rec-scroll">
                 <div class="section">
@@ -628,7 +632,10 @@ appId: "..."'></textarea>
     <div id="page-history" class="page">
         <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
             <div><h2>歷史紀錄</h2><p>最近六個月的點數記錄</p></div>
-            <button class="btn btn-outline btn-sm" onclick="exportToExcel('history')">↓ 匯出 Excel</button>
+            <div style="display:flex;gap:8px">
+                <button class="btn btn-outline btn-sm" onclick="exportToExcel('history')">↓ 匯出 Excel</button>
+                <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
+            </div>
         </div>
         <div class="page-content">
             <div class="month-tabs" id="history-month-tabs"></div>
@@ -660,7 +667,10 @@ appId: "..."'></textarea>
     <div id="page-settlement" class="page">
         <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
             <div><h2>月結算</h2><p>點數分配比例 · 季獎金指標</p></div>
-            <button class="btn btn-outline btn-sm" onclick="exportToExcel('settlement')">↓ 匯出 Excel</button>
+            <div style="display:flex;gap:8px">
+                <button class="btn btn-outline btn-sm" onclick="exportToExcel('settlement')">↓ 匯出 Excel</button>
+                <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
+            </div>
         </div>
         <div class="page-content">
             <div class="month-tabs" id="stl-month-tabs"></div>
@@ -670,7 +680,10 @@ appId: "..."'></textarea>
 
     <!-- ── 助理管理 ── -->
     <div id="page-assistants" class="page">
-        <div class="page-header"><h2>助理管理</h2><p>新增、編輯、停用助理，設定季獎金資格</p></div>
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <div><h2>助理管理</h2><p>新增、編輯、停用助理，設定季獎金資格</p></div>
+            <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
+        </div>
         <div class="page-content">
             <div id="asst-info-box" class="info-box"></div>
             <div class="section">
@@ -704,7 +717,10 @@ appId: "..."'></textarea>
 
     <!-- ── 規定管理 ── -->
     <div id="page-rules" class="page">
-        <div class="page-header"><h2>規定管理</h2><p>加扣分規定列表</p></div>
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <div><h2>規定管理</h2><p>加扣分規定列表</p></div>
+            <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
+        </div>
         <div class="page-content">
             <div class="section">
                 <div class="sec-header">
@@ -721,74 +737,87 @@ appId: "..."'></textarea>
         </div>
     </div>
 
-    <!-- ── 加班申請 ── -->
+    <!-- ── 加班（申請 + 記錄合併） ── -->
     <div id="page-overtime-apply" class="page">
         <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-            <div><h2>申請加班</h2><p>填寫加班申請單</p></div>
-            <button class="btn btn-outline btn-sm" onclick="navigate('overtime-status')">📋 加班記錄</button>
+            <div><h2 id="ot-page-title">申請加班</h2><p id="ot-page-sub">填寫加班申請單</p></div>
+            <div style="display:flex;gap:8px;align-items:center">
+                <button class="btn btn-outline btn-sm" id="ot-tab-toggle" onclick="switchOTTab()">📋 加班記錄</button>
+                <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
+            </div>
         </div>
         <div class="page-content">
-            <div class="section">
-                <div class="form-group"><label class="form-label">日期</label><input type="date" class="form-input" id="ot-date" style="max-width:180px"></div>
-            </div>
-            <div class="section">
-                <div class="form-label" style="margin-bottom:10px">當日班別（可複選）</div>
-                <div class="ot-shift-row" id="ot-worked-shifts"></div>
-            </div>
-            <div class="section" id="ot-overtime-section" style="display:none">
-                <div class="form-label" style="margin-bottom:10px">加班班次</div>
-                <div class="ot-shift-row" id="ot-ot-shift-btns"></div>
-                <div style="margin-top:14px">
-                    <div class="form-label">加班結束時間（24 小時制）</div>
-                    <div style="display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap">
-                        <select class="form-select" id="ot-end-hour" style="width:90px" onchange="updateOTCalc()"></select>
-                        <span style="font-weight:700">時</span>
-                        <select class="form-select" id="ot-end-min" style="width:90px" onchange="updateOTCalc()"></select>
-                        <span style="font-weight:700">分</span>
+            <div id="ot-apply-form">
+                <div class="section">
+                    <div class="form-group"><label class="form-label">日期</label><input type="date" class="form-input" id="ot-date" style="max-width:180px"></div>
+                </div>
+                <div class="section">
+                    <div class="form-label" style="margin-bottom:10px">當日班別（可複選）</div>
+                    <div class="ot-shift-row" id="ot-worked-shifts"></div>
+                </div>
+                <div class="section" id="ot-overtime-section" style="display:none">
+                    <div class="form-label" style="margin-bottom:10px">加班班次</div>
+                    <div class="ot-shift-row" id="ot-ot-shift-btns"></div>
+                    <div style="margin-top:14px">
+                        <div class="form-label">加班結束時間（24 小時制）</div>
+                        <div style="display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap">
+                            <select class="form-select" id="ot-end-hour" style="width:90px" onchange="updateOTCalc()"></select>
+                            <span style="font-weight:700">時</span>
+                            <select class="form-select" id="ot-end-min" style="width:90px" onchange="updateOTCalc()"></select>
+                            <span style="font-weight:700">分</span>
+                        </div>
                     </div>
+                    <div id="ot-calc-result" class="ot-result hidden"></div>
                 </div>
-                <div id="ot-calc-result" class="ot-result hidden"></div>
+                <div class="section">
+                    <div class="form-group">
+                        <label class="form-label">簽核醫師</label>
+                        <select class="form-select" id="ot-approver" style="max-width:200px"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">加班原因（可複選）</label>
+                        <div style="display:flex;flex-direction:column;gap:9px;margin-top:6px">
+                            <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
+                                <input type="checkbox" id="ot-reason-a" style="width:15px;height:15px;accent-color:var(--accent);flex-shrink:0">
+                                <span>醫師延遲下診</span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
+                                <input type="checkbox" id="ot-reason-b" style="width:15px;height:15px;accent-color:var(--accent);flex-shrink:0">
+                                <span>流動器械量大</span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
+                                <input type="checkbox" id="ot-reason-c" style="width:15px;height:15px;accent-color:var(--accent);flex-shrink:0">
+                                <span>櫃檯帳務 / 患者相關</span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
+                                <input type="checkbox" id="ot-reason-d" style="width:15px;height:15px;accent-color:var(--accent);flex-shrink:0" onchange="document.getElementById('ot-note-other').style.display=this.checked?'':'none'">
+                                <span>其他</span>
+                            </label>
+                            <input type="text" class="form-input" id="ot-note-other" placeholder="請說明…" style="display:none;margin-top:2px;max-width:280px">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="submitOvertimeApply()">送出申請</button>
+                </div>
             </div>
-            <div class="section">
-                <div class="form-group">
-                    <label class="form-label">簽核醫師</label>
-                    <select class="form-select" id="ot-approver" style="max-width:200px"></select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">備注（可選）</label>
-                    <input type="text" class="form-input" id="ot-note" placeholder="說明原因...">
-                </div>
-                <button class="btn btn-primary" onclick="submitOvertimeApply()">送出申請</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ── 加班記錄 ── -->
-    <div id="page-overtime-status" class="page">
-        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-            <div><h2>加班記錄</h2><p>申請狀態及本月累計</p></div>
-            <button class="btn btn-outline btn-sm" onclick="navigate('overtime-apply')">+ 申請加班</button>
-        </div>
-        <div class="page-content">
-            <div id="ot-status-content"></div>
+            <div id="ot-status-content" style="display:none"></div>
         </div>
     </div>
 
     <!-- ── 報備支援 ── -->
     <div id="page-support-report" class="page">
-        <div class="page-header">
-            <h2>報備支援</h2>
-            <p>填寫醫師報備支援登記號碼</p>
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <div><h2>報備支援</h2><p>填寫醫師報備支援登記號碼</p></div>
+            <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
         </div>
         <div class="page-content">
             <div class="info-box" style="margin-bottom:20px">
                 請至衛生福利部醫事管理系統完成報備：
                 <a href="https://euservice.mohw.gov.tw" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600;text-decoration:underline">euservice.mohw.gov.tw ↗</a>
-                <br>完成後將 12 位數登記號碼填入下方並儲存。
+                <br>完成後將健保卡卡號（12 位數）及身分證字號填入下方並儲存。
             </div>
             <div id="support-report-content"></div>
             <div style="margin-top:20px">
-                <button class="btn btn-primary" onclick="saveSupportReport()">儲存登記號碼</button>
+                <button class="btn btn-primary" onclick="saveSupportReport()">儲存資料</button>
             </div>
         </div>
     </div>
@@ -808,7 +837,7 @@ appId: "..."'></textarea>
 
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
-    <button class="mn-item active" onclick="navigate('overview')">
+    <button class="mn-item mn-overview active" onclick="navigate('overview')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       總覽
     </button>
@@ -838,15 +867,19 @@ appId: "..."'></textarea>
     </button>
     <button class="mn-item mn-not" onclick="navigate('overtime-apply')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="7" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="14"/></svg>
-      申請
-    </button>
-    <button class="mn-item mn-not" onclick="navigate('overtime-status')">
-      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
-      加班記錄
+      加班
     </button>
     <button class="mn-item mn-ndoc" onclick="navigate('overtime-approve')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       簽核
+    </button>
+    <button class="mn-item mn-nfull" onclick="openSettings()">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      設定
+    </button>
+    <button class="mn-item mn-nlogin" onclick="logoutAll()">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      登出
     </button>
   </div>
 </nav>
@@ -976,7 +1009,7 @@ appId: "..."'></textarea>
             <div id="doc-list-ui" class="mgr-list"></div>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
                 <input type="text" class="form-input" id="new-doc-name" placeholder="醫師姓名" style="flex:1;min-width:100px">
-                <input type="password" class="form-input" id="new-doc-pw" placeholder="密碼" style="flex:1;min-width:100px">
+                <input type="password" class="form-input" id="new-doc-pw" placeholder="4位數密碼" maxlength="4" inputmode="numeric" style="flex:1;min-width:100px">
                 <button class="btn btn-outline btn-sm" onclick="addDoctorAccount()" style="flex-shrink:0">+ 新增</button>
             </div>
             <div class="divider"></div>
@@ -1085,10 +1118,11 @@ let settings = {
         {id:'pm', name:'午晚班', segments:[{start:'13:30',end:'17:00'},{start:'18:00',end:'21:30'}]},
         {id:'full', name:'全天班', segments:[{start:'09:00',end:'12:30'},{start:'14:00',end:'17:00'},{start:'18:00',end:'21:30'}]}
     ],
-    doctorSupport: {} // { doctorName: '12-digit number' }
+    doctorSupport: {} // { doctorName: { nhi: '12-digit', idNum: 'A123456789' } }
 };
 // ── Overtime state ────────────────────────────────────────────────
 let otState = { workedShifts: [], otSegKey: null }; // otSegKey = 'shiftId:segIdx'
+let otTab = 'apply'; // 'apply' | 'status'
 let currentOTId = null; // for doctor approval
 
 // ── OT multi-select & chart ───────────────────────────────────────
@@ -1253,7 +1287,7 @@ function subscribeData() {
     db.collection(col('overtime')).orderBy('date','desc').limit(200)
       .onSnapshot(snap => {
           state.overtime = snap.docs.map(d=>({id:d.id,...d.data()}));
-          if (currentPage==='overtime-apply'||currentPage==='overtime-status'||currentPage==='overtime-approve') refreshPage();
+          if (currentPage==='overtime-apply'||currentPage==='overtime-approve') refreshPage();
           updateDocBadge();
       }, e => console.error('overtime', e));
 
@@ -1511,13 +1545,13 @@ function deleteSelectedHistory() {
 const FULL_PAGES = ['history','settlement','assistants','rules'];
 const REC_PAGES  = ['record'];
 const DOC_PAGES  = ['overtime-approve'];
-const ASST_PAGES = ['myview','overtime-apply','overtime-status'];
+const ASST_PAGES = ['myview','overtime-apply'];
 
 function navigate(p) {
     if (viewMode === 'viewer' && p !== 'overview') { showLoginScreen(); return; }
     if (viewMode === 'manager'   && !['overview','record'].includes(p)) return;
     if (viewMode === 'doctor'    && !['overview','record','overtime-approve'].includes(p)) return;
-    if (viewMode === 'assistant' && !['overview','myview','overtime-apply','overtime-status'].includes(p)) return;
+    if (viewMode === 'assistant' && !['overview','myview','overtime-apply'].includes(p)) return;
     // principal can go anywhere
     const el = document.getElementById('page-'+p);
     if (!el) return;
@@ -1532,7 +1566,7 @@ function renderPage(p) {
     ({overview:renderOverview,record:renderRecord,history:renderHistory,
       settlement:renderSettlementPage,assistants:renderAssistants,rules:renderRules,
       myview:renderMyView,'overtime-apply':renderOvertimeApply,
-      'overtime-status':renderOvertimeStatus,'overtime-approve':renderOvertimeApprove,
+      'overtime-approve':renderOvertimeApprove,
       'support-report':renderSupportReport})[p]?.();
 }
 function refreshPage() { renderPage(currentPage); }
@@ -1870,11 +1904,6 @@ function renderMyView() {
         signBtn.textContent = hasSig ? '✅ 已簽名' : '✍ 本月簽名確認';
     }
 
-    const s = calcSettlement(m);
-    const myItem = s.items.find(i=>i.id===a.id);
-    const rank = s.items.filter(i=>i.isEligible).findIndex(i=>i.id===a.id)+1;
-    const pts = myItem?.points ?? 0;
-    const pct = s.highThr > 0 ? s.totalAll/s.highThr*100 : 0;
     const myTxns = state.transactions.filter(t=>t.assistantId===a.id)
         .sort((x,y)=>new Date(y.date)-new Date(x.date)).slice(0,30);
 
@@ -1885,23 +1914,6 @@ function renderMyView() {
         : '';
 
     document.getElementById('myview-content').innerHTML = `
-        <div class="grid-3 section">
-            <div class="personal-stat">
-                <div style="font-size:11.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em">本月點數</div>
-                <div class="personal-pts ${pts>=0?'pp':'pn'}">${pts>=0?'+':''}${pts}</div>
-                <div class="personal-rank">第 ${rank||'—'} 名</div>
-            </div>
-            <div class="personal-stat" style="text-align:center">
-                <div style="font-size:11.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">季獎金進度</div>
-                <div style="display:flex;justify-content:center">${donutSVG(pct,100)}</div>
-                <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px">${s.bonusStatus==='bonus'?'🎉 本月達標':s.bonusStatus==='penalty'?'⚠️ 未達底線':'進行中'}</div>
-            </div>
-            <div class="personal-stat">
-                <div style="font-size:11.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em">分配比例</div>
-                <div class="personal-pts" style="font-size:28px;color:var(--accent)">${myItem?.isEligible?myItem.pct.toFixed(1)+'%':'—'}</div>
-                <div class="personal-rank">${myItem?.isEligible?'正職參與分配':'試用期'}</div>
-            </div>
-        </div>
         ${sigHtml}
         <div class="card">
             <div class="card-title">最近點數記錄</div>
@@ -2276,7 +2288,33 @@ function getSegmentName(seg) {
 function getShiftLabel(sh) { return sh.segments?.length ? sh.segments.map(s=>s.start+'-'+s.end).join('，') : (sh.endTime?'下班 '+sh.endTime:''); }
 function getShiftClass(shiftId) { const idx=settings.shifts.findIndex(s=>s.id===shiftId); return idx===0?'sm':idx===1?'sa':'se'; }
 
+function switchOTTab() {
+    otTab = otTab === 'apply' ? 'status' : 'apply';
+    renderOvertimeApply();
+}
+
 function renderOvertimeApply() {
+    // Update header & toggle
+    const titleEl   = document.getElementById('ot-page-title');
+    const subEl     = document.getElementById('ot-page-sub');
+    const toggleBtn = document.getElementById('ot-tab-toggle');
+    const applyForm = document.getElementById('ot-apply-form');
+    const statusSec = document.getElementById('ot-status-content');
+    if (otTab === 'status') {
+        if (titleEl)   titleEl.textContent = '加班記錄';
+        if (subEl)     subEl.textContent   = '申請狀態及本月累計';
+        if (toggleBtn) toggleBtn.textContent = '＋ 申請加班';
+        if (applyForm) applyForm.style.display = 'none';
+        if (statusSec) statusSec.style.display = '';
+        renderOvertimeStatus();
+        return;
+    }
+    if (titleEl)   titleEl.textContent = '申請加班';
+    if (subEl)     subEl.textContent   = '填寫加班申請單';
+    if (toggleBtn) toggleBtn.textContent = '📋 加班記錄';
+    if (applyForm) applyForm.style.display = '';
+    if (statusSec) statusSec.style.display = 'none';
+
     // Date — restrict to past 3 days
     const dateEl = document.getElementById('ot-date');
     const todayStr = today();
@@ -2386,7 +2424,15 @@ async function submitOvertimeApply() {
     if (mins <= 0) { toast('加班結束時間必須晚於下班時間'); return; }
     const approver = document.getElementById('ot-approver').value;
     if (!approver) { toast('請選擇簽核醫師'); return; }
-    const note = document.getElementById('ot-note').value.trim();
+    const reasons = [];
+    if (document.getElementById('ot-reason-a')?.checked) reasons.push('醫師延遲下診');
+    if (document.getElementById('ot-reason-b')?.checked) reasons.push('流動器械量大');
+    if (document.getElementById('ot-reason-c')?.checked) reasons.push('櫃檯帳務/患者相關');
+    if (document.getElementById('ot-reason-d')?.checked) {
+        const other = document.getElementById('ot-note-other')?.value.trim();
+        reasons.push(other ? `其他：${other}` : '其他');
+    }
+    const note = reasons.join('、');
     try {
         await db.collection(col('overtime')).add({
             assistantId: a.id, assistantName: a.name, date,
@@ -2397,7 +2443,8 @@ async function submitOvertimeApply() {
         });
         otState = { workedShifts: [], otSegKey: null };
         document.getElementById('ot-date').value = today();
-        document.getElementById('ot-note').value = '';
+        ['ot-reason-a','ot-reason-b','ot-reason-c','ot-reason-d'].forEach(id=>{ const el=document.getElementById(id); if(el) el.checked=false; });
+        const otherEl = document.getElementById('ot-note-other'); if(otherEl){otherEl.value='';otherEl.style.display='none';}
         renderOvertimeApply();
         toast('申請已送出，等待醫師簽核');
     } catch(e) { toast('送出失敗：'+e.message); }
@@ -2747,10 +2794,10 @@ function applyViewMode() {
         chip.className = 'mode-chip' + (isPrincipal||isManager?' admin':isAsst||isDoctor?' assistant':'');
     }
 
-    if (isPrincipal) { if (!['overview','record','history','settlement','assistants','rules','overtime-apply','overtime-status','overtime-approve','support-report'].includes(currentPage)) navigate('overview'); else refreshPage(); return; }
+    if (isPrincipal) { if (!['overview','record','history','settlement','assistants','rules','overtime-apply','overtime-approve','support-report'].includes(currentPage)) navigate('overview'); else refreshPage(); return; }
     if (isManager)   { if (currentPage !== 'record' && currentPage !== 'overview') navigate('record'); else refreshPage(); return; }
-    if (isDoctor)    { if (!['record','overtime-approve','overview'].includes(currentPage)) navigate('record'); else refreshPage(); return; }
-    if (isAsst)      { if (!['myview','overtime-apply','overtime-status'].includes(currentPage)) navigate('myview'); else refreshPage(); return; }
+    if (isDoctor)    { if (!['record','overtime-approve'].includes(currentPage)) navigate('record'); else refreshPage(); return; }
+    if (isAsst)      { if (!['myview','overtime-apply'].includes(currentPage)) navigate('myview'); else refreshPage(); return; }
     if (currentPage !== 'overview') navigate('overview'); else refreshPage();
 }
 
@@ -2907,16 +2954,41 @@ function renderDocListUI() {
     const el = document.getElementById('doc-list-ui');
     if (!el) return;
     el.innerHTML = _docDraft.map((d, i) => `
-        <div class="mgr-row">
+        <div class="mgr-row" id="doc-row-${i}">
             <span class="mgr-name">${d.name} <span style="color:var(--text-muted);font-size:12.5px">(${d.password})</span></span>
-            <button class="btn btn-sm btn-danger" onclick="removeDoctorAccount(${i})">移除</button>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+                <button class="btn btn-sm btn-outline" onclick="toggleDocPwEdit(${i})">修改密碼</button>
+                <button class="btn btn-sm btn-danger" onclick="removeDoctorAccount(${i})">移除</button>
+            </div>
+        </div>
+        <div id="doc-pw-edit-${i}" style="display:none;padding:8px 0 10px;display:none;gap:8px;align-items:center">
+            <input type="password" class="form-input" id="doc-pw-new-${i}" placeholder="新4位數密碼" maxlength="4" inputmode="numeric" style="max-width:140px">
+            <button class="btn btn-sm btn-primary" onclick="confirmDocPwEdit(${i})">確認</button>
+            <button class="btn btn-sm btn-outline" onclick="toggleDocPwEdit(${i})">取消</button>
         </div>`).join('') || '<div style="font-size:12.5px;color:var(--text-muted);padding:4px 0">尚無醫師帳號</div>';
+}
+
+function toggleDocPwEdit(i) {
+    const el = document.getElementById(`doc-pw-edit-${i}`);
+    if (!el) return;
+    const showing = el.style.display === 'flex';
+    el.style.display = showing ? 'none' : 'flex';
+    if (!showing) document.getElementById(`doc-pw-new-${i}`)?.focus();
+}
+
+function confirmDocPwEdit(i) {
+    const pw = document.getElementById(`doc-pw-new-${i}`)?.value.trim();
+    if (!/^\d{4}$/.test(pw)) { toast('密碼必須為4位數字'); return; }
+    _docDraft[i].password = pw;
+    renderDocListUI();
+    toast('密碼已更新（尚未儲存）');
 }
 
 function addDoctorAccount() {
     const name = document.getElementById('new-doc-name').value.trim();
     const pw   = document.getElementById('new-doc-pw').value.trim();
     if (!name || !pw) { toast('請填寫醫師姓名與密碼'); return; }
+    if (!/^\d{4}$/.test(pw)) { toast('密碼必須為4位數字'); return; }
     if (_docDraft.some(d => d.name === name)) { toast('此醫師姓名已存在'); return; }
     _docDraft.push({ name, password: pw });
     document.getElementById('new-doc-name').value = '';
@@ -3022,30 +3094,45 @@ function renderSupportReport() {
         el.innerHTML = '<div class="empty-state"><p>尚無醫師帳號，請先至系統設定新增醫師。</p></div>';
         return;
     }
-    el.innerHTML = settings.doctors.map(d => `
-        <div style="display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--border)">
-            <span style="width:80px;font-weight:600;font-size:13px;flex-shrink:0">${d.name}</span>
-            <input type="text" class="form-input" id="support-num-${CSS.escape(d.name)}"
-                value="${settings.doctorSupport?.[d.name]||''}"
-                maxlength="12" inputmode="numeric" pattern="[0-9]{12}"
-                placeholder="12 位登記號碼" style="max-width:220px">
-        </div>`).join('');
+    el.innerHTML = settings.doctors.map(d => {
+        const saved = settings.doctorSupport?.[d.name] || {};
+        // backwards compat: old format stored string directly
+        const nhi = typeof saved === 'string' ? saved : (saved.nhi || '');
+        const idNum = typeof saved === 'string' ? '' : (saved.idNum || '');
+        return `
+        <div style="padding:13px 0;border-bottom:1px solid var(--border)">
+            <div style="font-weight:600;font-size:13px;margin-bottom:8px">${d.name}</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+                <div>
+                    <label class="form-label" style="margin-bottom:3px">健保卡卡號（12 位）</label>
+                    <input type="text" class="form-input" id="support-nhi-${CSS.escape(d.name)}"
+                        value="${nhi}" maxlength="12" inputmode="numeric" pattern="[0-9]{12}"
+                        placeholder="123456789012" style="max-width:200px">
+                </div>
+                <div>
+                    <label class="form-label" style="margin-bottom:3px">身分證字號</label>
+                    <input type="text" class="form-input" id="support-id-${CSS.escape(d.name)}"
+                        value="${idNum}" maxlength="10"
+                        placeholder="A123456789" style="max-width:160px;text-transform:uppercase">
+                </div>
+            </div>
+        </div>`;
+    }).join('');
 }
 
 async function saveSupportReport() {
-    const nums = {};
-    settings.doctors.forEach(d => {
-        const val = document.getElementById('support-num-'+CSS.escape(d.name))?.value.trim() || '';
-        if (val) nums[d.name] = val;
-    });
-    // Validate: non-empty fields must be exactly 12 digits
-    for (const [name, val] of Object.entries(nums)) {
-        if (!/^\d{12}$/.test(val)) { toast(`${name} 的號碼必須為 12 位數字`); return; }
+    const data = {};
+    for (const d of settings.doctors) {
+        const nhi   = document.getElementById('support-nhi-'+CSS.escape(d.name))?.value.trim() || '';
+        const idNum = document.getElementById('support-id-'+CSS.escape(d.name))?.value.trim().toUpperCase() || '';
+        if (nhi && !/^\d{12}$/.test(nhi)) { toast(`${d.name} 的健保卡卡號必須為 12 位數字`); return; }
+        if (idNum && !/^[A-Za-z]\d{9}$/.test(idNum)) { toast(`${d.name} 的身分證字號格式不正確（例：A123456789）`); return; }
+        if (nhi || idNum) data[d.name] = { nhi, idNum };
     }
     try {
-        await db.collection(col('settings')).doc('main').update({ doctorSupport: nums });
-        settings.doctorSupport = nums;
-        toast('登記號碼已儲存');
+        await db.collection(col('settings')).doc('main').update({ doctorSupport: data });
+        settings.doctorSupport = data;
+        toast('資料已儲存');
     } catch(e) { toast('儲存失敗：'+e.message); }
 }
 
