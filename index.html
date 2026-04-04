@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#ffffff">
-    <title>助理點數系統</title>
+    <title>加班＆點數系統</title>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -14,55 +14,74 @@
     <style>
         :root {
             /* ── 7-step type scale ── */
-            --fs-xs:   10px;    /* meta, timestamps, table-headers, chips */
-            --fs-sm:   11.5px;  /* badges, card-title, status pills, hints */
-            --fs-cap:  12.5px;  /* form-label, captions, info-box, btn-sm */
-            --fs-base: 13px;    /* body — nav, buttons, inputs, tables */
-            --fs-sub:  15px;    /* sub-heading — sec-title, modal-title, sidebar brand */
-            --fs-hd:   18px;    /* heading — page-header h2, setup heading */
-            --fs-disp: 28px;    /* display — stat values, personal pts, logo */
+            --fs-xs:   10px;
+            --fs-sm:   11.5px;
+            --fs-cap:  12.5px;
+            --fs-base: 13px;
+            --fs-sub:  15px;
+            --fs-hd:   18px;
+            --fs-disp: 28px;
 
-            --bg: #f5f5f2; --surface: #fff; --surface-alt: #f0f0ec;
-            --border: #e2e2dc; --text-primary: #2c2c2a; --text-secondary: #6e6e68; --text-muted: #9e9e96;
-            --accent: #6b7fa3; --accent-light: #eef0f5; --accent-hover: #5a6d8f;
-            --green: #6f9e6f; --green-light: #eef5ee; --green-border: #c2dcc2;
-            --red: #b07068; --red-light: #f8efee; --red-border: #ddc4c0;
-            --gold: #b89c5a; --gold-light: #faf4e4; --gold-border: #ddd0a8;
-            --orange: #c0824a; --orange-light: #fdf2e8;
-            --sw: 220px; --r: 10px; --mnav: 0px;
-            --sh: 0 1px 3px rgba(0,0,0,.06); --shm: 0 4px 16px rgba(0,0,0,.1);
+            /* ── Cool neutral palette ── */
+            --bg: #f3f5f8;
+            --surface: #ffffff;
+            --surface-alt: #eaecf3;
+            --border: #dce0ec;
+            --text-primary: #1e2635;
+            --text-secondary: #50607a;
+            --text-muted: #8a96aa;
+
+            /* ── Muted slate-blue accent ── */
+            --accent: #4a6fa5;
+            --accent-light: #edf1f8;
+            --accent-hover: #3a5a8c;
+            --accent-border: #bacde8;
+
+            /* ── Semantic colors (lower saturation) ── */
+            --green: #4a8c60; --green-light: #edf5f0; --green-border: #b8d9c4;
+            --red: #b85563;   --red-light:  #fdf0f2;  --red-border:  #f0c4cc;
+            --gold: #9c7e3c;  --gold-light: #faf4e4;  --gold-border: #e0cc98;
+            --orange: #c07040; --orange-light: #fdf3ea;
+
+            /* ── Layout ── */
+            --sw: 232px; --r: 14px; --mnav: 0px;
+
+            /* ── Shadows ── */
+            --sh:  0 1px 2px rgba(0,0,0,.04), 0 3px 10px rgba(0,0,0,.05);
+            --shm: 0 8px 28px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.06);
         }
         *{box-sizing:border-box;margin:0;padding:0;}
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;font-size:var(--fs-sub);line-height:1.5;}
 
         /* ── Sidebar ── */
-        .sidebar{width:var(--sw);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
-        .sidebar-brand{padding:20px 20px 14px;border-bottom:1px solid var(--border);}
-        .sidebar-brand h1{font-size:var(--fs-sub);font-weight:700;}
-        .sidebar-brand p{font-size:var(--fs-sm);color:var(--text-muted);margin-top:2px;}
-        .sidebar-nav{flex:1;padding:10px 8px;overflow-y:auto;}
-        .nav-sec-label{font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);padding:10px 10px 4px;}
-        .nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--text-secondary);font-size:var(--fs-base);font-weight:500;transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:inherit;}
-        .nav-item:hover{background:var(--surface-alt);color:var(--text-primary);}
-        .nav-item.active{background:var(--accent-light);color:var(--accent);}
-        .nav-icon{width:15px;height:15px;flex-shrink:0;opacity:.85;}
-        .sidebar-footer{padding:10px 14px 14px;border-top:1px solid var(--border);}
+        .sidebar{width:var(--sw);background:linear-gradient(170deg,#ffffff 0%,#f4f6fb 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;box-shadow:1px 0 0 var(--border);}
+        .sidebar-brand{padding:22px 20px 16px;border-bottom:1px solid var(--border);}
+        .sidebar-brand h1{font-size:var(--fs-sub);font-weight:800;letter-spacing:-.01em;color:var(--text-primary);}
+        .sidebar-brand p{font-size:var(--fs-sm);color:var(--text-muted);margin-top:3px;}
+        .sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;}
+        .nav-sec-label{font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);padding:14px 10px 5px;}
+        .nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;cursor:pointer;color:var(--text-secondary);font-size:var(--fs-base);font-weight:500;transition:all .18s;border:none;background:none;width:100%;text-align:left;font-family:inherit;border-left:3px solid transparent;}
+        .nav-item:hover{background:var(--surface-alt);color:var(--text-primary);border-left-color:var(--border);}
+        .nav-item.active{background:var(--accent-light);color:var(--accent);font-weight:700;border-left-color:var(--accent);}
+        .nav-icon{width:15px;height:15px;flex-shrink:0;opacity:.8;}
+        .nav-item.active .nav-icon{opacity:1;}
+        .sidebar-footer{padding:10px 14px 16px;border-top:1px solid var(--border);}
         .conn-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--text-muted);margin-right:6px;vertical-align:middle;}
         .conn-dot.online{background:var(--green);} .conn-dot.error{background:var(--red);} .conn-dot.connecting{background:var(--gold);}
         #conn-label{font-size:var(--fs-sm);color:var(--text-muted);}
-        .btn-sidebar{display:block;width:100%;margin-top:6px;padding:6px 10px;font-size:var(--fs-sm);border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;color:var(--text-muted);font-family:inherit;text-align:left;}
-        .btn-sidebar:hover{background:var(--surface-alt);color:var(--text-primary);}
+        .btn-sidebar{display:block;width:100%;margin-top:6px;padding:7px 10px;font-size:var(--fs-sm);border-radius:8px;border:1px solid var(--border);background:none;cursor:pointer;color:var(--text-muted);font-family:inherit;text-align:left;transition:all .15s;}
+        .btn-sidebar:hover{background:var(--accent-light);color:var(--accent);border-color:var(--accent-border);}
 
         /* ── Main ── */
         .main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;}
-        .page-header{background:var(--surface);border-bottom:1px solid var(--border);padding:18px 32px;}
-        .page-header h2{font-size:var(--fs-hd);font-weight:700;}
-        .page-header p{font-size:var(--fs-cap);color:var(--text-muted);margin-top:2px;}
-        .page-content{padding:24px 32px;flex:1;overflow-y:auto;}
+        .page-header{background:var(--surface);border-bottom:1px solid var(--border);padding:22px 36px;box-shadow:0 1px 0 var(--border),0 2px 12px rgba(0,0,0,.03);}
+        .page-header h2{font-size:var(--fs-hd);font-weight:800;letter-spacing:-.01em;}
+        .page-header p{font-size:var(--fs-cap);color:var(--text-muted);margin-top:3px;}
+        .page-content{padding:28px 36px;flex:1;overflow-y:auto;}
 
         /* ── Cards ── */
-        .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--sh);}
-        .card-title{font-size:var(--fs-sm);font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;}
+        .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;box-shadow:var(--sh);}
+        .card-title{font-size:var(--fs-sm);font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;}
 
         /* ── Grid ── */
         .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
@@ -76,28 +95,34 @@
         .stat-card .sub{font-size:var(--fs-sm);color:var(--text-muted);margin-top:4px;}
 
         /* ── Buttons ── */
-        .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:var(--fs-base);font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:inherit;}
-        .btn-primary{background:var(--accent);color:#fff;} .btn-primary:hover{background:var(--accent-hover);} .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
-        .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-secondary);} .btn-outline:hover{background:var(--surface-alt);}
-        .btn-danger{background:var(--red-light);color:var(--red);border:1px solid var(--red-border);} .btn-danger:hover{background:#f0dbd8;}
-        .btn-success{background:var(--green-light);color:var(--green);border:1px solid var(--green-border);} .btn-success:hover{background:#deeede;}
-        .btn-gold{background:var(--gold-light);color:var(--gold);border:1px solid var(--gold-border);} .btn-gold:hover{background:#f0e8cc;}
-        .btn-sm{padding:5px 11px;font-size:var(--fs-cap);border-radius:6px;}
+        .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 17px;border-radius:9px;font-size:var(--fs-base);font-weight:600;cursor:pointer;border:none;transition:all .18s;font-family:inherit;letter-spacing:.01em;}
+        .btn-primary{background:linear-gradient(135deg,var(--accent) 0%,var(--accent-hover) 100%);color:#fff;box-shadow:0 2px 8px rgba(74,111,165,.2);}
+        .btn-primary:hover{background:linear-gradient(135deg,var(--accent-hover) 0%,#2d4d78 100%);box-shadow:0 4px 14px rgba(74,111,165,.28);transform:translateY(-1px);}
+        .btn-primary:active{transform:translateY(0);box-shadow:0 2px 8px rgba(74,111,165,.2);}
+        .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
+        .btn-outline{background:var(--surface);border:1px solid var(--border);color:var(--text-secondary);} .btn-outline:hover{background:var(--surface-alt);border-color:var(--text-muted);color:var(--text-primary);}
+        .btn-danger{background:var(--red-light);color:var(--red);border:1px solid var(--red-border);} .btn-danger:hover{background:#ffe0e6;border-color:var(--red);}
+        .btn-success{background:var(--green-light);color:var(--green);border:1px solid var(--green-border);} .btn-success:hover{background:#dcfce7;border-color:var(--green);}
+        .btn-gold{background:var(--gold-light);color:var(--gold);border:1px solid var(--gold-border);} .btn-gold:hover{background:#fef3c7;border-color:var(--gold);}
+        .btn-sm{padding:5px 12px;font-size:var(--fs-cap);border-radius:7px;}
 
         /* ── Form ── */
-        .form-group{margin-bottom:14px;}
-        .form-label{display:block;font-size:var(--fs-cap);font-weight:600;color:var(--text-secondary);margin-bottom:5px;}
-        .form-input,.form-select,.form-textarea{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:8px;font-size:var(--fs-base);color:var(--text-primary);background:var(--surface);transition:border-color .15s,box-shadow .15s;font-family:inherit;}
-        .form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(107,127,163,.12);}
+        .form-group{margin-bottom:16px;}
+        .form-label{display:block;font-size:var(--fs-cap);font-weight:700;color:var(--text-secondary);margin-bottom:6px;letter-spacing:.01em;}
+        .form-input,.form-select,.form-textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:var(--fs-base);color:var(--text-primary);background:var(--surface);transition:border-color .18s,box-shadow .18s;font-family:inherit;}
+        .form-input:hover,.form-select:hover{border-color:var(--text-muted);}
+        .form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,111,165,.1);}
         .form-textarea{resize:vertical;min-height:72px;}
 
         /* ── Tables ── */
-        .table-wrapper{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);}
+        .table-wrapper{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);box-shadow:var(--sh);}
         table{width:100%;border-collapse:collapse;font-size:var(--fs-base);}
-        thead th{background:var(--surface-alt);padding:10px 14px;text-align:left;font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);border-bottom:1px solid var(--border);}
-        tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
-        tbody tr:last-child{border-bottom:none;} tbody tr:hover{background:var(--surface-alt);}
-        tbody td{padding:11px 14px;vertical-align:middle;}
+        thead th{background:var(--surface-alt);padding:11px 16px;text-align:left;font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);border-bottom:1px solid var(--border);}
+        tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
+        tbody tr:last-child{border-bottom:none;}
+        tbody tr:nth-child(even){background:#f2f4f8;}
+        tbody tr:hover{background:var(--accent-light)!important;}
+        tbody td{padding:12px 16px;vertical-align:middle;}
 
         /* ── Badges ── */
         .badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-size:var(--fs-sm);font-weight:600;}
@@ -134,10 +159,10 @@
         .stl-pts{width:60px;text-align:right;font-size:var(--fs-cap);color:var(--text-muted);flex-shrink:0;}
 
         /* ── Month tabs ── */
-        .month-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
-        .month-tab{padding:5px 13px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:var(--fs-cap);cursor:pointer;color:var(--text-secondary);transition:all .15s;font-family:inherit;}
-        .month-tab:hover{background:var(--surface-alt);}
-        .month-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+        .month-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
+        .month-tab{padding:6px 15px;border-radius:999px;border:1.5px solid var(--border);background:var(--surface);font-size:var(--fs-cap);font-weight:600;cursor:pointer;color:var(--text-secondary);transition:all .18s;font-family:inherit;}
+        .month-tab:hover{background:var(--surface-alt);border-color:var(--text-muted);}
+        .month-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(74,111,165,.22);}
 
         /* ── Section ── */
         .section{margin-bottom:24px;}
@@ -154,14 +179,14 @@
         .empty-state p{font-size:var(--fs-base);}
 
         /* ── Modal ── */
-        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px;}
-        .modal{background:var(--surface);border-radius:14px;width:100%;max-width:480px;box-shadow:var(--shm);max-height:90vh;overflow-y:auto;}
-        .modal-hd{padding:20px 22px 0;display:flex;align-items:center;justify-content:space-between;}
-        .modal-title{font-size:var(--fs-sub);font-weight:700;}
-        .modal-x{width:26px;height:26px;border-radius:6px;border:none;background:var(--surface-alt);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:var(--fs-sub);font-family:inherit;}
-        .modal-x:hover{background:var(--border);}
-        .modal-body{padding:18px 22px;}
-        .modal-ft{padding:0 22px 20px;display:flex;gap:8px;justify-content:flex-end;}
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.32);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px;backdrop-filter:blur(2px);}
+        .modal{background:var(--surface);border-radius:var(--r);width:100%;max-width:480px;box-shadow:var(--shm);max-height:90vh;overflow-y:auto;border:1px solid var(--border);}
+        .modal-hd{padding:22px 24px 0;display:flex;align-items:center;justify-content:space-between;}
+        .modal-title{font-size:var(--fs-sub);font-weight:800;letter-spacing:-.01em;}
+        .modal-x{width:28px;height:28px;border-radius:8px;border:none;background:var(--surface-alt);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:var(--fs-sub);font-family:inherit;transition:all .15s;}
+        .modal-x:hover{background:var(--border);color:var(--text-primary);}
+        .modal-body{padding:20px 24px;}
+        .modal-ft{padding:0 24px 22px;display:flex;gap:8px;justify-content:flex-end;}
 
         /* ── Toast ── */
         .toast{position:fixed;bottom:22px;right:22px;background:#2c2c2a;color:#fff;padding:11px 16px;border-radius:10px;font-size:var(--fs-base);box-shadow:var(--shm);opacity:0;transform:translateY(10px);transition:all .25s;z-index:2000;pointer-events:none;}
@@ -171,23 +196,23 @@
         .rec-wrap{display:flex;flex-direction:column;height:calc(100vh - 68px);height:calc(100dvh - 68px);overflow:hidden;}
         .rec-scroll{flex:1;overflow-y:auto;padding:22px 32px;}
         .asst-picker{display:flex;gap:9px;flex-wrap:wrap;}
-        .asst-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 13px;min-width:70px;border-radius:12px;border:2px solid var(--border);cursor:pointer;transition:all .15s;background:var(--surface);}
-        .asst-card:hover{border-color:var(--accent);background:var(--accent-light);}
-        .asst-card.sel{border-color:var(--accent);background:var(--accent-light);}
+        .asst-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 13px;min-width:72px;border-radius:14px;border:2px solid var(--border);cursor:pointer;transition:all .18s;background:var(--surface);box-shadow:var(--sh);}
+        .asst-card:hover{border-color:var(--accent);background:var(--accent-light);transform:translateY(-1px);box-shadow:0 4px 12px rgba(74,111,165,.12);}
+        .asst-card.sel{border-color:var(--accent);background:var(--accent-light);box-shadow:0 4px 12px rgba(74,111,165,.15);}
         .asst-avatar{width:40px;height:40px;border-radius:50%;background:var(--surface-alt);color:var(--text-secondary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:var(--fs-sub);}
         .asst-card.sel .asst-avatar{background:var(--accent);color:#fff;}
         .asst-card-name{font-size:var(--fs-cap);font-weight:600;white-space:nowrap;}
         .mode-btns{display:flex;gap:12px;margin-bottom:20px;}
-        .mode-btn{flex:1;padding:16px 12px;border-radius:12px;border:2px solid var(--border);font-size:var(--fs-sub);font-weight:700;cursor:pointer;transition:all .18s;background:var(--surface);font-family:inherit;color:var(--text-secondary);}
-        .mode-btn-add:hover,.mode-btn-add.sel{border-color:var(--green);background:var(--green-light);color:var(--green);}
-        .mode-btn-deduct:hover,.mode-btn-deduct.sel{border-color:var(--red);background:var(--red-light);color:var(--red);}
+        .mode-btn{flex:1;padding:16px 12px;border-radius:14px;border:2px solid var(--border);font-size:var(--fs-sub);font-weight:700;cursor:pointer;transition:all .18s;background:var(--surface);font-family:inherit;color:var(--text-secondary);box-shadow:var(--sh);}
+        .mode-btn-add:hover,.mode-btn-add.sel{border-color:var(--green);background:var(--green-light);color:var(--green);box-shadow:0 4px 12px rgba(74,140,96,.12);}
+        .mode-btn-deduct:hover,.mode-btn-deduct.sel{border-color:var(--red);background:var(--red-light);color:var(--red);box-shadow:0 4px 12px rgba(184,85,99,.12);}
         .rule-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;}
-        .rule-card{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;cursor:pointer;transition:all .15s;background:var(--surface);}
-        .rule-card:hover{border-color:var(--accent);background:var(--accent-light);}
+        .rule-card{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .18s;background:var(--surface);}
+        .rule-card:hover{border-color:var(--accent);background:var(--accent-light);transform:translateY(-1px);}
         .rule-card.sel-r{border-color:var(--green);background:var(--green-light);}
         .rule-card.sel-v{border-color:var(--red);background:var(--red-light);}
         .rule-card-name{font-size:var(--fs-base);font-weight:500;}
-        .confirm-bar{flex-shrink:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 32px;display:flex;align-items:center;gap:12px;box-shadow:0 -4px 14px rgba(0,0,0,.05);}
+        .confirm-bar{flex-shrink:0;background:var(--surface);border-top:1px solid var(--border);padding:14px 36px;display:flex;align-items:center;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.06);}
         .confirm-summary{flex:1;font-size:var(--fs-base);font-weight:600;display:flex;align-items:center;gap:8px;min-width:0;}
         .cs-name{color:var(--accent);}
         .cs-rule{color:var(--text-secondary);font-weight:500;}
@@ -199,7 +224,7 @@
         .tc-bonus{background:#f0f9f0;border-color:var(--green-border);}
         .tc-penalty{background:var(--red-light);border-color:var(--red-border);}
         .tc-warning{background:var(--gold-light);border-color:var(--gold-border);}
-        .tc-normal{background:var(--accent-light);border-color:#c8d4e8;}
+        .tc-normal{background:var(--accent-light);border-color:var(--accent-border);}
         .tc-title{font-size:var(--fs-cap);font-weight:700;margin-bottom:6px;}
         .tc-desc{font-size:var(--fs-cap);line-height:1.6;}
         .tc-prog{margin-top:10px;}
@@ -271,17 +296,17 @@
         /* misc */
         .page{display:none;} .page.active{display:flex;flex-direction:column;flex:1;}
         .hidden{display:none!important;}
-        .info-box{background:var(--accent-light);border:1px solid #c8d4e8;border-radius:8px;padding:11px 14px;font-size:var(--fs-cap);color:var(--accent);line-height:1.6;margin-bottom:16px;}
+        .info-box{background:var(--accent-light);border:1px solid var(--accent-border);border-radius:10px;padding:12px 16px;font-size:var(--fs-cap);color:var(--accent);line-height:1.6;margin-bottom:16px;}
         .divider{height:1px;background:var(--border);margin:18px 0;}
         .tbl-icon-btn{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:3px 7px;border-radius:4px;font-size:var(--fs-base);}
         .tbl-icon-btn:hover{color:var(--red);}
 
         /* ─── Mobile bottom nav ─── */
-        .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:101;padding-bottom:env(safe-area-inset-bottom,0px);}
+        .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:101;padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:0 -4px 20px rgba(0,0,0,.07);}
         .mobile-nav-inner{display:flex;}
-        .mn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 6px;cursor:pointer;color:var(--text-muted);font-size:var(--fs-xs);font-weight:600;border:none;background:none;font-family:inherit;transition:color .15s;-webkit-tap-highlight-color:transparent;}
+        .mn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 4px 7px;cursor:pointer;color:var(--text-muted);font-size:var(--fs-xs);font-weight:600;border:none;background:none;font-family:inherit;transition:color .18s;-webkit-tap-highlight-color:transparent;}
         .mn-item.active{color:var(--accent);}
-        .mn-icon{width:21px;height:21px;flex-shrink:0;}
+        .mn-icon{width:22px;height:22px;flex-shrink:0;}
 
         @media(max-width:900px){.grid-4{grid-template-columns:1fr 1fr;}.grid-3{grid-template-columns:1fr 1fr;}}
         @media(max-width:700px){
@@ -308,18 +333,19 @@
         }
 
         /* ─── Login Screen ─── */
-        #login-screen{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:9990;padding:20px;overflow-y:auto;}
+        #login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#edf1f8 0%,var(--bg) 50%,#f0f3f8 100%);display:flex;align-items:center;justify-content:center;z-index:9990;padding:20px;overflow-y:auto;}
         .ls-card{width:100%;max-width:420px;}
-        .ls-logo{font-size:var(--fs-disp);font-weight:800;color:var(--accent);text-align:center;margin-bottom:3px;}
+        .ls-logo{font-size:var(--fs-disp);font-weight:800;color:var(--accent);text-align:center;margin-bottom:3px;letter-spacing:-.02em;}
         .ls-sub{font-size:var(--fs-cap);color:var(--text-muted);text-align:center;margin-bottom:24px;}
         .ls-sys-row{display:flex;gap:10px;margin-bottom:20px;}
-        .ls-sys-btn{flex:1;padding:14px 10px;border-radius:12px;border:2px solid var(--border);font-size:var(--fs-base);font-weight:700;cursor:pointer;background:#fff;color:var(--text-secondary);font-family:inherit;transition:all .15s;text-align:center;line-height:1.5;}
-        .ls-sys-btn.sel{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
-        .ls-form-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:22px;box-shadow:0 4px 24px rgba(0,0,0,.09);}
-        .ls-tabs{display:flex;margin-bottom:18px;border-bottom:1px solid var(--border);}
-        .ls-tab{flex:1;padding:9px 0;border:none;background:none;font-size:var(--fs-base);font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;transition:color .15s,border-color .15s;}
+        .ls-sys-btn{flex:1;padding:14px 10px;border-radius:12px;border:2px solid var(--border);font-size:var(--fs-base);font-weight:700;cursor:pointer;background:var(--surface);color:var(--text-secondary);font-family:inherit;transition:all .18s;text-align:center;line-height:1.5;}
+        .ls-sys-btn:hover{border-color:var(--text-muted);background:var(--surface-alt);}
+        .ls-sys-btn.sel{border-color:var(--accent);background:var(--accent-light);color:var(--accent);box-shadow:0 2px 8px rgba(74,111,165,.15);}
+        .ls-form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;box-shadow:0 8px 32px rgba(0,0,0,.1),0 2px 8px rgba(0,0,0,.06);}
+        .ls-tabs{display:flex;margin-bottom:20px;border-bottom:1px solid var(--border);}
+        .ls-tab{flex:1;padding:9px 0;border:none;background:none;font-size:var(--fs-base);font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;transition:color .18s,border-color .18s;}
         .ls-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
-        .ls-err{background:var(--red-light);color:var(--red);border:1px solid var(--red-border);border-radius:7px;padding:9px 13px;font-size:var(--fs-cap);margin-bottom:12px;display:none;}
+        .ls-err{background:var(--red-light);color:var(--red);border:1px solid var(--red-border);border-radius:9px;padding:9px 13px;font-size:var(--fs-cap);margin-bottom:12px;display:none;}
 
         /* ─── Signature pad ─── */
         .sig-canvas-wrap{border:2px dashed var(--border);border-radius:8px;overflow:hidden;background:#fff;position:relative;cursor:crosshair;}
@@ -334,16 +360,18 @@
 
         /* ─── Overtime ─── */
         .ot-shift-row{display:flex;gap:8px;flex-wrap:wrap;}
-        .ot-shift-btn{padding:9px 18px;border-radius:8px;border:2px solid var(--border);font-size:var(--fs-base);font-weight:700;cursor:pointer;background:#fff;color:var(--text-secondary);font-family:inherit;transition:all .15s;}
+        .ot-shift-btn{flex:1;min-width:90px;padding:10px 12px;border-radius:10px;border:2px solid var(--border);font-size:var(--fs-base);font-weight:700;cursor:pointer;background:var(--surface);color:var(--text-secondary);font-family:inherit;transition:all .18s;box-shadow:var(--sh);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.4;}
+        .ot-shift-btn:hover{border-color:var(--text-muted);transform:translateY(-1px);}
         .ot-shift-btn.sm{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
         .ot-shift-btn.sa{border-color:var(--green);background:var(--green-light);color:var(--green);}
         .ot-shift-btn.se{border-color:var(--gold);background:var(--gold-light);color:var(--gold);}
-        .ot-record{border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;background:#fff;}
+        .ot-record{border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:10px;background:var(--surface);box-shadow:var(--sh);transition:box-shadow .18s;}
+        .ot-record:hover{box-shadow:var(--shm);}
         .ot-record-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
         .ot-pend{display:inline-flex;padding:2px 8px;border-radius:999px;font-size:var(--fs-sm);font-weight:700;background:var(--gold-light);color:var(--gold);}
         .ot-appr{display:inline-flex;padding:2px 8px;border-radius:999px;font-size:var(--fs-sm);font-weight:700;background:var(--green-light);color:var(--green);}
         .ot-sig-img{max-height:50px;border:1px solid var(--border);border-radius:4px;background:#fff;padding:2px;display:block;margin-top:6px;}
-        .ot-result{background:var(--accent-light);border:1px solid #c8d4e8;border-radius:8px;padding:10px 14px;font-size:var(--fs-base);font-weight:700;color:var(--accent);margin-top:10px;}
+        .ot-result{background:var(--accent-light);border:1px solid var(--accent-border);border-radius:10px;padding:10px 14px;font-size:var(--fs-base);font-weight:700;color:var(--accent);margin-top:10px;}
 
         /* ─── OT chart & stats ─── */
         .ot-chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;box-shadow:var(--sh);margin-bottom:18px;}
@@ -352,11 +380,11 @@
         .ot-stat-card .sc-name{font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         .ot-stat-card .sc-val{font-size:var(--fs-hd);font-weight:700;color:var(--accent);}
         .ot-stat-card .sc-sub{font-size:var(--fs-sm);color:var(--text-muted);margin-top:1px;}
-        .ot-stat-card.total-card{border-color:#c8d4e8;background:var(--accent-light);}
-        .ot-stat-card.total-card .sc-val{color:#4361ee;}
+        .ot-stat-card.total-card{border-color:var(--accent-border);background:var(--accent-light);}
+        .ot-stat-card.total-card .sc-val{color:var(--accent);}
 
         /* ─── History multi-select ─── */
-        .sel-bar{display:none;align-items:center;gap:10px;margin-bottom:12px;padding:8px 14px;background:var(--accent-light);border:1px solid #c8d4e8;border-radius:8px;flex-wrap:wrap;}
+        .sel-bar{display:none;align-items:center;gap:10px;margin-bottom:12px;padding:8px 14px;background:var(--accent-light);border:1px solid var(--accent-border);border-radius:10px;flex-wrap:wrap;}
         .sel-bar.show{display:flex;}
         input[type=checkbox].row-chk{width:16px;height:16px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;vertical-align:middle;}
 
@@ -396,7 +424,7 @@
 <!-- ══ Login Screen ══ -->
 <div id="login-screen" class="hidden">
     <div class="ls-card">
-        <div class="ls-logo">助理點數系統</div>
+        <div class="ls-logo">加班＆點數系統</div>
         <div class="ls-sub">牙醫診所績效管理平台</div>
         <div class="ls-form-card">
             <div class="ls-tabs">
@@ -510,7 +538,7 @@ appId: "..."'></textarea>
 <!-- ══ Sidebar ══ -->
 <nav class="sidebar">
     <div class="sidebar-brand">
-        <h1>助理點數系統</h1>
+        <h1>加班＆點數系統</h1>
         <p id="ws-label">—</p>
     </div>
     <div class="sidebar-nav">
@@ -527,6 +555,9 @@ appId: "..."'></textarea>
         </button>
         <button class="nav-item nfull" onclick="navigate('settlement')">
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 00-2 0v2a1 1 0 102 0V9z" clip-rule="evenodd"/></svg>月結算
+        </button>
+        <button class="nav-item nfull" onclick="navigate('salary')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.028 2.353 1.118V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.028-2.354-1.118V5z" clip-rule="evenodd"/></svg>薪資計算
         </button>
         <div class="nav-sec-label nfull-lbl">管理</div>
         <button class="nav-item nfull" onclick="navigate('assistants')">
@@ -589,10 +620,7 @@ appId: "..."'></textarea>
 
     <!-- ── 記錄點數 ── -->
     <div id="page-record" class="page">
-        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
-            <div><h2>記錄點數</h2><p>選擇助理，再選取獎勵或違規事項</p></div>
-            <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
-        </div>
+        <div class="page-header"><h2>記錄點數</h2><p>選擇助理，再選取獎勵或違規事項</p></div>
         <div class="rec-wrap">
             <div class="rec-scroll">
                 <div class="section">
@@ -632,10 +660,7 @@ appId: "..."'></textarea>
     <div id="page-history" class="page">
         <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
             <div><h2>歷史紀錄</h2><p>最近六個月的點數記錄</p></div>
-            <div style="display:flex;gap:8px">
-                <button class="btn btn-outline btn-sm" onclick="exportToExcel('history')">↓ 匯出 Excel</button>
-                <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
-            </div>
+            <button class="btn btn-outline btn-sm" onclick="exportToExcel('history')">↓ 匯出 Excel</button>
         </div>
         <div class="page-content">
             <div class="month-tabs" id="history-month-tabs"></div>
@@ -667,10 +692,7 @@ appId: "..."'></textarea>
     <div id="page-settlement" class="page">
         <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
             <div><h2>月結算</h2><p>點數分配比例 · 季獎金指標</p></div>
-            <div style="display:flex;gap:8px">
-                <button class="btn btn-outline btn-sm" onclick="exportToExcel('settlement')">↓ 匯出 Excel</button>
-                <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
-            </div>
+            <button class="btn btn-outline btn-sm" onclick="exportToExcel('settlement')">↓ 匯出 Excel</button>
         </div>
         <div class="page-content">
             <div class="month-tabs" id="stl-month-tabs"></div>
@@ -678,14 +700,37 @@ appId: "..."'></textarea>
         </div>
     </div>
 
-    <!-- ── 助理管理 ── -->
-    <div id="page-assistants" class="page">
+    <!-- ── 薪資計算 ── -->
+    <div id="page-salary" class="page">
         <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
-            <div><h2>助理管理</h2><p>新增、編輯、停用助理，設定季獎金資格</p></div>
-            <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
+            <div><h2>薪資計算</h2><p>月薪試算 · 底薪 + 績效獎金 + 加班費 + 季獎金</p></div>
+            <button class="btn btn-outline btn-sm" onclick="exportToExcel('salary')">↓ 匯出 Excel</button>
         </div>
         <div class="page-content">
+            <div class="month-tabs" id="sal-month-tabs"></div>
+            <div id="sal-content"></div>
+        </div>
+    </div>
+
+    <!-- ── 助理管理 ── -->
+    <div id="page-assistants" class="page">
+        <div class="page-header"><h2>助理管理</h2><p>新增、編輯、停用助理，設定季獎金資格</p></div>
+        <div class="page-content">
             <div id="asst-info-box" class="info-box"></div>
+            <div class="section">
+                <div class="sec-header">
+                    <div class="sec-title">額外津貼項目</div>
+                    <button class="btn btn-outline btn-sm" onclick="openAddAllowanceType()">+ 新增項目</button>
+                </div>
+                <div id="allowance-types-list"></div>
+                <div id="allowance-type-add-form" class="hidden" style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                    <input type="text" id="at-new-name" placeholder="項目名稱" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:var(--fs-base);font-family:inherit;width:140px">
+                    <input type="number" id="at-new-amount" placeholder="金額" min="0" step="100" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:var(--fs-base);font-family:inherit;width:110px;text-align:right">
+                    <span style="font-size:var(--fs-sm);color:var(--text-muted)">元</span>
+                    <button class="btn btn-primary btn-sm" onclick="confirmAddAllowanceType()">新增</button>
+                    <button class="btn btn-outline btn-sm" onclick="document.getElementById('allowance-type-add-form').classList.add('hidden')">取消</button>
+                </div>
+            </div>
             <div class="section">
                 <div class="sec-header">
                     <div class="sec-title">助理列表</div>
@@ -693,7 +738,7 @@ appId: "..."'></textarea>
                 </div>
                 <div class="table-wrapper">
                     <table>
-                        <thead><tr><th>姓名</th><th>狀態</th><th>季獎金資格</th><th>本月點數</th><th>專屬密碼</th><th>加入日期</th><th>操作</th></tr></thead>
+                        <thead><tr><th>姓名</th><th>狀態</th><th>季獎金資格</th><th>底薪</th><th>額外津貼</th><th>本月點數</th><th>專屬密碼</th><th>加入日期</th><th>操作</th></tr></thead>
                         <tbody id="assistants-tbody"></tbody>
                     </table>
                 </div>
@@ -705,10 +750,7 @@ appId: "..."'></textarea>
     <div id="page-myview" class="page">
         <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
             <div><h2 id="myview-title">我的點數</h2><p id="myview-month">—</p></div>
-            <div style="display:flex;gap:8px;align-items:center">
-                <button class="btn btn-success btn-sm hidden" id="btn-sign-settle" onclick="openSignatureModal()">✍ 本月簽名確認</button>
-                <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
-            </div>
+            <button class="btn btn-success btn-sm hidden" id="btn-sign-settle" onclick="openSignatureModal()">✍ 本月簽名確認</button>
         </div>
         <div class="page-content">
             <div id="myview-content"></div>
@@ -717,10 +759,7 @@ appId: "..."'></textarea>
 
     <!-- ── 規定管理 ── -->
     <div id="page-rules" class="page">
-        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
-            <div><h2>規定管理</h2><p>加扣分規定列表</p></div>
-            <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
-        </div>
+        <div class="page-header"><h2>規定管理</h2><p>加扣分規定列表</p></div>
         <div class="page-content">
             <div class="section">
                 <div class="sec-header">
@@ -741,10 +780,7 @@ appId: "..."'></textarea>
     <div id="page-overtime-apply" class="page">
         <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
             <div><h2 id="ot-page-title">申請加班</h2><p id="ot-page-sub">填寫加班申請單</p></div>
-            <div style="display:flex;gap:8px;align-items:center">
-                <button class="btn btn-outline btn-sm" id="ot-tab-toggle" onclick="switchOTTab()">📋 加班記錄</button>
-                <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
-            </div>
+            <button class="btn btn-outline btn-sm" id="ot-tab-toggle" onclick="switchOTTab()">📋 加班記錄</button>
         </div>
         <div class="page-content">
             <div id="ot-apply-form">
@@ -805,10 +841,7 @@ appId: "..."'></textarea>
 
     <!-- ── 報備支援 ── -->
     <div id="page-support-report" class="page">
-        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
-            <div><h2>報備支援</h2><p>填寫醫師報備支援登記號碼</p></div>
-            <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
-        </div>
+        <div class="page-header"><h2>報備支援</h2><p>填寫醫師報備支援登記號碼</p></div>
         <div class="page-content">
             <div class="info-box" style="margin-bottom:20px">
                 請至衛生福利部醫事管理系統完成報備：
@@ -824,9 +857,8 @@ appId: "..."'></textarea>
 
     <!-- ── 加班簽核（醫師） ── -->
     <div id="page-overtime-approve" class="page">
-        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-            <div><h2 id="approve-title">加班簽核</h2><p id="approve-sub">待簽核申請列表</p></div>
-            <button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>
+        <div class="page-header">
+            <h2 id="approve-title">加班簽核</h2><p id="approve-sub">待簽核申請列表</p>
         </div>
         <div class="page-content">
             <div id="ot-approve-content"></div>
@@ -852,6 +884,10 @@ appId: "..."'></textarea>
     <button class="mn-item mn-nfull" onclick="navigate('settlement')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
       結算
+    </button>
+    <button class="mn-item mn-nfull" onclick="navigate('salary')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 14.25c0 1.243 1.343 2.25 3 2.25s3-1.007 3-2.25c0-1.243-1.343-2.25-3-2.25S9 11.507 9 10.25C9 9.007 10.343 8 12 8s3 1.007 3 2.25"/><line x1="12" y1="6.5" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="17.5"/></svg>
+      薪資
     </button>
     <button class="mn-item mn-nfull" onclick="navigate('assistants')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><line x1="16" y1="11" x2="22" y2="11"/><line x1="19" y1="8" x2="19" y2="14"/></svg>
@@ -881,6 +917,10 @@ appId: "..."'></textarea>
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       登出
     </button>
+    <button class="mn-item" onclick="showSetup()">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 6s0-3 3-3 3 3 3 3"/><path d="M23 18s0 3-3 3-3-3-3-3"/><path d="M8 11.5A6.5 6.5 0 0 1 21 9"/><path d="M16 12.5A6.5 6.5 0 0 1 3 15"/></svg>
+      重新連線
+    </button>
   </div>
 </nav>
 
@@ -897,6 +937,20 @@ appId: "..."'></textarea>
                     <option value="1">正職（參與分配）</option>
                     <option value="0">試用期 / 不參與分配</option>
                 </select>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="form-group">
+                    <label class="form-label">底薪（元）</label>
+                    <input type="number" class="form-input" id="asst-base-salary" min="0" step="100" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">到職日</label>
+                    <input type="date" class="form-input" id="asst-hire-date">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">額外津貼</label>
+                <div id="asst-allowances" style="margin-top:4px"></div>
             </div>
         </div>
         <div class="modal-ft"><button class="btn btn-outline" onclick="hideModal('modal-assistant')">取消</button><button class="btn btn-primary" onclick="saveAssistant()">儲存</button></div>
@@ -1090,6 +1144,16 @@ appId: "..."'></textarea>
 // ================================================================
 const CFG_KEY = 'asst_pts_cfg_v3';
 const STARTING_PTS = 15;
+const DEFAULT_ALLOWANCE_TYPES = [
+    { key: 'inventory', name: '耗材盤點', defaultAmount: 1000 },
+    { key: 'social',    name: '粉轉小編', defaultAmount: 2000 },
+    { key: 'admin',     name: '櫃檯行政', defaultAmount: 1000 },
+    { key: 'birthday',  name: '生日禮金', defaultAmount: 1000 },
+    { key: 'holiday',   name: '三節禮金', defaultAmount: 1000 },
+    { key: 'other',     name: '其他',     defaultAmount: 0 },
+];
+// Runtime: use settings.allowanceTypes (loaded from Firestore, editable)
+function getAllowanceTypes() { return settings.allowanceTypes?.length ? settings.allowanceTypes : DEFAULT_ALLOWANCE_TYPES; }
 const STARTING_PTS_LOW = 10;
 const INDIVIDUAL_HIGH = 35;
 const INDIVIDUAL_ZERO = 0;
@@ -1118,12 +1182,26 @@ let settings = {
         {id:'pm', name:'午晚班', segments:[{start:'13:30',end:'17:00'},{start:'18:00',end:'21:30'}]},
         {id:'full', name:'全天班', segments:[{start:'09:00',end:'12:30'},{start:'14:00',end:'17:00'},{start:'18:00',end:'21:30'}]}
     ],
-    doctorSupport: {} // { doctorName: { nhi: '12-digit', idNum: 'A123456789' } }
+    doctorSupport: {}, // { doctorName: { nhi: '12-digit', idNum: 'A123456789' } }
+    allowanceTypes: [], // dynamic, loaded from Firestore; falls back to DEFAULT_ALLOWANCE_TYPES
+    salarySettings: {
+        otRatePerMinute: 4,
+        perfectAttendanceBonus: 2000,
+        seniorityRate: 1000,
+        monthlyParams: {}
+        // monthlyParams['YYYY-MM'] = { revenue, labFee, assistantCost, utilities, rent, otherCost,
+        //   fullAttendance: {[id]: bool}, deductions: {[id]: amount},
+        //   followFee: {[id]: {feePerSession, sessions}},
+        //   surgeryFee: {reconstruction:{feePerCase}, implant:{feePerCase}, cases:{[id]:{reconstruction,implant}}} }
+    }
 };
 // ── Overtime state ────────────────────────────────────────────────
 let otState = { workedShifts: [], otSegKey: null }; // otSegKey = 'shiftId:segIdx'
 let otTab = 'apply'; // 'apply' | 'status'
 let currentOTId = null; // for doctor approval
+
+// ── Salary page state ─────────────────────────────────────────────
+let salaryMonth = null;
 
 // ── OT multi-select & chart ───────────────────────────────────────
 let otSelected = new Set();
@@ -1265,6 +1343,11 @@ function subscribeData() {
               if (d.startingPtsLow  !== undefined) settings.startingPtsLow  = d.startingPtsLow;
               if (d.doctors         !== undefined) settings.doctors         = d.doctors;
               if (d.doctorSupport   !== undefined) settings.doctorSupport   = d.doctorSupport;
+              if (Array.isArray(d.allowanceTypes)) settings.allowanceTypes = d.allowanceTypes;
+              if (d.salarySettings  !== undefined) {
+                  settings.salarySettings = { ...settings.salarySettings, ...d.salarySettings };
+                  if (!settings.salarySettings.monthlyParams) settings.salarySettings.monthlyParams = {};
+              }
               // Shifts: only load if new segment format
               if (d.shifts?.length && d.shifts[0].segments) settings.shifts = d.shifts;
               // principalPassword: prefer new field, fall back to old adminPassword
@@ -1409,6 +1492,7 @@ function donutSVG(pct, size=110) {
 function today() { return new Date().toISOString().split('T')[0]; }
 function currentMonth() { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
 function nextMonthStr() { const d=new Date(); d.setMonth(d.getMonth()+1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+function prevMonth(ym) { const [y,mo]=ym.split('-').map(Number); return mo===1?`${y-1}-12`:`${y}-${String(mo-1).padStart(2,'0')}`; }
 function last6Months() {
     const arr=[]; const d=new Date();
     for(let i=0;i<6;i++){ arr.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`); d.setMonth(d.getMonth()-1); }
@@ -1487,6 +1571,48 @@ function exportToExcel(source) {
         const ws = XLSX.utils.json_to_sheet(data);
         XLSX.utils.book_append_sheet(wb, ws, '加班記錄');
         XLSX.writeFile(wb, `加班記錄_${currentMonth()}.xlsx`);
+    } else if (source === 'salary') {
+        const m = salaryMonth || currentMonth();
+        const params = getSalaryParams(m);
+        const totalCost = params.labFee + params.assistantCost + params.utilities + params.rent + params.otherCost;
+        const rows = calcSalaryRows(m);
+        const data = rows.map(r=>({
+            '助理': r.name,
+            '資格': r.isEligible ? '正職' : '試用',
+            '年資': r.years+'年',
+            '點數': r.points,
+            '分配比例': r.isEligible ? r.pct.toFixed(1)+'%' : '—',
+            '績效獎金池': Math.round(r.bonusPool),
+            '底薪': r.baseSalary,
+            '年資加給': r.seniorityPay,
+            '績效獎金': Math.round(r.perfBonus),
+            '加班費': Math.round(r.otPay),
+            '加班分鐘': r.approvedMins,
+            '季獎金': r.seasonalAdj,
+            '額外津貼': r.allowanceTotal,
+            '津貼項目': r.allowanceNames.join('、'),
+            '全勤獎金': r.fullAttendancePay,
+            '專跟費': Math.round(r.followFeePay),
+            '跟刀費': Math.round(r.surgeryFeePay),
+            '扣除': r.deduction,
+            '實領薪資': Math.round(r.total)
+        }));
+        const ws = XLSX.utils.json_to_sheet(data.length ? data : [{}]);
+        // Append cost summary as extra rows
+        XLSX.utils.sheet_add_aoa(ws, [
+            [],
+            ['成本明細',''],
+            ['業績', params.revenue],
+            ['技工費', params.labFee],
+            ['助理薪資（前月）', params.assistantCost],
+            ['水電', params.utilities],
+            ['房租', params.rent],
+            ['其他', params.otherCost],
+            ['總成本', totalCost],
+            ['績效獎金池', Math.max(0, params.revenue - totalCost)],
+        ], { origin: -1 });
+        XLSX.utils.book_append_sheet(wb, ws, '薪資計算');
+        XLSX.writeFile(wb, `助理薪資_${m}.xlsx`);
     }
 }
 
@@ -1564,7 +1690,7 @@ function navigate(p) {
 }
 function renderPage(p) {
     ({overview:renderOverview,record:renderRecord,history:renderHistory,
-      settlement:renderSettlementPage,assistants:renderAssistants,rules:renderRules,
+      settlement:renderSettlementPage,salary:renderSalaryPage,assistants:renderAssistants,rules:renderRules,
       myview:renderMyView,'overtime-apply':renderOvertimeApply,
       'overtime-approve':renderOvertimeApprove,
       'support-report':renderSupportReport})[p]?.();
@@ -1582,7 +1708,7 @@ function renderOverview() {
     if (modeDiv) {
         modeDiv.innerHTML = viewMode === 'viewer'
             ? '<button class="btn btn-outline btn-sm" onclick="showLoginScreen()">🔒 登入</button>'
-            : '<button class="btn btn-outline btn-sm" onclick="logoutAll()">↩ 登出</button>';
+            : '';
     }
     const s = calcSettlement(m);
     const txns = state.transactions.filter(t=>txnMonth(t)===m);
@@ -2076,6 +2202,380 @@ function renderStlContent() {
         </div>`;
 }
 
+// ================================================================
+// SALARY CALCULATION
+// ================================================================
+function renderSalaryPage() {
+    if (!salaryMonth) salaryMonth = currentMonth();
+    document.getElementById('sal-month-tabs').innerHTML = last6Months().map(m =>
+        `<button class="month-tab ${m===salaryMonth?'active':''}" onclick="setSalaryMonth('${m}')">${monthLabel(m)}</button>`
+    ).join('');
+    renderSalaryContent();
+}
+function setSalaryMonth(m) { salaryMonth = m; renderSalaryPage(); }
+
+// Calculate previous month's total assistant cost (baseSalary + allowances, fixed portion)
+function calcPrevMonthAssistantCost() {
+    return state.assistants.filter(a => a.active).reduce((sum, a) => {
+        const bp = a.baseSalary || 0;
+        const allowanceTotal = (a.allowances || []).reduce((s, k) => {
+            const t = getAllowanceTypes().find(x => x.key === k);
+            const amt = (a.allowanceAmounts?.[k] !== undefined) ? a.allowanceAmounts[k] : (t?.defaultAmount || 0);
+            return s + amt;
+        }, 0);
+        return sum + bp + allowanceTotal;
+    }, 0);
+}
+
+function calcSeniority(hireDate, m) {
+    if (!hireDate) return 0;
+    const hire = new Date(hireDate);
+    const [y, mo] = m.split('-').map(Number);
+    const ref = new Date(y, mo, 0); // last day of month m
+    return Math.max(0, Math.floor((ref - hire) / (365.25 * 24 * 60 * 60 * 1000)));
+}
+
+function getSalaryParams(m) {
+    const mp  = (settings.salarySettings?.monthlyParams || {})[m]  || {};
+    const prevM  = prevMonth(m);
+    const prevMp = (settings.salarySettings?.monthlyParams || {})[prevM] || {};
+
+    // Carry forward per-session rates and per-case rates from previous month if not yet set
+    const followFee = {};
+    state.assistants.filter(a=>a.active).forEach(a => {
+        const cur  = mp.followFee?.[a.id]  || {};
+        const prev = prevMp.followFee?.[a.id] || {};
+        followFee[a.id] = {
+            feePerSession: cur.feePerSession !== undefined ? cur.feePerSession : (prev.feePerSession ?? 0),
+            sessions:      cur.sessions      !== undefined ? cur.sessions      : 0,
+        };
+    });
+
+    const prevSurgery = prevMp.surgeryFee || {};
+    const curSurgery  = mp.surgeryFee    || {};
+    const surgeryFee = {
+        reconstruction: { feePerCase: curSurgery.reconstruction?.feePerCase !== undefined ? curSurgery.reconstruction.feePerCase : (prevSurgery.reconstruction?.feePerCase ?? 0) },
+        implant:        { feePerCase: curSurgery.implant?.feePerCase        !== undefined ? curSurgery.implant.feePerCase        : (prevSurgery.implant?.feePerCase        ?? 0) },
+        cases: curSurgery.cases || {},
+    };
+
+    return {
+        revenue:        mp.revenue        ?? 0,
+        labFee:         mp.labFee         ?? 0,
+        assistantCost:  mp.assistantCost  !== undefined ? mp.assistantCost : calcPrevMonthAssistantCost(),
+        utilities:      mp.utilities      ?? 0,
+        rent:           mp.rent           !== undefined ? mp.rent : (prevMp.rent ?? 0),
+        otherCost:      mp.otherCost      ?? 0,
+        fullAttendance: mp.fullAttendance || {},
+        deductions:     mp.deductions     || {},
+        followFee,
+        surgeryFee,
+    };
+}
+
+function calcSalaryRows(m) {
+    const s = calcSettlement(m);
+    const ss = settings.salarySettings || {};
+    const params = getSalaryParams(m);
+    const totalCost = params.labFee + params.assistantCost + params.utilities + params.rent + params.otherCost;
+    const bonusPool = Math.max(0, params.revenue - totalCost);
+    const otRate = ss.otRatePerMinute ?? 4;
+    const perfBonus2 = ss.perfectAttendanceBonus ?? 2000;
+    const seniorityRate = ss.seniorityRate ?? 1000;
+    const seasonalAdjBase = s.bonusStatus === 'bonus' ? 500 : s.bonusStatus === 'penalty' ? -500 : 0;
+
+    return s.items.map(item => {
+        const asst = state.assistants.find(a => a.id === item.id) || {};
+        const baseSalary = asst.baseSalary || 0;
+        const years = calcSeniority(asst.hireDate, m);
+        const seniorityPay = years * seniorityRate;
+        const allowanceTotal = (asst.allowances || []).reduce((sum, k) => {
+            const t = getAllowanceTypes().find(x => x.key === k);
+            const amt = (asst.allowanceAmounts?.[k] !== undefined) ? asst.allowanceAmounts[k] : (t?.defaultAmount || 0);
+            return sum + amt;
+        }, 0);
+        const allowanceNames = (asst.allowances || []).map(k => {
+            const t = getAllowanceTypes().find(x=>x.key===k);
+            const amt = (asst.allowanceAmounts?.[k] !== undefined) ? asst.allowanceAmounts[k] : (t?.defaultAmount || 0);
+            return `${t?.name||k}${amt?'('+amt.toLocaleString()+')':''}`;
+        });
+        const perfBonus = item.isEligible ? item.pct / 100 * bonusPool * 0.01 : 0;
+        const approvedMins = state.overtime
+            .filter(r => r.assistantId === item.id && r.status === 'approved' && r.date.startsWith(m))
+            .reduce((sum, r) => sum + r.overtimeMinutes, 0);
+        const otPay = approvedMins * otRate;
+        const seasonalAdj = item.isEligible ? seasonalAdjBase : 0;
+        const fullAttendance = !!params.fullAttendance[item.id];
+        const fullAttendancePay = fullAttendance ? perfBonus2 : 0;
+        const deduction = Number(params.deductions[item.id] || 0);
+        // Follow fee
+        const ffData = params.followFee[item.id] || {};
+        const followFeePay = (ffData.feePerSession || 0) * (ffData.sessions || 0);
+        // Surgery fee
+        const sfCases = (params.surgeryFee.cases || {})[item.id] || {};
+        const reconPay   = (sfCases.reconstruction || 0) * (params.surgeryFee.reconstruction?.feePerCase || 0);
+        const implantPay = (sfCases.implant        || 0) * (params.surgeryFee.implant?.feePerCase        || 0);
+        const surgeryFeePay = reconPay + implantPay;
+
+        const total = baseSalary + seniorityPay + perfBonus + otPay + seasonalAdj + allowanceTotal + fullAttendancePay + followFeePay + surgeryFeePay - deduction;
+        return {
+            id: item.id, name: item.name, isEligible: item.isEligible,
+            points: item.points, pct: item.pct,
+            baseSalary, years, seniorityPay, allowanceTotal, allowanceNames,
+            perfBonus, otPay, approvedMins, seasonalAdj,
+            fullAttendance, fullAttendancePay, deduction,
+            followFeePay, ffData, reconPay, implantPay, surgeryFeePay,
+            sfCases, total, bonusPool
+        };
+    });
+}
+
+function renderSalaryContent() {
+    const m = salaryMonth;
+    const ss = settings.salarySettings || {};
+    const params = getSalaryParams(m);
+    const totalCost = params.labFee + params.assistantCost + params.utilities + params.rent + params.otherCost;
+    const bonusPool = Math.max(0, params.revenue - totalCost);
+    const rows = calcSalaryRows(m);
+    const s = calcSettlement(m);
+    const seasonalLabel = s.bonusStatus==='bonus' ? '＋500（達標）' : s.bonusStatus==='penalty' ? '－500（未達底線）' : '無調整';
+    const seasonalColor = s.bonusStatus==='bonus' ? 'var(--green)' : s.bonusStatus==='penalty' ? 'var(--red)' : 'var(--text-muted)';
+    const fmt = n => Math.round(n).toLocaleString();
+    const inpStyle = 'width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:9px;font-size:var(--fs-base);font-family:inherit;background:var(--surface);text-align:right';
+    const lbl = (text, sub='') => `<div style="font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:5px">${text}${sub?`<span style="color:var(--text-muted);font-size:10px;margin-left:4px">${sub}</span>`:''}</div>`;
+    const inp = (id,val,min=0,step=100) => `<input type="number" id="${id}" value="${val}" min="${min}" step="${step}" style="${inpStyle}">`;
+    const thStyle = 'padding:9px 10px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-muted);white-space:nowrap;text-align:right';
+    const tdStyle = (extra='') => `padding:11px 10px;border-bottom:1px solid var(--border);text-align:right;${extra}`;
+
+    const activeAsstRows = state.assistants.filter(a=>a.active).sort((a,b)=>a.name.localeCompare(b.name,'zh-TW'));
+
+    document.getElementById('sal-content').innerHTML = `
+        <!-- 業績與成本 -->
+        <div class="card section">
+            <div class="card-title">績效獎金池計算</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:14px">
+                <div>${lbl('業績（元）')}${inp('sal-revenue',params.revenue,0,1000)}</div>
+                <div>${lbl('技工費（元）')}${inp('sal-lab',params.labFee)}</div>
+                <div>${lbl('助理薪資','（前月，可調整）')}${inp('sal-asst-cost',params.assistantCost)}</div>
+                <div>${lbl('水電（元）')}${inp('sal-utilities',params.utilities)}</div>
+                <div>${lbl('房租（元）','（自動帶入前月）')}${inp('sal-rent',params.rent)}</div>
+                <div>${lbl('其他成本（元）')}${inp('sal-other',params.otherCost)}</div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:12px 16px;background:var(--surface-alt);border-radius:10px">
+                <div style="display:flex;gap:28px;flex-wrap:wrap">
+                    <div><div style="font-size:var(--fs-sm);color:var(--text-muted)">總成本</div><div style="font-size:var(--fs-sub);font-weight:700;color:var(--red)">${fmt(totalCost)}</div></div>
+                    <div><div style="font-size:var(--fs-sm);color:var(--text-muted)">業績</div><div style="font-size:var(--fs-sub);font-weight:700">${fmt(params.revenue)}</div></div>
+                    <div><div style="font-size:var(--fs-sm);color:var(--text-muted)">績效獎金池</div><div style="font-size:var(--fs-sub);font-weight:800;color:var(--green)">${fmt(bonusPool)}</div></div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                    <div style="font-size:var(--fs-sm);color:var(--text-muted)">季獎金：<strong style="color:${seasonalColor}">${seasonalLabel}</strong></div>
+                    <button class="btn btn-primary btn-sm" onclick="saveSalarySettings()">儲存設定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 年資與費用設定 -->
+        <div class="card section">
+            <div class="card-title">年資與費用設定</div>
+            <!-- 年資加給率 -->
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap">
+                <div style="display:flex;align-items:center;gap:10px">
+                    <div style="font-size:var(--fs-base);color:var(--text-secondary);white-space:nowrap">年資加給（元／年）</div>
+                    <input type="number" id="sal-seniority-rate" value="${ss.seniorityRate??1000}" min="0" step="100"
+                        style="width:110px;padding:7px 10px;border:1px solid var(--border);border-radius:9px;font-size:var(--fs-base);font-family:inherit;text-align:right;background:var(--surface)">
+                </div>
+                <div style="font-size:var(--fs-sm);color:var(--text-muted)">依到職日自動計算年資，每滿1年增加對應加給</div>
+            </div>
+            <!-- 專跟費設定 -->
+            <div style="margin-bottom:18px">
+                <div style="font-size:var(--fs-sm);font-weight:700;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">專跟費用</div>
+                <div style="overflow-x:auto">
+                <table style="width:100%;border-collapse:collapse;min-width:500px">
+                    <thead><tr>
+                        <th style="${thStyle};text-align:left">助理</th>
+                        <th style="${thStyle}">每診費用（元）</th>
+                        <th style="${thStyle}">診次</th>
+                        <th style="${thStyle}">小計</th>
+                    </tr></thead>
+                    <tbody>
+                        ${activeAsstRows.map((a,i) => {
+                            const ff = params.followFee[a.id] || {};
+                            const subtotal = (ff.feePerSession||0)*(ff.sessions||0);
+                            return `<tr style="${i%2===1?'background:var(--surface-alt)':''}">
+                                <td style="${tdStyle('text-align:left;font-weight:500')}">${a.name}</td>
+                                <td style="${tdStyle()}"><input type="number" data-ff-fps="${a.id}" value="${ff.feePerSession||0}" min="0" step="100" style="width:90px;padding:5px 8px;border:1px solid var(--border);border-radius:7px;font-size:var(--fs-base);font-family:inherit;text-align:right;background:var(--surface)"></td>
+                                <td style="${tdStyle()}"><input type="number" data-ff-sess="${a.id}" value="${ff.sessions||0}" min="0" step="1" style="width:70px;padding:5px 8px;border:1px solid var(--border);border-radius:7px;font-size:var(--fs-base);font-family:inherit;text-align:right;background:var(--surface)"></td>
+                                <td style="${tdStyle('font-weight:600;color:var(--accent)')}">${subtotal?fmt(subtotal):'—'}</td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+            <!-- 跟刀費設定 -->
+            <div>
+                <div style="font-size:var(--fs-sm);font-weight:700;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">跟刀費用</div>
+                <div style="display:flex;gap:20px;margin-bottom:12px;flex-wrap:wrap">
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <div style="font-size:var(--fs-base);color:var(--text-secondary);white-space:nowrap">全口重建每台（元）</div>
+                        <input type="number" id="sal-sf-recon" value="${params.surgeryFee.reconstruction?.feePerCase||0}" min="0" step="100"
+                            style="width:110px;padding:7px 10px;border:1px solid var(--border);border-radius:9px;font-size:var(--fs-base);font-family:inherit;text-align:right;background:var(--surface)">
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <div style="font-size:var(--fs-base);color:var(--text-secondary);white-space:nowrap">植牙每台（元）</div>
+                        <input type="number" id="sal-sf-implant" value="${params.surgeryFee.implant?.feePerCase||0}" min="0" step="100"
+                            style="width:110px;padding:7px 10px;border:1px solid var(--border);border-radius:9px;font-size:var(--fs-base);font-family:inherit;text-align:right;background:var(--surface)">
+                    </div>
+                </div>
+                <div style="overflow-x:auto">
+                <table style="width:100%;border-collapse:collapse;min-width:500px">
+                    <thead><tr>
+                        <th style="${thStyle};text-align:left">助理</th>
+                        <th style="${thStyle}">全口重建（台數）</th>
+                        <th style="${thStyle}">植牙（台數）</th>
+                        <th style="${thStyle}">跟刀費小計</th>
+                    </tr></thead>
+                    <tbody>
+                        ${activeAsstRows.map((a,i) => {
+                            const sfC = (params.surgeryFee.cases||{})[a.id]||{};
+                            const subtotal = (sfC.reconstruction||0)*(params.surgeryFee.reconstruction?.feePerCase||0)+(sfC.implant||0)*(params.surgeryFee.implant?.feePerCase||0);
+                            return `<tr style="${i%2===1?'background:var(--surface-alt)':''}">
+                                <td style="${tdStyle('text-align:left;font-weight:500')}">${a.name}</td>
+                                <td style="${tdStyle()}"><input type="number" data-sf-recon="${a.id}" value="${sfC.reconstruction||0}" min="0" step="1" style="width:70px;padding:5px 8px;border:1px solid var(--border);border-radius:7px;font-size:var(--fs-base);font-family:inherit;text-align:right;background:var(--surface)"></td>
+                                <td style="${tdStyle()}"><input type="number" data-sf-implant="${a.id}" value="${sfC.implant||0}" min="0" step="1" style="width:70px;padding:5px 8px;border:1px solid var(--border);border-radius:7px;font-size:var(--fs-base);font-family:inherit;text-align:right;background:var(--surface)"></td>
+                                <td style="${tdStyle('font-weight:600;color:var(--accent)')}">${subtotal?fmt(subtotal):'—'}</td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 薪資明細表 -->
+        <div class="card">
+            <div class="card-title">${monthLabel(m)} 薪資明細</div>
+            <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;min-width:1050px">
+                <thead><tr>
+                    <th style="${thStyle};text-align:left">助理</th>
+                    <th style="${thStyle}">底薪</th>
+                    <th style="${thStyle}">年資加給</th>
+                    <th style="${thStyle}">績效獎金</th>
+                    <th style="${thStyle}">加班費</th>
+                    <th style="${thStyle}">季獎金</th>
+                    <th style="${thStyle}">額外津貼</th>
+                    <th style="${thStyle}">全勤獎金</th>
+                    <th style="${thStyle}">專跟費</th>
+                    <th style="${thStyle}">跟刀費</th>
+                    <th style="${thStyle}">扣除</th>
+                    <th style="${thStyle}">實領薪資</th>
+                </tr></thead>
+                <tbody>
+                    ${rows.map((r,i) => {
+                        const stripe = i%2===1?'background:var(--surface-alt)':'';
+                        const td = (content, extra='') => `<td style="${tdStyle(extra)}">${content}</td>`;
+                        return `<tr style="${stripe}">
+                            <td style="${tdStyle('text-align:left')}">
+                                <div style="font-weight:600">${r.name}</div>
+                                <div style="font-size:var(--fs-sm);color:var(--text-muted)">${r.isEligible?'正職':'試用'}${r.years>0?' · '+r.years+'年':''}</div>
+                            </td>
+                            ${td(fmt(r.baseSalary))}
+                            ${td(r.seniorityPay>0?`<div style="font-weight:600">${fmt(r.seniorityPay)}</div><div style="font-size:10px;color:var(--text-muted)">${r.years}年×${(ss.seniorityRate??1000).toLocaleString()}</div>`:'—')}
+                            ${td(r.isEligible?`<div style="font-weight:600">${fmt(r.perfBonus)}</div><div style="font-size:10px;color:var(--text-muted)">${r.pct.toFixed(1)}%×1%</div>`:'—')}
+                            ${td(r.approvedMins>0?`<div>${fmt(r.otPay)}</div><div style="font-size:10px;color:var(--text-muted)">${r.approvedMins}分</div>`:'—')}
+                            ${td(r.isEligible&&r.seasonalAdj!==0?`<span style="color:${r.seasonalAdj>0?'var(--green)':'var(--red)'};font-weight:600">${r.seasonalAdj>0?'+':''}${r.seasonalAdj}</span>`:'—')}
+                            ${td(r.allowanceTotal>0?`<div>${fmt(r.allowanceTotal)}</div><div style="font-size:10px;color:var(--text-muted)">${r.allowanceNames.join('、')}</div>`:'—')}
+                            <td style="${tdStyle()}">
+                                <label style="display:flex;align-items:center;justify-content:flex-end;gap:6px;cursor:pointer">
+                                    <input type="checkbox" data-fa="${r.id}" ${r.fullAttendance?'checked':''} style="width:14px;height:14px">
+                                    <span style="font-size:var(--fs-sm);color:var(--text-muted)">2,000</span>
+                                </label>
+                            </td>
+                            ${td(r.followFeePay>0?`<div>${fmt(r.followFeePay)}</div><div style="font-size:10px;color:var(--text-muted)">${r.ffData.sessions}診</div>`:'—')}
+                            ${td(r.surgeryFeePay>0?`<div>${fmt(r.surgeryFeePay)}</div>${r.reconPay>0?`<div style="font-size:10px;color:var(--text-muted)">全口${r.sfCases.reconstruction||0}台</div>`:''}${r.implantPay>0?`<div style="font-size:10px;color:var(--text-muted)">植牙${r.sfCases.implant||0}台</div>`:''}`:'—')}
+                            <td style="${tdStyle()}">
+                                <input type="number" data-deduct="${r.id}" value="${r.deduction}" min="0" step="100"
+                                    style="width:80px;padding:5px 8px;border:1px solid var(--border);border-radius:7px;font-size:var(--fs-base);font-family:inherit;text-align:right;color:var(--red);background:var(--surface)">
+                            </td>
+                            ${td(`<span style="font-size:var(--fs-sub);font-weight:800;color:${r.total>=0?'var(--text-primary)':'var(--red)'}">${fmt(r.total)}</span>`)}
+                        </tr>`;
+                    }).join('')}
+                    <tr style="background:var(--accent-light)">
+                        <td style="padding:11px 10px;font-weight:700;border-top:2px solid var(--border)">合計</td>
+                        <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border)">${fmt(rows.reduce((s,r)=>s+r.baseSalary,0))}</td>
+                        <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border)">${fmt(rows.reduce((s,r)=>s+r.seniorityPay,0))}</td>
+                        <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border)">${fmt(rows.reduce((s,r)=>s+r.perfBonus,0))}</td>
+                        <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border)">${fmt(rows.reduce((s,r)=>s+r.otPay,0))}</td>
+                        <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border)">${fmt(rows.reduce((s,r)=>s+r.seasonalAdj,0))}</td>
+                        <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border)">${fmt(rows.reduce((s,r)=>s+r.allowanceTotal,0))}</td>
+                        <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border)">${fmt(rows.reduce((s,r)=>s+r.fullAttendancePay,0))}</td>
+                        <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border)">${fmt(rows.reduce((s,r)=>s+r.followFeePay,0))}</td>
+                        <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border)">${fmt(rows.reduce((s,r)=>s+r.surgeryFeePay,0))}</td>
+                        <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border);color:var(--red)">${fmt(rows.reduce((s,r)=>s+r.deduction,0))}</td>
+                        <td style="padding:11px 10px;text-align:right;border-top:2px solid var(--border)"><span style="font-size:var(--fs-sub);font-weight:800;color:var(--accent)">${fmt(rows.reduce((s,r)=>s+r.total,0))}</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+        </div>`;
+}
+
+async function saveSalarySettings() {
+    const m = salaryMonth;
+    if (!settings.salarySettings.monthlyParams) settings.salarySettings.monthlyParams = {};
+    const mp = settings.salarySettings.monthlyParams[m] || {};
+    mp.revenue       = Number(document.getElementById('sal-revenue')?.value)    || 0;
+    mp.labFee        = Number(document.getElementById('sal-lab')?.value)         || 0;
+    mp.assistantCost = Number(document.getElementById('sal-asst-cost')?.value)   || 0;
+    mp.utilities     = Number(document.getElementById('sal-utilities')?.value)   || 0;
+    mp.rent          = Number(document.getElementById('sal-rent')?.value)        || 0;
+    mp.otherCost     = Number(document.getElementById('sal-other')?.value)       || 0;
+    // Seniority rate (global)
+    settings.salarySettings.seniorityRate = Number(document.getElementById('sal-seniority-rate')?.value) || 0;
+    // Full attendance
+    mp.fullAttendance = {};
+    document.querySelectorAll('[data-fa]').forEach(cb => { if (cb.checked) mp.fullAttendance[cb.dataset.fa] = true; });
+    // Deductions
+    mp.deductions = {};
+    document.querySelectorAll('[data-deduct]').forEach(inp => {
+        const v = Number(inp.value) || 0;
+        if (v) mp.deductions[inp.dataset.deduct] = v;
+    });
+    // Follow fee
+    mp.followFee = {};
+    document.querySelectorAll('[data-ff-fps]').forEach(inp => {
+        const id = inp.dataset.ffFps;
+        if (!mp.followFee[id]) mp.followFee[id] = {};
+        mp.followFee[id].feePerSession = Number(inp.value) || 0;
+    });
+    document.querySelectorAll('[data-ff-sess]').forEach(inp => {
+        const id = inp.dataset.ffSess;
+        if (!mp.followFee[id]) mp.followFee[id] = {};
+        mp.followFee[id].sessions = Number(inp.value) || 0;
+    });
+    // Surgery fee
+    const reconFee   = Number(document.getElementById('sal-sf-recon')?.value)   || 0;
+    const implantFee = Number(document.getElementById('sal-sf-implant')?.value) || 0;
+    mp.surgeryFee = { reconstruction: { feePerCase: reconFee }, implant: { feePerCase: implantFee }, cases: {} };
+    document.querySelectorAll('[data-sf-recon]').forEach(inp => {
+        const id = inp.dataset.sfRecon;
+        if (!mp.surgeryFee.cases[id]) mp.surgeryFee.cases[id] = {};
+        mp.surgeryFee.cases[id].reconstruction = Number(inp.value) || 0;
+    });
+    document.querySelectorAll('[data-sf-implant]').forEach(inp => {
+        const id = inp.dataset.sfImplant;
+        if (!mp.surgeryFee.cases[id]) mp.surgeryFee.cases[id] = {};
+        mp.surgeryFee.cases[id].implant = Number(inp.value) || 0;
+    });
+    settings.salarySettings.monthlyParams[m] = mp;
+    try {
+        await db.collection(col('settings')).doc('main').update({ salarySettings: settings.salarySettings });
+        toast('薪資設定已儲存');
+        renderSalaryContent();
+    } catch(e) { toast('儲存失敗：'+e.message); }
+}
+
 // ── Monthly settle execution ─────────────────────────────────────
 function openMonthlySettle() {
     const m = currentMonth();
@@ -2126,16 +2626,92 @@ async function runMonthlySettle() {
 // ================================================================
 // ASSISTANTS
 // ================================================================
+// ── Allowance type management ─────────────────────────────────────
+function renderAllowanceTypesList() {
+    const el = document.getElementById('allowance-types-list');
+    if (!el) return;
+    const types = getAllowanceTypes();
+    if (!types.length) { el.innerHTML = '<div style="color:var(--text-muted);font-size:var(--fs-sm);padding:8px 0">尚無項目</div>'; return; }
+    el.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">${types.map(t => `
+        <div id="at-row-${t.key}" style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:9px">
+            <span style="flex:1;font-weight:500">${t.name}</span>
+            <span style="color:var(--text-muted);font-size:var(--fs-base)">${(t.defaultAmount||0).toLocaleString()} 元</span>
+            <button class="btn btn-sm btn-outline" onclick="openEditAllowanceType('${t.key}')">編輯</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteAllowanceType('${t.key}')">刪除</button>
+        </div>
+        <div id="at-edit-${t.key}" class="hidden" style="display:none;padding:10px 12px;background:var(--surface-alt);border:1px solid var(--border);border-radius:9px;gap:10px;align-items:center;flex-wrap:wrap">
+            <input type="text" id="at-edit-name-${t.key}" value="${t.name}" style="padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:var(--fs-base);font-family:inherit;width:140px">
+            <input type="number" id="at-edit-amt-${t.key}" value="${t.defaultAmount||0}" min="0" step="100" style="padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:var(--fs-base);font-family:inherit;width:100px;text-align:right">
+            <span style="font-size:var(--fs-sm);color:var(--text-muted)">元</span>
+            <button class="btn btn-primary btn-sm" onclick="confirmEditAllowanceType('${t.key}')">儲存</button>
+            <button class="btn btn-outline btn-sm" onclick="cancelEditAllowanceType('${t.key}')">取消</button>
+        </div>`).join('')}
+    </div>`;
+}
+function openAddAllowanceType() {
+    document.getElementById('allowance-type-add-form').classList.remove('hidden');
+    document.getElementById('allowance-type-add-form').style.display = 'flex';
+    document.getElementById('at-new-name').value = '';
+    document.getElementById('at-new-amount').value = '';
+    setTimeout(() => document.getElementById('at-new-name').focus(), 60);
+}
+async function confirmAddAllowanceType() {
+    const name = document.getElementById('at-new-name').value.trim();
+    const amount = Number(document.getElementById('at-new-amount').value) || 0;
+    if (!name) { toast('請輸入項目名稱'); return; }
+    const key = 'custom_' + Date.now();
+    const types = [...getAllowanceTypes(), { key, name, defaultAmount: amount }];
+    await saveAllowanceTypes(types);
+    document.getElementById('allowance-type-add-form').classList.add('hidden');
+}
+function openEditAllowanceType(key) {
+    const row = document.getElementById('at-row-' + key);
+    const editDiv = document.getElementById('at-edit-' + key);
+    if (row) row.style.display = 'none';
+    if (editDiv) { editDiv.classList.remove('hidden'); editDiv.style.display = 'flex'; }
+}
+function cancelEditAllowanceType(key) {
+    const row = document.getElementById('at-row-' + key);
+    const editDiv = document.getElementById('at-edit-' + key);
+    if (row) row.style.display = 'flex';
+    if (editDiv) { editDiv.classList.add('hidden'); editDiv.style.display = 'none'; }
+}
+async function confirmEditAllowanceType(key) {
+    const name = document.getElementById('at-edit-name-' + key)?.value.trim();
+    const amount = Number(document.getElementById('at-edit-amt-' + key)?.value) || 0;
+    if (!name) { toast('名稱不可空白'); return; }
+    const types = getAllowanceTypes().map(t => t.key === key ? { ...t, name, defaultAmount: amount } : t);
+    await saveAllowanceTypes(types);
+}
+function deleteAllowanceType(key) {
+    const t = getAllowanceTypes().find(x => x.key === key);
+    confirm2(`確定刪除津貼項目「${t?.name}」？`, async () => {
+        const types = getAllowanceTypes().filter(x => x.key !== key);
+        await saveAllowanceTypes(types);
+    });
+}
+async function saveAllowanceTypes(types) {
+    settings.allowanceTypes = types;
+    try {
+        await db.collection(col('settings')).doc('main').update({ allowanceTypes: types });
+        toast('津貼項目已儲存');
+        renderAssistants();
+    } catch(e) { toast('儲存失敗：' + e.message); }
+}
+
 function renderAssistants() {
+    renderAllowanceTypesList();
     document.getElementById('asst-info-box').innerHTML = `起始點數：每月 <strong>${settings.startingPts} 點</strong>（上月個人點數 &lt; 0 者為 <strong>${settings.startingPtsLow} 點</strong>）。新增助理時會自動建立本月起始點數記錄。可於系統設定調整。`;
     const pts = monthlyPoints(currentMonth());
     const tbody = document.getElementById('assistants-tbody');
-    if(!state.assistants.length){tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">尚無助理</td></tr>`;return;}
+    if(!state.assistants.length){tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted)">尚無助理</td></tr>`;return;}
     tbody.innerHTML=state.assistants.map(a=>`
         <tr>
             <td style="font-weight:600">${a.name}</td>
             <td><span class="badge ${a.active?'bg':'bgr'}">${a.active?'啟用':'停用'}</span></td>
             <td><span class="badge ${a.bonusEligible!==false?'bb':'bgr'}">${a.bonusEligible!==false?'參與分配':'試用/不分配'}</span></td>
+            <td style="color:var(--text-secondary)">${(a.baseSalary||0).toLocaleString()}</td>
+            <td style="font-size:var(--fs-sm);color:var(--text-secondary)">${(a.allowances||[]).map(k=>getAllowanceTypes().find(t=>t.key===k)?.name||k).join('、')||'—'}</td>
             <td><span class="${(pts[a.id]||0)>=0?'pp':'pn'}">${(pts[a.id]||0)>=0?'+':''}${pts[a.id]||0}</span></td>
             <td><span class="pin-code">${a.pin||'—'}</span></td>
             <td style="color:var(--text-muted);font-size:12.5px">${(a.createdAt||'').slice(0,10)}</td>
@@ -2147,19 +2723,32 @@ function renderAssistants() {
             </div></td>
         </tr>`).join('');
 }
+function _resetAsstModal(a) {
+    document.getElementById('edit-asst-id').value = a?.id || '';
+    document.getElementById('asst-name-input').value = a?.name || '';
+    document.getElementById('asst-bonus-input').value = (a?.bonusEligible!==false) ? '1' : '0';
+    document.getElementById('asst-base-salary').value = a?.baseSalary || 0;
+    document.getElementById('asst-hire-date').value = a?.hireDate || '';
+    const enabledKeys = a?.allowances || [];
+    const amts = a?.allowanceAmounts || {};
+    document.getElementById('asst-allowances').innerHTML = getAllowanceTypes().map(t => `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <input type="checkbox" id="al-cb-${t.key}" value="${t.key}" ${enabledKeys.includes(t.key)?'checked':''} style="width:14px;height:14px;flex-shrink:0;cursor:pointer">
+            <label for="al-cb-${t.key}" style="flex:1;font-size:var(--fs-base);cursor:pointer">${t.name}</label>
+            <input type="number" id="al-amt-${t.key}" value="${amts[t.key]!==undefined ? amts[t.key] : t.defaultAmount}" min="0" step="100"
+                style="width:90px;padding:5px 8px;border:1px solid var(--border);border-radius:7px;font-size:var(--fs-base);font-family:inherit;text-align:right">
+            <span style="font-size:var(--fs-sm);color:var(--text-muted);flex-shrink:0">元</span>
+        </div>`).join('');
+}
 function openAddAssistant() {
-    document.getElementById('edit-asst-id').value='';
-    document.getElementById('asst-name-input').value='';
-    document.getElementById('asst-bonus-input').value='1';
+    _resetAsstModal(null);
     document.getElementById('modal-asst-title').textContent='新增助理';
     showModal('modal-assistant');
     setTimeout(()=>document.getElementById('asst-name-input').focus(),60);
 }
 function editAssistant(id) {
     const a=findA(id); if(!a) return;
-    document.getElementById('edit-asst-id').value=id;
-    document.getElementById('asst-name-input').value=a.name;
-    document.getElementById('asst-bonus-input').value=a.bonusEligible!==false?'1':'0';
+    _resetAsstModal(a);
     document.getElementById('modal-asst-title').textContent='編輯助理';
     showModal('modal-assistant');
     setTimeout(()=>document.getElementById('asst-name-input').focus(),60);
@@ -2167,13 +2756,18 @@ function editAssistant(id) {
 async function saveAssistant() {
     const name=document.getElementById('asst-name-input').value.trim();
     const bonusEligible=document.getElementById('asst-bonus-input').value==='1';
+    const baseSalary=Number(document.getElementById('asst-base-salary').value)||0;
+    const hireDate=document.getElementById('asst-hire-date').value||'';
+    const allowances=getAllowanceTypes().filter(t=>document.getElementById('al-cb-'+t.key)?.checked).map(t=>t.key);
+    const allowanceAmounts={};
+    getAllowanceTypes().forEach(t=>{ allowanceAmounts[t.key]=Number(document.getElementById('al-amt-'+t.key)?.value)||0; });
     if(!name){toast('請輸入姓名');return;}
     const editId=document.getElementById('edit-asst-id').value;
     try {
-        if(editId){ await updDoc('assistants',editId,{name,bonusEligible}); toast('已更新'); }
+        if(editId){ await updDoc('assistants',editId,{name,bonusEligible,baseSalary,hireDate,allowances,allowanceAmounts}); toast('已更新'); }
         else {
             const pin = generatePin();
-            const ref = await addDoc('assistants',{name,active:true,bonusEligible,pin});
+            const ref = await addDoc('assistants',{name,active:true,bonusEligible,baseSalary,hireDate,allowances,allowanceAmounts,pin});
             await addDoc('transactions',{assistantId:ref.id,ruleId:null,points:settings.startingPts,date:today(),note:'月初起始點數',operator:currentOperator||''});
             toast(`已新增「${name}」，專屬密碼：${pin}`);
         }
@@ -2327,7 +2921,7 @@ function renderOvertimeApply() {
     const wsEl = document.getElementById('ot-worked-shifts');
     wsEl.innerHTML = settings.shifts.map(sh=>`
         <button class="ot-shift-btn ${otState.workedShifts.includes(sh.id)?getShiftClass(sh.id):''}"
-            onclick="toggleOTWorkedShift('${sh.id}')">${sh.name}<br><span style="font-size:11.5px;font-weight:400;opacity:.8">${getShiftLabel(sh)}</span></button>
+            onclick="toggleOTWorkedShift('${sh.id}')">${sh.name}<br><span style="font-size:11.5px;font-weight:400;opacity:.8">${sh.segments?.map(s=>s.start+'–'+s.end).join('<br>') || (sh.endTime?sh.endTime:'')}</span></button>
     `).join('');
 
     // OT shift section — show individual segments from all selected worked shifts
@@ -2401,7 +2995,7 @@ function updateOTCalc() {
         resultEl.style.background='var(--red-light)';resultEl.style.color='var(--red)';resultEl.style.borderColor='var(--red-border)';
         resultEl.textContent = '結束時間早於下班時間，請確認';
     } else {
-        resultEl.style.background='var(--accent-light)';resultEl.style.color='var(--accent)';resultEl.style.borderColor='#c8d4e8';
+        resultEl.style.background='var(--accent-light)';resultEl.style.color='var(--accent)';resultEl.style.borderColor='#bacde8';
         resultEl.textContent = `加班時數：${formatOTDuration(mins)}（${shEnd} → ${actualEnd}）`;
     }
 }
@@ -2656,8 +3250,8 @@ function renderOTChart(records) {
     datasets.push({
         label: '總計',
         data: totalByMonth.map(v => Math.round(v / 60 * 10) / 10),
-        borderColor: '#4361ee',
-        backgroundColor: 'rgba(67,97,238,0.07)',
+        borderColor: '#4a6fa5',
+        backgroundColor: 'rgba(74,111,165,0.06)',
         borderWidth: 3, tension: 0.3, pointRadius: 5, fill: true,
     });
 
@@ -2794,7 +3388,7 @@ function applyViewMode() {
         chip.className = 'mode-chip' + (isPrincipal||isManager?' admin':isAsst||isDoctor?' assistant':'');
     }
 
-    if (isPrincipal) { if (!['overview','record','history','settlement','assistants','rules','overtime-apply','overtime-approve','support-report'].includes(currentPage)) navigate('overview'); else refreshPage(); return; }
+    if (isPrincipal) { if (!['overview','record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report'].includes(currentPage)) navigate('overview'); else refreshPage(); return; }
     if (isManager)   { if (currentPage !== 'record' && currentPage !== 'overview') navigate('record'); else refreshPage(); return; }
     if (isDoctor)    { if (!['record','overtime-approve'].includes(currentPage)) navigate('record'); else refreshPage(); return; }
     if (isAsst)      { if (!['myview','overtime-apply'].includes(currentPage)) navigate('myview'); else refreshPage(); return; }
