@@ -11,77 +11,91 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* ── 7-step type scale ── */
-            --fs-xs:   10px;
-            --fs-sm:   11.5px;
-            --fs-cap:  12.5px;
-            --fs-base: 13px;
+            /* ── Shibuya Ward Portal — Design Tokens ── */
+
+            /* Type scale */
+            --fs-xs:   11px;
+            --fs-sm:   12px;
+            --fs-cap:  13px;
+            --fs-base: 14px;
             --fs-sub:  15px;
             --fs-hd:   18px;
             --fs-disp: 28px;
 
-            /* ── Cool neutral palette ── */
-            --bg: #f3f5f8;
-            --surface: #ffffff;
-            --surface-alt: #eaecf3;
-            --border: #dce0ec;
-            --text-primary: #1e2635;
-            --text-secondary: #50607a;
-            --text-muted: #8a96aa;
+            /* Colors */
+            --bg:          #F7F7F7;
+            --surface:     #FFFFFF;
+            --surface-alt: #F0F0F0;
+            --border:      #E0E0E0;
+            --border-strong: #CCCCCC;
+            --text-primary:   #1A1A1A;
+            --text-secondary: #555555;
+            --text-muted:     #888888;
 
-            /* ── Muted slate-blue accent ── */
-            --accent: #4a6fa5;
-            --accent-light: #edf1f8;
-            --accent-hover: #3a5a8c;
-            --accent-border: #bacde8;
+            /* Accent — link blue */
+            --accent:        #0068B7;
+            --accent-light:  #EAF3FB;
+            --accent-hover:  #004E8C;
+            --accent-border: #B3D4EF;
 
-            /* ── Semantic colors (lower saturation) ── */
-            --green: #4a8c60; --green-light: #edf5f0; --green-border: #b8d9c4;
-            --red: #b85563;   --red-light:  #fdf0f2;  --red-border:  #f0c4cc;
-            --gold: #9c7e3c;  --gold-light: #faf4e4;  --gold-border: #e0cc98;
-            --orange: #c07040; --orange-light: #fdf3ea;
+            /* Semantic — pictogram palette */
+            --green: #009B6B; --green-light: #E6F5F0; --green-border: #99D9C2;
+            --red:   #E8380D; --red-light:   #FEF0EC; --red-border:   #F5B8A8;
+            --gold:  #F5A200; --gold-light:  #FEF6E6; --gold-border:  #FBDD99;
+            --orange: #F5A200; --orange-light: #FEF6E6;
 
-            /* ── Layout ── */
-            --sw: 232px; --r: 14px; --mnav: 0px;
+            /* Layout */
+            --sw: 232px; --r: 8px; --mnav: 0px;
 
-            /* ── Shadows ── */
-            --sh:  0 1px 2px rgba(0,0,0,.04), 0 3px 10px rgba(0,0,0,.05);
-            --shm: 0 8px 28px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.06);
+            /* Shadows — none (borders only, Shibuya style) */
+            --sh:  none;
+            --shm: none;
         }
         *{box-sizing:border-box;margin:0;padding:0;}
-        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;font-size:var(--fs-sub);line-height:1.5;}
+        body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic Medium",sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;font-size:var(--fs-sub);line-height:1.6;letter-spacing:0.02em;}
 
         /* ── Sidebar ── */
-        .sidebar{width:var(--sw);background:linear-gradient(170deg,#ffffff 0%,#f4f6fb 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;box-shadow:1px 0 0 var(--border);}
-        .sidebar-brand{padding:22px 20px 16px;border-bottom:1px solid var(--border);}
-        .sidebar-brand h1{font-size:var(--fs-sub);font-weight:800;letter-spacing:-.01em;color:var(--text-primary);}
+        .sidebar{width:var(--sw);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+        .sidebar-brand{padding:20px 20px 16px;border-bottom:2px solid var(--text-primary);}
+        .sidebar-brand h1{font-size:var(--fs-sub);font-weight:700;letter-spacing:-0.01em;color:var(--text-primary);}
         .sidebar-brand p{font-size:var(--fs-sm);color:var(--text-muted);margin-top:3px;}
-        .sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;}
-        .nav-sec-label{font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);padding:14px 10px 5px;}
-        .nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;cursor:pointer;color:var(--text-secondary);font-size:var(--fs-base);font-weight:500;transition:all .18s;border:none;background:none;width:100%;text-align:left;font-family:inherit;border-left:3px solid transparent;}
-        .nav-item:hover{background:var(--surface-alt);color:var(--text-primary);border-left-color:var(--border);}
-        .nav-item.active{background:var(--accent-light);color:var(--accent);font-weight:700;border-left-color:var(--accent);}
-        .nav-icon{width:15px;height:15px;flex-shrink:0;opacity:.8;}
+        .sidebar-nav{flex:1;padding:8px 0;overflow-y:auto;}
+        .nav-sec-label{font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);padding:14px 16px 5px;}
+        .nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;border-radius:0;cursor:pointer;color:var(--text-secondary);font-size:var(--fs-base);font-weight:400;transition:background .15s,color .15s;border:none;background:none;width:100%;text-align:left;font-family:inherit;border-left:3px solid transparent;}
+        .nav-item:hover{background:var(--surface-alt);color:var(--text-primary);border-left-color:var(--border-strong);}
+        .nav-item.active{background:var(--surface-alt);color:var(--text-primary);font-weight:700;border-left-color:var(--text-primary);}
+        .nav-icon{width:15px;height:15px;flex-shrink:0;opacity:.7;}
         .nav-item.active .nav-icon{opacity:1;}
         .sidebar-footer{padding:10px 14px 16px;border-top:1px solid var(--border);}
         .conn-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--text-muted);margin-right:6px;vertical-align:middle;}
         .conn-dot.online{background:var(--green);} .conn-dot.error{background:var(--red);} .conn-dot.connecting{background:var(--gold);}
         #conn-label{font-size:var(--fs-sm);color:var(--text-muted);}
-        .btn-sidebar{display:block;width:100%;margin-top:6px;padding:7px 10px;font-size:var(--fs-sm);border-radius:8px;border:1px solid var(--border);background:none;cursor:pointer;color:var(--text-muted);font-family:inherit;text-align:left;transition:all .15s;}
-        .btn-sidebar:hover{background:var(--accent-light);color:var(--accent);border-color:var(--accent-border);}
+        .btn-sidebar{display:block;width:100%;margin-top:6px;padding:7px 10px;font-size:var(--fs-sm);border-radius:4px;border:1px solid var(--border);background:none;cursor:pointer;color:var(--text-muted);font-family:inherit;text-align:left;transition:all .15s;}
+        .btn-sidebar:hover{background:var(--surface-alt);color:var(--text-primary);border-color:var(--border-strong);}
+        .btn-maint-link{background:none;border:none;font-size:var(--fs-sm);color:var(--text-muted);cursor:pointer;font-family:inherit;padding:4px 8px;border-radius:4px;transition:color .15s;}
+        .btn-maint-link:hover{color:var(--text-secondary);}
+        .maint-section-label{font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin:14px 0 6px;}
+        .maint-id-row{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;background:var(--surface);}
+        .maint-id-info{display:flex;flex-direction:column;gap:2px;}
+        .maint-id-name{font-size:var(--fs-base);font-weight:600;color:var(--text-primary);}
+        .maint-id-meta{font-size:var(--fs-xs);color:var(--text-muted);}
+        .maint-empty{font-size:var(--fs-sm);color:var(--text-muted);padding:6px 0;font-style:italic;}
 
         /* ── Main ── */
         .main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;}
-        .page-header{background:var(--surface);border-bottom:1px solid var(--border);padding:22px 36px;box-shadow:0 1px 0 var(--border),0 2px 12px rgba(0,0,0,.03);}
-        .page-header h2{font-size:var(--fs-hd);font-weight:800;letter-spacing:-.01em;}
+        .page-header{background:var(--surface);border-bottom:1px solid var(--border);padding:20px 32px;}
+        .page-header h2{font-size:var(--fs-hd);font-weight:700;letter-spacing:-0.02em;}
         .page-header p{font-size:var(--fs-cap);color:var(--text-muted);margin-top:3px;}
-        .page-content{padding:28px 36px;flex:1;overflow-y:auto;}
+        .page-content{padding:24px 32px;flex:1;overflow-y:auto;}
 
         /* ── Cards ── */
         .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;box-shadow:var(--sh);}
-        .card-title{font-size:var(--fs-sm);font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;}
+        .card-title{font-size:var(--fs-base);font-weight:700;color:var(--text-primary);letter-spacing:-0.01em;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--text-primary);}
 
         /* ── Grid ── */
         .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
@@ -95,23 +109,23 @@
         .stat-card .sub{font-size:var(--fs-sm);color:var(--text-muted);margin-top:4px;}
 
         /* ── Buttons ── */
-        .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 17px;border-radius:9px;font-size:var(--fs-base);font-weight:600;cursor:pointer;border:none;transition:all .18s;font-family:inherit;letter-spacing:.01em;}
-        .btn-primary{background:linear-gradient(135deg,var(--accent) 0%,var(--accent-hover) 100%);color:#fff;box-shadow:0 2px 8px rgba(74,111,165,.2);}
-        .btn-primary:hover{background:linear-gradient(135deg,var(--accent-hover) 0%,#2d4d78 100%);box-shadow:0 4px 14px rgba(74,111,165,.28);transform:translateY(-1px);}
-        .btn-primary:active{transform:translateY(0);box-shadow:0 2px 8px rgba(74,111,165,.2);}
-        .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
-        .btn-outline{background:var(--surface);border:1px solid var(--border);color:var(--text-secondary);} .btn-outline:hover{background:var(--surface-alt);border-color:var(--text-muted);color:var(--text-primary);}
-        .btn-danger{background:var(--red-light);color:var(--red);border:1px solid var(--red-border);} .btn-danger:hover{background:#ffe0e6;border-color:var(--red);}
-        .btn-success{background:var(--green-light);color:var(--green);border:1px solid var(--green-border);} .btn-success:hover{background:#dcfce7;border-color:var(--green);}
-        .btn-gold{background:var(--gold-light);color:var(--gold);border:1px solid var(--gold-border);} .btn-gold:hover{background:#fef3c7;border-color:var(--gold);}
-        .btn-sm{padding:5px 12px;font-size:var(--fs-cap);border-radius:7px;}
+        .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 17px;border-radius:4px;font-size:var(--fs-base);font-weight:500;cursor:pointer;border:none;transition:background .15s,color .15s;font-family:inherit;letter-spacing:0.02em;}
+        .btn-primary{background:var(--text-primary);color:#fff;}
+        .btn-primary:hover{background:#333333;}
+        .btn-primary:active{background:#1A1A1A;}
+        .btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+        .btn-outline{background:var(--surface);border:1px solid var(--text-primary);color:var(--text-primary);} .btn-outline:hover{background:var(--surface-alt);}
+        .btn-danger{background:var(--red-light);color:var(--red);border:1px solid var(--red-border);} .btn-danger:hover{background:var(--red);color:#fff;border-color:var(--red);}
+        .btn-success{background:var(--green-light);color:var(--green);border:1px solid var(--green-border);} .btn-success:hover{background:var(--green);color:#fff;border-color:var(--green);}
+        .btn-gold{background:var(--gold-light);color:#996600;border:1px solid var(--gold-border);} .btn-gold:hover{background:var(--gold);color:#fff;border-color:var(--gold);}
+        .btn-sm{padding:5px 12px;font-size:var(--fs-cap);border-radius:4px;}
 
         /* ── Form ── */
         .form-group{margin-bottom:16px;}
         .form-label{display:block;font-size:var(--fs-cap);font-weight:700;color:var(--text-secondary);margin-bottom:6px;letter-spacing:.01em;}
-        .form-input,.form-select,.form-textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:var(--fs-base);color:var(--text-primary);background:var(--surface);transition:border-color .18s,box-shadow .18s;font-family:inherit;}
+        .form-input,.form-select,.form-textarea{width:100%;padding:9px 12px;border:1px solid var(--border-strong);border-radius:4px;font-size:var(--fs-base);color:var(--text-primary);background:var(--surface);transition:border-color .15s;font-family:inherit;}
         .form-input:hover,.form-select:hover{border-color:var(--text-muted);}
-        .form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,111,165,.1);}
+        .form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,104,183,.15);}
         .form-textarea{resize:vertical;min-height:72px;}
 
         /* ── Tables ── */
@@ -120,12 +134,12 @@
         thead th{background:var(--surface-alt);padding:11px 16px;text-align:left;font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);border-bottom:1px solid var(--border);}
         tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
         tbody tr:last-child{border-bottom:none;}
-        tbody tr:nth-child(even){background:#f2f4f8;}
-        tbody tr:hover{background:var(--accent-light)!important;}
+        tbody tr:nth-child(even){background:var(--surface-alt);}
+        tbody tr:hover{background:#EAF3FB!important;}
         tbody td{padding:12px 16px;vertical-align:middle;}
 
         /* ── Badges ── */
-        .badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-size:var(--fs-sm);font-weight:600;}
+        .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:2px;font-size:var(--fs-sm);font-weight:500;}
         .bg{background:var(--green-light);color:var(--green);}
         .br{background:var(--red-light);color:var(--red);}
         .bb{background:var(--accent-light);color:var(--accent);}
@@ -160,14 +174,14 @@
 
         /* ── Month tabs ── */
         .month-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
-        .month-tab{padding:6px 15px;border-radius:999px;border:1.5px solid var(--border);background:var(--surface);font-size:var(--fs-cap);font-weight:600;cursor:pointer;color:var(--text-secondary);transition:all .18s;font-family:inherit;}
-        .month-tab:hover{background:var(--surface-alt);border-color:var(--text-muted);}
-        .month-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(74,111,165,.22);}
+        .month-tab{padding:6px 14px;border-radius:4px;border:1px solid var(--border);background:var(--surface);font-size:var(--fs-cap);font-weight:500;cursor:pointer;color:var(--text-secondary);transition:background .15s,color .15s,border-color .15s;font-family:inherit;}
+        .month-tab:hover{background:var(--surface-alt);border-color:var(--border-strong);color:var(--text-primary);}
+        .month-tab.active{background:var(--text-primary);color:#fff;border-color:var(--text-primary);}
 
         /* ── Section ── */
         .section{margin-bottom:24px;}
-        .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-        .sec-title{font-size:var(--fs-sub);font-weight:700;}
+        .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--text-primary);}
+        .sec-title{font-size:var(--fs-sub);font-weight:700;letter-spacing:-0.01em;}
 
         /* ── Filter row ── */
         .filter-row{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap;}
@@ -179,40 +193,40 @@
         .empty-state p{font-size:var(--fs-base);}
 
         /* ── Modal ── */
-        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.32);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px;backdrop-filter:blur(2px);}
-        .modal{background:var(--surface);border-radius:var(--r);width:100%;max-width:480px;box-shadow:var(--shm);max-height:90vh;overflow-y:auto;border:1px solid var(--border);}
-        .modal-hd{padding:22px 24px 0;display:flex;align-items:center;justify-content:space-between;}
-        .modal-title{font-size:var(--fs-sub);font-weight:800;letter-spacing:-.01em;}
-        .modal-x{width:28px;height:28px;border-radius:8px;border:none;background:var(--surface-alt);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:var(--fs-sub);font-family:inherit;transition:all .15s;}
-        .modal-x:hover{background:var(--border);color:var(--text-primary);}
-        .modal-body{padding:20px 24px;}
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px;}
+        .modal{background:var(--surface);border-radius:8px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;border:1px solid var(--border);}
+        .modal-hd{padding:22px 24px 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:16px;}
+        .modal-title{font-size:var(--fs-sub);font-weight:700;letter-spacing:-0.01em;}
+        .modal-x{width:28px;height:28px;border-radius:4px;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:var(--fs-sub);font-family:inherit;transition:all .15s;}
+        .modal-x:hover{background:var(--surface-alt);color:var(--text-primary);}
+        .modal-body{padding:20px 24px;padding-top:16px;}
         .modal-ft{padding:0 24px 22px;display:flex;gap:8px;justify-content:flex-end;}
 
         /* ── Toast ── */
-        .toast{position:fixed;bottom:22px;right:22px;background:#2c2c2a;color:#fff;padding:11px 16px;border-radius:10px;font-size:var(--fs-base);box-shadow:var(--shm);opacity:0;transform:translateY(10px);transition:all .25s;z-index:2000;pointer-events:none;}
+        .toast{position:fixed;bottom:22px;right:22px;background:var(--text-primary);color:#fff;padding:11px 16px;border-radius:4px;font-size:var(--fs-base);opacity:0;transform:translateY(10px);transition:all .25s;z-index:2000;pointer-events:none;}
         .toast.show{opacity:1;transform:translateY(0);}
 
         /* ─── Record Page ─── */
         .rec-wrap{display:flex;flex-direction:column;height:calc(100vh - 68px);height:calc(100dvh - 68px);overflow:hidden;}
         .rec-scroll{flex:1;overflow-y:auto;padding:22px 32px;}
         .asst-picker{display:flex;gap:9px;flex-wrap:wrap;}
-        .asst-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 13px;min-width:72px;border-radius:14px;border:2px solid var(--border);cursor:pointer;transition:all .18s;background:var(--surface);box-shadow:var(--sh);}
-        .asst-card:hover{border-color:var(--accent);background:var(--accent-light);transform:translateY(-1px);box-shadow:0 4px 12px rgba(74,111,165,.12);}
-        .asst-card.sel{border-color:var(--accent);background:var(--accent-light);box-shadow:0 4px 12px rgba(74,111,165,.15);}
+        .asst-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 13px;min-width:72px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:background .15s,border-color .15s;background:var(--surface);}
+        .asst-card:hover{border-color:var(--border-strong);background:var(--surface-alt);}
+        .asst-card.sel{border-color:var(--accent);background:var(--accent-light);}
         .asst-avatar{width:40px;height:40px;border-radius:50%;background:var(--surface-alt);color:var(--text-secondary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:var(--fs-sub);}
         .asst-card.sel .asst-avatar{background:var(--accent);color:#fff;}
-        .asst-card-name{font-size:var(--fs-cap);font-weight:600;white-space:nowrap;}
+        .asst-card-name{font-size:var(--fs-cap);font-weight:500;white-space:nowrap;}
         .mode-btns{display:flex;gap:12px;margin-bottom:20px;}
-        .mode-btn{flex:1;padding:16px 12px;border-radius:14px;border:2px solid var(--border);font-size:var(--fs-sub);font-weight:700;cursor:pointer;transition:all .18s;background:var(--surface);font-family:inherit;color:var(--text-secondary);box-shadow:var(--sh);}
-        .mode-btn-add:hover,.mode-btn-add.sel{border-color:var(--green);background:var(--green-light);color:var(--green);box-shadow:0 4px 12px rgba(74,140,96,.12);}
-        .mode-btn-deduct:hover,.mode-btn-deduct.sel{border-color:var(--red);background:var(--red-light);color:var(--red);box-shadow:0 4px 12px rgba(184,85,99,.12);}
+        .mode-btn{flex:1;padding:16px 12px;border-radius:4px;border:1px solid var(--border);font-size:var(--fs-sub);font-weight:700;cursor:pointer;transition:background .15s,border-color .15s,color .15s;background:var(--surface);font-family:inherit;color:var(--text-secondary);}
+        .mode-btn-add:hover,.mode-btn-add.sel{border-color:var(--green);background:var(--green-light);color:var(--green);}
+        .mode-btn-deduct:hover,.mode-btn-deduct.sel{border-color:var(--red);background:var(--red-light);color:var(--red);}
         .rule-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;}
-        .rule-card{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .18s;background:var(--surface);}
-        .rule-card:hover{border-color:var(--accent);background:var(--accent-light);transform:translateY(-1px);}
+        .rule-card{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border:1px solid var(--border);border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s;background:var(--surface);}
+        .rule-card:hover{border-color:var(--border-strong);background:var(--surface-alt);}
         .rule-card.sel-r{border-color:var(--green);background:var(--green-light);}
         .rule-card.sel-v{border-color:var(--red);background:var(--red-light);}
         .rule-card-name{font-size:var(--fs-base);font-weight:500;}
-        .confirm-bar{flex-shrink:0;background:var(--surface);border-top:1px solid var(--border);padding:14px 36px;display:flex;align-items:center;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.06);}
+        .confirm-bar{flex-shrink:0;background:var(--surface);border-top:1px solid var(--border);padding:14px 36px;display:flex;align-items:center;gap:12px;}
         .confirm-summary{flex:1;font-size:var(--fs-base);font-weight:600;display:flex;align-items:center;gap:8px;min-width:0;}
         .cs-name{color:var(--accent);}
         .cs-rule{color:var(--text-secondary);font-weight:500;}
@@ -228,14 +242,14 @@
         .tc-title{font-size:var(--fs-cap);font-weight:700;margin-bottom:6px;}
         .tc-desc{font-size:var(--fs-cap);line-height:1.6;}
         .tc-prog{margin-top:10px;}
-        .flag-pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:var(--fs-sm);font-weight:600;margin-left:6px;}
+        .flag-pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:2px;font-size:var(--fs-sm);font-weight:500;margin-left:6px;}
         .fp-good{background:#e8f5e8;color:var(--green);}
         .fp-warn{background:var(--gold-light);color:var(--gold);}
         .fp-bad{background:var(--red-light);color:var(--red);}
         .fp-prob{background:var(--surface-alt);color:var(--text-muted);}
 
         /* ─── Mode chip ─── */
-        .mode-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:var(--fs-xs);font-weight:700;background:var(--surface-alt);color:var(--text-muted);}
+        .mode-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:2px;font-size:var(--fs-xs);font-weight:500;background:var(--surface-alt);color:var(--text-muted);}
         .mode-chip.admin{background:var(--accent-light);color:var(--accent);}
         .mode-chip.assistant{background:var(--green-light);color:var(--green);}
 
@@ -244,12 +258,12 @@
         body.viewer-mode .page-content{padding-bottom:14px!important;}
 
         /* ─── Login tabs ─── */
-        .login-tabs{display:flex;margin-bottom:18px;border-bottom:1px solid var(--border);}
-        .login-tab{flex:1;padding:10px 0;border:none;background:none;font-size:var(--fs-base);font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;transition:color .15s,border-color .15s;}
-        .login-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+        .login-tabs{display:flex;margin-bottom:18px;border-bottom:2px solid var(--border);}
+        .login-tab{flex:1;padding:10px 0;border:none;background:none;font-size:var(--fs-base);font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;transition:color .15s,border-color .15s;}
+        .login-tab.active{color:var(--text-primary);border-bottom-color:var(--text-primary);font-weight:700;}
 
         /* ─── PIN code display ─── */
-        .pin-code{font-family:'SF Mono','Fira Code',monospace;font-size:var(--fs-base);font-weight:700;letter-spacing:.2em;color:var(--accent);background:var(--accent-light);padding:3px 10px;border-radius:6px;}
+        .pin-code{font-family:'SF Mono','Fira Code',monospace;font-size:var(--fs-base);font-weight:700;letter-spacing:.2em;color:var(--text-primary);background:var(--surface-alt);padding:3px 10px;border-radius:4px;border:1px solid var(--border);}
 
         /* ─── Donut chart ─── */
         .donut-wrap{display:flex;align-items:center;gap:20px;margin-top:10px;flex-wrap:wrap;}
@@ -258,31 +272,31 @@
 
         /* ─── Manager list in settings ─── */
         .mgr-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
-        .mgr-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface-alt);border-radius:7px;font-size:var(--fs-base);}
+        .mgr-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface-alt);border-radius:4px;border:1px solid var(--border);font-size:var(--fs-base);}
         .mgr-name{flex:1;font-weight:500;}
 
         /* ─── Personal view ─── */
         .personal-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;}
-        .personal-pts{font-size:var(--fs-disp);font-weight:800;line-height:1;margin:8px 0;}
+        .personal-pts{font-size:var(--fs-disp);font-weight:700;line-height:1;margin:8px 0;}
         .personal-rank{font-size:var(--fs-base);color:var(--text-muted);}
         .personal-txn-list{max-height:320px;overflow-y:auto;}
 
         /* ─── Setup overlay ─── */
         #setup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;}
-        .setup-card{background:var(--surface);border-radius:16px;width:100%;max-width:560px;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden;}
-        .setup-hd{background:var(--accent);color:#fff;padding:26px 30px 22px;}
+        .setup-card{background:var(--surface);border-radius:8px;width:100%;max-width:560px;border:1px solid var(--border);overflow:hidden;}
+        .setup-hd{background:var(--text-primary);color:#fff;padding:26px 30px 22px;}
         .setup-hd h2{font-size:var(--fs-hd);font-weight:700;}
-        .setup-hd p{font-size:var(--fs-cap);opacity:.85;margin-top:3px;}
+        .setup-hd p{font-size:var(--fs-cap);opacity:.75;margin-top:3px;}
         .setup-body{padding:26px 30px;max-height:72vh;overflow-y:auto;}
         .setup-step{display:flex;gap:12px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border);}
         .setup-step:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0;}
-        .step-num{width:26px;height:26px;border-radius:50%;background:var(--accent-light);color:var(--accent);font-weight:700;font-size:var(--fs-cap);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+        .step-num{width:26px;height:26px;border-radius:50%;background:var(--surface-alt);color:var(--text-primary);font-weight:700;font-size:var(--fs-cap);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;border:1px solid var(--border);}
         .step-body h4{font-size:var(--fs-base);font-weight:700;margin-bottom:4px;}
         .step-body p{font-size:var(--fs-cap);color:var(--text-secondary);line-height:1.7;}
         .step-body a{color:var(--accent);}
-        .setup-code{font-family:'SF Mono','Fira Code',monospace;font-size:var(--fs-sm);background:var(--surface-alt);border:1px solid var(--border);border-radius:6px;padding:9px 11px;margin-top:7px;white-space:pre;overflow-x:auto;color:var(--text-secondary);line-height:1.6;}
+        .setup-code{font-family:'SF Mono','Fira Code',monospace;font-size:var(--fs-sm);background:var(--surface-alt);border:1px solid var(--border);border-radius:4px;padding:9px 11px;margin-top:7px;white-space:pre;overflow-x:auto;color:var(--text-secondary);line-height:1.6;}
         .setup-ft{padding:0 30px 26px;display:flex;gap:8px;justify-content:flex-end;}
-        .setup-err{background:var(--red-light);color:var(--red);border:1px solid var(--red-border);border-radius:7px;padding:9px 13px;font-size:var(--fs-cap);margin-bottom:14px;display:none;}
+        .setup-err{background:var(--red-light);color:var(--red);border:1px solid var(--red-border);border-radius:4px;padding:9px 13px;font-size:var(--fs-cap);margin-bottom:14px;display:none;}
 
         /* ─── Loading ─── */
         #loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9998;flex-direction:column;gap:14px;}
@@ -296,16 +310,16 @@
         /* misc */
         .page{display:none;} .page.active{display:flex;flex-direction:column;flex:1;}
         .hidden{display:none!important;}
-        .info-box{background:var(--accent-light);border:1px solid var(--accent-border);border-radius:10px;padding:12px 16px;font-size:var(--fs-cap);color:var(--accent);line-height:1.6;margin-bottom:16px;}
+        .info-box{background:var(--accent-light);border:1px solid var(--accent-border);border-radius:4px;padding:12px 16px;font-size:var(--fs-cap);color:var(--accent);line-height:1.6;margin-bottom:16px;}
         .divider{height:1px;background:var(--border);margin:18px 0;}
         .tbl-icon-btn{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:3px 7px;border-radius:4px;font-size:var(--fs-base);}
         .tbl-icon-btn:hover{color:var(--red);}
 
         /* ─── Mobile bottom nav ─── */
-        .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:101;padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:0 -4px 20px rgba(0,0,0,.07);}
+        .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:101;padding-bottom:env(safe-area-inset-bottom,0px);}
         .mobile-nav-inner{display:flex;}
-        .mn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 4px 7px;cursor:pointer;color:var(--text-muted);font-size:var(--fs-xs);font-weight:600;border:none;background:none;font-family:inherit;transition:color .18s;-webkit-tap-highlight-color:transparent;}
-        .mn-item.active{color:var(--accent);}
+        .mn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 4px 7px;cursor:pointer;color:var(--text-muted);font-size:var(--fs-xs);font-weight:500;border:none;background:none;font-family:inherit;transition:color .15s;-webkit-tap-highlight-color:transparent;}
+        .mn-item.active{color:var(--text-primary);}
         .mn-icon{width:22px;height:22px;flex-shrink:0;}
 
         @media(max-width:900px){.grid-4{grid-template-columns:1fr 1fr;}.grid-3{grid-template-columns:1fr 1fr;}}
@@ -333,19 +347,19 @@
         }
 
         /* ─── Login Screen ─── */
-        #login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#edf1f8 0%,var(--bg) 50%,#f0f3f8 100%);display:flex;align-items:center;justify-content:center;z-index:9990;padding:20px;overflow-y:auto;}
+        #login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9990;padding:20px;overflow-y:auto;}
         .ls-card{width:100%;max-width:420px;}
-        .ls-logo{font-size:var(--fs-disp);font-weight:800;color:var(--accent);text-align:center;margin-bottom:3px;letter-spacing:-.02em;}
+        .ls-logo{font-size:var(--fs-disp);font-weight:700;color:var(--text-primary);text-align:center;margin-bottom:3px;letter-spacing:-0.02em;}
         .ls-sub{font-size:var(--fs-cap);color:var(--text-muted);text-align:center;margin-bottom:24px;}
         .ls-sys-row{display:flex;gap:10px;margin-bottom:20px;}
-        .ls-sys-btn{flex:1;padding:14px 10px;border-radius:12px;border:2px solid var(--border);font-size:var(--fs-base);font-weight:700;cursor:pointer;background:var(--surface);color:var(--text-secondary);font-family:inherit;transition:all .18s;text-align:center;line-height:1.5;}
-        .ls-sys-btn:hover{border-color:var(--text-muted);background:var(--surface-alt);}
-        .ls-sys-btn.sel{border-color:var(--accent);background:var(--accent-light);color:var(--accent);box-shadow:0 2px 8px rgba(74,111,165,.15);}
-        .ls-form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;box-shadow:0 8px 32px rgba(0,0,0,.1),0 2px 8px rgba(0,0,0,.06);}
-        .ls-tabs{display:flex;margin-bottom:20px;border-bottom:1px solid var(--border);}
-        .ls-tab{flex:1;padding:9px 0;border:none;background:none;font-size:var(--fs-base);font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;transition:color .18s,border-color .18s;}
-        .ls-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
-        .ls-err{background:var(--red-light);color:var(--red);border:1px solid var(--red-border);border-radius:9px;padding:9px 13px;font-size:var(--fs-cap);margin-bottom:12px;display:none;}
+        .ls-sys-btn{flex:1;padding:14px 10px;border-radius:4px;border:1px solid var(--border);font-size:var(--fs-base);font-weight:500;cursor:pointer;background:var(--surface);color:var(--text-secondary);font-family:inherit;transition:background .15s,border-color .15s,color .15s;text-align:center;line-height:1.5;}
+        .ls-sys-btn:hover{border-color:var(--border-strong);background:var(--surface-alt);color:var(--text-primary);}
+        .ls-sys-btn.sel{border-color:var(--text-primary);background:var(--text-primary);color:#fff;}
+        .ls-form-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:24px;}
+        .ls-tabs{display:flex;margin-bottom:20px;border-bottom:2px solid var(--border);}
+        .ls-tab{flex:1;padding:9px 0;border:none;background:none;font-size:var(--fs-base);font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;transition:color .15s,border-color .15s;}
+        .ls-tab.active{color:var(--text-primary);border-bottom-color:var(--text-primary);font-weight:700;}
+        .ls-err{background:var(--red-light);color:var(--red);border:1px solid var(--red-border);border-radius:4px;padding:9px 13px;font-size:var(--fs-cap);margin-bottom:12px;display:none;}
 
         /* ─── Signature pad ─── */
         .sig-canvas-wrap{border:2px dashed var(--border);border-radius:8px;overflow:hidden;background:#fff;position:relative;cursor:crosshair;}
@@ -360,33 +374,65 @@
 
         /* ─── Overtime ─── */
         .ot-shift-row{display:flex;gap:8px;flex-wrap:wrap;}
-        .ot-shift-btn{flex:1;min-width:90px;padding:10px 12px;border-radius:10px;border:2px solid var(--border);font-size:var(--fs-base);font-weight:700;cursor:pointer;background:var(--surface);color:var(--text-secondary);font-family:inherit;transition:all .18s;box-shadow:var(--sh);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.4;}
-        .ot-shift-btn:hover{border-color:var(--text-muted);transform:translateY(-1px);}
+        .ot-shift-btn{flex:1;min-width:90px;padding:10px 12px;border-radius:4px;border:1px solid var(--border);font-size:var(--fs-base);font-weight:500;cursor:pointer;background:var(--surface);color:var(--text-secondary);font-family:inherit;transition:background .15s,border-color .15s,color .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.4;}
+        .ot-shift-btn:hover{border-color:var(--border-strong);background:var(--surface-alt);color:var(--text-primary);}
         .ot-shift-btn.sm{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
         .ot-shift-btn.sa{border-color:var(--green);background:var(--green-light);color:var(--green);}
-        .ot-shift-btn.se{border-color:var(--gold);background:var(--gold-light);color:var(--gold);}
-        .ot-record{border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:10px;background:var(--surface);box-shadow:var(--sh);transition:box-shadow .18s;}
-        .ot-record:hover{box-shadow:var(--shm);}
+        .ot-shift-btn.se{border-color:var(--gold);background:var(--gold-light);color:#996600;}
+        .ot-record{border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:10px;background:var(--surface);transition:border-color .15s;}
+        .ot-record:hover{border-color:var(--border-strong);}
         .ot-record-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
-        .ot-pend{display:inline-flex;padding:2px 8px;border-radius:999px;font-size:var(--fs-sm);font-weight:700;background:var(--gold-light);color:var(--gold);}
-        .ot-appr{display:inline-flex;padding:2px 8px;border-radius:999px;font-size:var(--fs-sm);font-weight:700;background:var(--green-light);color:var(--green);}
+        .ot-pend{display:inline-flex;padding:2px 8px;border-radius:2px;font-size:var(--fs-sm);font-weight:500;background:var(--gold-light);color:#996600;}
+        .ot-appr{display:inline-flex;padding:2px 8px;border-radius:2px;font-size:var(--fs-sm);font-weight:500;background:var(--green-light);color:var(--green);}
         .ot-sig-img{max-height:50px;border:1px solid var(--border);border-radius:4px;background:#fff;padding:2px;display:block;margin-top:6px;}
-        .ot-result{background:var(--accent-light);border:1px solid var(--accent-border);border-radius:10px;padding:10px 14px;font-size:var(--fs-base);font-weight:700;color:var(--accent);margin-top:10px;}
+        .ot-result{background:var(--accent-light);border:1px solid var(--accent-border);border-radius:4px;padding:10px 14px;font-size:var(--fs-base);font-weight:700;color:var(--accent);margin-top:10px;}
 
         /* ─── OT chart & stats ─── */
         .ot-chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;box-shadow:var(--sh);margin-bottom:18px;}
         .ot-stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:18px;}
         .ot-stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh);}
         .ot-stat-card .sc-name{font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-        .ot-stat-card .sc-val{font-size:var(--fs-hd);font-weight:700;color:var(--accent);}
+        .ot-stat-card .sc-val{font-size:var(--fs-hd);font-weight:700;color:var(--text-primary);}
         .ot-stat-card .sc-sub{font-size:var(--fs-sm);color:var(--text-muted);margin-top:1px;}
         .ot-stat-card.total-card{border-color:var(--accent-border);background:var(--accent-light);}
         .ot-stat-card.total-card .sc-val{color:var(--accent);}
 
         /* ─── History multi-select ─── */
-        .sel-bar{display:none;align-items:center;gap:10px;margin-bottom:12px;padding:8px 14px;background:var(--accent-light);border:1px solid var(--accent-border);border-radius:10px;flex-wrap:wrap;}
+        .sel-bar{display:none;align-items:center;gap:10px;margin-bottom:12px;padding:8px 14px;background:var(--accent-light);border:1px solid var(--accent-border);border-radius:4px;flex-wrap:wrap;}
         .sel-bar.show{display:flex;}
         input[type=checkbox].row-chk{width:16px;height:16px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;vertical-align:middle;}
+
+        /* ─── Leave system ─── */
+        .leave-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:var(--fs-xs);font-weight:700;letter-spacing:.04em;border:1px solid transparent;}
+        .lb-annual{background:var(--accent-light);color:var(--accent);border-color:var(--accent-border);}
+        .lb-sick{background:var(--red-light);color:var(--red);border-color:var(--red-border);}
+        .lb-personal{background:var(--gold-light);color:var(--gold);border-color:var(--gold-border);}
+        .lb-other{background:var(--surface-alt);color:var(--text-secondary);border-color:var(--border-strong);}
+        .lb-approved{background:var(--green-light);color:var(--green);border-color:var(--green-border);}
+        .lb-pending-s{background:var(--gold-light);color:var(--gold);border-color:var(--gold-border);}
+        .lb-pending-p{background:var(--accent-light);color:var(--accent);border-color:var(--accent-border);}
+        .lb-rejected{background:var(--red-light);color:var(--red);border-color:var(--red-border);}
+        .leave-type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px;margin-top:8px;}
+        .leave-type-btn{padding:10px 8px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);cursor:pointer;text-align:center;font-size:var(--fs-base);font-family:inherit;transition:border-color .15s,background .15s,color .15s;line-height:1.4;color:var(--text-secondary);}
+        .leave-type-btn:hover{border-color:var(--border-strong);background:var(--surface-alt);color:var(--text-primary);}
+        .leave-type-btn.sel-annual{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:700;}
+        .leave-type-btn.sel-sick{border-color:var(--red);background:var(--red-light);color:var(--red);font-weight:700;}
+        .leave-type-btn.sel-personal{border-color:var(--gold);background:var(--gold-light);color:var(--gold);font-weight:700;}
+        .leave-type-btn.sel-other{border-color:var(--border-strong);background:var(--surface-alt);color:var(--text-primary);font-weight:700;}
+        .leave-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;}
+        .leave-card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:7px;gap:8px;flex-wrap:wrap;}
+        .annual-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
+        .annual-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;}
+        .annual-card .ac-name{font-weight:700;font-size:var(--fs-base);color:var(--text-primary);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+        .annual-card .ac-bars{display:flex;gap:8px;}
+        .annual-card .ac-bar-item{flex:1;text-align:center;}
+        .annual-card .ac-bar-val{font-size:20px;font-weight:700;line-height:1;color:var(--text-primary);}
+        .annual-card .ac-bar-lbl{font-size:var(--fs-xs);color:var(--text-muted);margin-top:3px;}
+        .tab-btn-group{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;flex-shrink:0;}
+        .tab-btn-group .tbb{padding:6px 13px;font-size:var(--fs-sm);font-weight:500;font-family:inherit;border:none;background:var(--surface);color:var(--text-secondary);cursor:pointer;border-right:1px solid var(--border);transition:background .15s,color .15s;}
+        .tab-btn-group .tbb:last-child{border-right:none;}
+        .tab-btn-group .tbb.active{background:var(--text-primary);color:#fff;font-weight:700;}
+        .tab-btn-group .tbb:hover:not(.active){background:var(--surface-alt);color:var(--text-primary);}
 
         /* ─── Role-based nav visibility ─── */
         .nrec,.nfull,.nfull-lbl,.ndoc,.ndoc-lbl,.nasst,.nasst-lbl,.not,.not-lbl{display:none!important}
@@ -394,7 +440,11 @@
         body.principal-mode .not{display:flex!important}
         body.principal-mode .nfull-lbl,body.principal-mode .ndoc-lbl,
         body.principal-mode .not-lbl{display:block!important}
-        body.manager-mode .nrec{display:flex!important}
+        /* manager-mode: 已移除記錄點數權限 */
+        .nlv-approve,.mn-nlv-approve{display:none!important}
+        body.principal-mode .nlv-approve,body.manager-mode .nlv-approve{display:flex!important}
+        body.manager-mode .nlv-approve-lbl{display:block!important}
+        body.principal-mode .mn-nlv-approve,body.manager-mode .mn-nlv-approve{display:flex!important}
         body.doctor-mode .nrec,body.doctor-mode .ndoc{display:flex!important}
         body.doctor-mode .ndoc-lbl{display:block!important}
         body.assistant-mode .nasst,body.assistant-mode .not{display:flex!important}
@@ -404,7 +454,7 @@
         .mn-nrec,.mn-nfull,.mn-ndoc,.mn-nasst,.mn-not{display:none!important}
         body.principal-mode .mn-nrec,body.principal-mode .mn-nfull,body.principal-mode .mn-ndoc,
         body.principal-mode .mn-not{display:flex!important}
-        body.manager-mode .mn-nrec{display:flex!important}
+        /* manager-mode .mn-nrec: 已移除記錄點數權限 */
         body.doctor-mode .mn-nrec,body.doctor-mode .mn-ndoc{display:flex!important}
         body.doctor-mode .mn-overview,body.assistant-mode .mn-overview{display:none!important}
         body.assistant-mode .mn-nasst,body.assistant-mode .mn-not{display:flex!important}
@@ -467,6 +517,50 @@
             <div style="margin-top:16px">
                 <button class="btn btn-primary" style="width:100%" onclick="attemptLoginScreen()">登入</button>
             </div>
+        </div>
+        <div style="text-align:center;margin-top:12px">
+            <button class="btn-maint-link" onclick="openMaintLogin()">維護</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ Modal: 維護登入 ══ -->
+<div id="modal-maint-login" class="modal-overlay hidden">
+    <div class="modal" style="max-width:360px">
+        <div class="modal-hd"><div class="modal-title">維護模式</div><button class="modal-x" onclick="hideModal('modal-maint-login')">×</button></div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">維護密碼</label>
+                <input type="password" class="form-input" id="maint-login-pw" placeholder="輸入維護密碼" autocomplete="off">
+            </div>
+            <div id="maint-login-err" class="ls-err" style="display:none"></div>
+        </div>
+        <div class="modal-ft">
+            <button class="btn btn-outline" onclick="hideModal('modal-maint-login')">取消</button>
+            <button class="btn btn-primary" onclick="attemptMaintLogin()">進入</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ Modal: 維護面板 ══ -->
+<div id="modal-maint-panel" class="modal-overlay hidden">
+    <div class="modal" style="max-width:520px">
+        <div class="modal-hd"><div class="modal-title">維護面板</div><button class="modal-x" onclick="hideModal('modal-maint-panel')">×</button></div>
+        <div class="modal-body">
+            <!-- 修改密碼 -->
+            <div class="form-label" style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:10px">修改維護密碼</div>
+            <div style="display:flex;gap:8px;margin-bottom:4px">
+                <input type="password" class="form-input" id="maint-new-pw" placeholder="新密碼" style="flex:1" autocomplete="new-password">
+                <input type="password" class="form-input" id="maint-confirm-pw" placeholder="確認新密碼" style="flex:1" autocomplete="new-password">
+                <button class="btn btn-outline btn-sm" onclick="saveMaintPassword()" style="flex-shrink:0">儲存</button>
+            </div>
+            <div class="divider"></div>
+            <!-- 帳號列表 -->
+            <div class="form-label" style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:10px">已登入 ID 管理</div>
+            <div id="maint-id-list"></div>
+        </div>
+        <div class="modal-ft">
+            <button class="btn btn-outline" onclick="hideModal('modal-maint-panel')">關閉</button>
         </div>
     </div>
 </div>
@@ -574,14 +668,23 @@ appId: "..."'></textarea>
         <!-- 加班系統 -->
         <div class="nav-sec-label not-lbl">加班系統</div>
         <button class="nav-item not" onclick="navigate('overtime-apply')">
-            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>加班
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>加班及請假
         </button>
-        <div class="nav-sec-label ndoc-lbl">簽核</div>
+        <button class="nav-item nfull" onclick="navigate('leave')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>假勤總覽
+        </button>
+        <div class="nav-sec-label ndoc-lbl nlv-approve-lbl">簽核</div>
         <button class="nav-item ndoc" onclick="navigate('overtime-approve')" style="justify-content:space-between">
             <span style="display:flex;align-items:center;gap:9px">
                 <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>待簽核申請
             </span>
             <span id="doc-pending-badge" class="hidden" style="background:var(--red);color:#fff;border-radius:999px;font-size:10px;font-weight:700;padding:1px 7px;min-width:18px;text-align:center"></span>
+        </button>
+        <button class="nav-item nlv-approve" onclick="navigate('leave-approve')" style="justify-content:space-between">
+            <span style="display:flex;align-items:center;gap:9px">
+                <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm5 4a1 1 0 10-2 0v3H6a1 1 0 100 2h3v3a1 1 0 102 0v-3h3a1 1 0 100-2h-3V6z" clip-rule="evenodd"/></svg>假勤簽核
+            </span>
+            <span id="leave-pending-badge" class="hidden" style="background:var(--red);color:#fff;border-radius:999px;font-size:10px;font-weight:700;padding:1px 7px;min-width:18px;text-align:center"></span>
         </button>
         <div class="nav-sec-label nfull-lbl">報備</div>
         <button class="nav-item nfull" onclick="navigate('support-report')">
@@ -776,11 +879,15 @@ appId: "..."'></textarea>
         </div>
     </div>
 
-    <!-- ── 加班（申請 + 記錄合併） ── -->
+    <!-- ── 加班 ＆ 請假合併頁（助理） ── -->
     <div id="page-overtime-apply" class="page">
-        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-            <div><h2 id="ot-page-title">申請加班</h2><p id="ot-page-sub">填寫加班申請單</p></div>
-            <button class="btn btn-outline btn-sm" id="ot-tab-toggle" onclick="switchOTTab()">📋 加班記錄</button>
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <div><h2 id="ot-page-title">加班及請假</h2><p id="ot-page-sub">填寫加班申請單</p></div>
+            <div class="tab-btn-group">
+                <button class="tbb active" id="tbb-ot-apply" onclick="setOTTab('ot-apply')">申請加班</button>
+                <button class="tbb" id="tbb-lv-apply" onclick="setOTTab('lv-apply')">申請請假</button>
+                <button class="tbb" id="tbb-records" onclick="setOTTab('records')">記錄</button>
+            </div>
         </div>
         <div class="page-content">
             <div id="ot-apply-form">
@@ -836,7 +943,25 @@ appId: "..."'></textarea>
                 </div>
             </div>
             <div id="ot-status-content" style="display:none"></div>
+            <div id="lv-apply-form" style="display:none"></div>
+            <div id="combined-records-content" style="display:none"></div>
         </div>
+    </div>
+
+    <!-- ── 請假（院長總覽） ── -->
+    <div id="page-leave" class="page">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <div><h2>請假</h2><p>假勤申請與年假概況</p></div>
+        </div>
+        <div class="page-content" id="leave-content"></div>
+    </div>
+
+    <!-- ── 假勤簽核（醫師 / 院長） ── -->
+    <div id="page-leave-approve" class="page">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <div><h2>假勤簽核</h2><p id="leave-approve-sub">請假申請審核</p></div>
+        </div>
+        <div class="page-content" id="leave-approve-content"></div>
     </div>
 
     <!-- ── 報備支援 ── -->
@@ -903,7 +1028,15 @@ appId: "..."'></textarea>
     </button>
     <button class="mn-item mn-not" onclick="navigate('overtime-apply')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="7" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="14"/></svg>
-      加班
+      加班及請假
+    </button>
+    <button class="mn-item mn-nfull" onclick="navigate('leave')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      假勤總覽
+    </button>
+    <button class="mn-item mn-nlv-approve" onclick="navigate('leave-approve')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+      假勤簽核
     </button>
     <button class="mn-item mn-ndoc" onclick="navigate('overtime-approve')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
@@ -985,6 +1118,66 @@ appId: "..."'></textarea>
         <div class="modal-hd"><div class="modal-title">確認操作</div><button class="modal-x" onclick="hideModal('modal-confirm')">×</button></div>
         <div class="modal-body"><p id="confirm-text" style="color:var(--text-secondary);font-size:13px;line-height:1.7"></p></div>
         <div class="modal-ft"><button class="btn btn-outline" onclick="hideModal('modal-confirm')">取消</button><button class="btn btn-danger" id="confirm-btn">確認</button></div>
+    </div>
+</div>
+
+<!-- ══ Modal: OT History ══ -->
+<div id="modal-ot-history" class="modal-overlay hidden">
+    <div class="modal" style="max-width:560px">
+        <div class="modal-hd"><div class="modal-title" id="ot-hist-title">加班紀錄</div><button class="modal-x" onclick="hideModal('modal-ot-history')">×</button></div>
+        <div class="modal-body" id="ot-hist-body"></div>
+        <div class="modal-ft">
+            <button class="btn btn-outline" onclick="hideModal('modal-ot-history')">關閉</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ Modal: 新增請假紀錄（院長） ══ -->
+<div id="modal-add-leave" class="modal-overlay hidden">
+    <div class="modal" style="max-width:520px">
+        <div class="modal-hd"><div class="modal-title">新增請假紀錄</div><button class="modal-x" onclick="hideModal('modal-add-leave')">×</button></div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">助理</label>
+                <select class="form-select" id="al-asst" style="max-width:200px">
+                    <option value="">— 請選擇 —</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">假別</label>
+                <div class="leave-type-grid" id="al-type-grid"></div>
+            </div>
+            <div id="al-subtype-wrap" style="display:none" class="form-group">
+                <label class="form-label">其他假別</label>
+                <select class="form-select" id="al-subtype" style="max-width:200px"></select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">請假日期（可複選多天）</label>
+                <div id="al-dates-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                    <input type="date" class="form-input" id="al-date-add" style="max-width:180px">
+                    <button class="btn btn-outline btn-sm" onclick="addAdminLeaveDate()">＋ 加入日期</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">代理人</label>
+                <select class="form-select" id="al-proxy" style="max-width:200px">
+                    <option value="">— 請選擇 —</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">狀態</label>
+                <select class="form-select" id="al-status" style="max-width:200px">
+                    <option value="approved">直接核准</option>
+                    <option value="pending_supervisor">待主管簽核</option>
+                    <option value="pending_principal">待院長批核</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-ft">
+            <button class="btn btn-outline" onclick="hideModal('modal-add-leave')">取消</button>
+            <button class="btn btn-primary" onclick="submitManualLeave()">新增</button>
+        </div>
     </div>
 </div>
 
@@ -1159,8 +1352,8 @@ const INDIVIDUAL_HIGH = 35;
 const INDIVIDUAL_ZERO = 0;
 
 let cfg = null, db = null, wsId = null;
-let state = { assistants: [], rules: [], transactions: [], overtime: [], signatures: {} };
-let loaded = { a: false, r: false, t: false, s: false };
+let state = { assistants: [], rules: [], transactions: [], overtime: [], signatures: {}, leaveRequests: [] };
+let loaded = { a: false, r: false, t: false, s: false, l: false };
 let appReady = false;
 let currentPage = 'overview';
 let recState = { assistantIds: [], mode: null, ruleIds: [], customPoints: null };
@@ -1173,7 +1366,7 @@ let currentOperator = '';
 let currentAssistantView = null;
 let currentDoctor = null; // {name, password} for doctor mode
 let settings = {
-    principalPassword: '0000', bonusHighFactor: 25, bonusLowFactor: 7,
+    principalPassword: '0000', maintPassword: '0331', bonusHighFactor: 25, bonusLowFactor: 7,
     managers: [], // [{name, password}]
     startingPts: 15, startingPtsLow: 10,
     doctors: [],
@@ -1193,11 +1386,16 @@ let settings = {
         //   fullAttendance: {[id]: bool}, deductions: {[id]: amount},
         //   followFee: {[id]: {feePerSession, sessions}},
         //   surgeryFee: {reconstruction:{feePerCase}, implant:{feePerCase}, cases:{[id]:{reconstruction,implant}}} }
+    },
+    leaveSettings: {
+        annualLeaveDays: 7,         // base days year 1
+        annualLeaveIncrement: 1,    // extra days per year after year 1 (principal can adjust)
+        leaveAdjustments: {}        // { [assistantId]: { [year]: override_days } }
     }
 };
 // ── Overtime state ────────────────────────────────────────────────
 let otState = { workedShifts: [], otSegKey: null }; // otSegKey = 'shiftId:segIdx'
-let otTab = 'apply'; // 'apply' | 'status'
+let otTab = 'ot-apply'; // 'ot-apply' | 'lv-apply' | 'records'
 let currentOTId = null; // for doctor approval
 
 // ── Salary page state ─────────────────────────────────────────────
@@ -1353,6 +1551,7 @@ function subscribeData() {
               // principalPassword: prefer new field, fall back to old adminPassword
               if (d.principalPassword !== undefined) settings.principalPassword = d.principalPassword;
               else if (d.adminPassword !== undefined) settings.principalPassword = d.adminPassword;
+              if (d.maintPassword !== undefined) settings.maintPassword = d.maintPassword;
               // Managers: migrate string[] to object[] format
               if (d.managers !== undefined) {
                   if (Array.isArray(d.managers) && d.managers.length && typeof d.managers[0] === 'string') {
@@ -1371,6 +1570,7 @@ function subscribeData() {
       .onSnapshot(snap => {
           state.overtime = snap.docs.map(d=>({id:d.id,...d.data()}));
           if (currentPage==='overtime-apply'||currentPage==='overtime-approve') refreshPage();
+          if (_otHistAsstId && !document.getElementById('modal-ot-history')?.classList.contains('hidden')) renderOTHistoryModal();
           updateDocBadge();
       }, e => console.error('overtime', e));
 
@@ -1381,10 +1581,19 @@ function subscribeData() {
           snap.docs.forEach(d => { state.signatures[d.id] = d.data(); });
           if (currentPage==='myview') refreshPage();
       }, e => console.error('signatures', e));
+
+    // Leave requests
+    db.collection(col('leaveRequests')).orderBy('createdAt','desc').limit(300)
+      .onSnapshot(snap => {
+          state.leaveRequests = snap.docs.map(d=>({id:d.id,...d.data()}));
+          if (currentPage==='leave'||currentPage==='leave-approve') refreshPage();
+          updateLeaveBadge();
+          loaded.l = true; tryReady();
+      }, e => { console.error('leaveRequests', e); loaded.l = true; tryReady(); });
 }
 
 function tryReady() {
-    if (loaded.a && loaded.r && loaded.t && loaded.s) {
+    if (loaded.a && loaded.r && loaded.t && loaded.s && loaded.l) {
         hideLoading();
         applyViewMode();
         if (!appReady) {
@@ -1675,7 +1884,7 @@ const ASST_PAGES = ['myview','overtime-apply'];
 
 function navigate(p) {
     if (viewMode === 'viewer' && p !== 'overview') { showLoginScreen(); return; }
-    if (viewMode === 'manager'   && !['overview','record'].includes(p)) return;
+    if (viewMode === 'manager'   && !['overview','leave-approve'].includes(p)) return;
     if (viewMode === 'doctor'    && !['overview','record','overtime-approve'].includes(p)) return;
     if (viewMode === 'assistant' && !['overview','myview','overtime-apply'].includes(p)) return;
     // principal can go anywhere
@@ -1693,6 +1902,7 @@ function renderPage(p) {
       settlement:renderSettlementPage,salary:renderSalaryPage,assistants:renderAssistants,rules:renderRules,
       myview:renderMyView,'overtime-apply':renderOvertimeApply,
       'overtime-approve':renderOvertimeApprove,
+      leave:renderLeave,'leave-approve':renderLeaveApprove,
       'support-report':renderSupportReport})[p]?.();
 }
 function refreshPage() { renderPage(currentPage); }
@@ -2033,6 +2243,14 @@ function renderMyView() {
     const myTxns = state.transactions.filter(t=>t.assistantId===a.id)
         .sort((x,y)=>new Date(y.date)-new Date(x.date)).slice(0,30);
 
+    // Current month points summary
+    const curMonthTxns = state.transactions.filter(t=>t.assistantId===a.id && txnMonth(t)===m);
+    const curMonthPts  = curMonthTxns.reduce((s,t)=>s+t.points, 0);
+    const curPlus  = curMonthTxns.filter(t=>t.points>0).reduce((s,t)=>s+t.points,0);
+    const curMinus = curMonthTxns.filter(t=>t.points<0).reduce((s,t)=>s+t.points,0);
+    const ptColor  = curMonthPts >= 0 ? 'var(--green)' : 'var(--red)';
+    const ptSign   = curMonthPts > 0 ? '+' : '';
+
     // Signature display
     const sigObj = state.signatures[sigKey];
     const sigHtml = hasSig
@@ -2041,6 +2259,24 @@ function renderMyView() {
 
     document.getElementById('myview-content').innerHTML = `
         ${sigHtml}
+        <!-- 當月點數摘要 -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">
+            <div class="stat-card" style="border-left:3px solid ${ptColor}">
+                <div class="lb">當月累積點數</div>
+                <div class="val" style="color:${ptColor};font-size:32px">${ptSign}${curMonthPts}</div>
+                <div class="sub">${monthLabel(m)}</div>
+            </div>
+            <div class="stat-card">
+                <div class="lb">加分合計</div>
+                <div class="val" style="color:var(--green);font-size:24px">+${curPlus}</div>
+                <div class="sub">本月</div>
+            </div>
+            <div class="stat-card">
+                <div class="lb">扣分合計</div>
+                <div class="val" style="color:var(--red);font-size:24px">${curMinus}</div>
+                <div class="sub">本月</div>
+            </div>
+        </div>
         <div class="card">
             <div class="card-title">最近點數記錄</div>
             ${myTxns.length===0?'<div class="empty-state"><p>尚無記錄</p></div>':
@@ -2235,6 +2471,20 @@ function calcSeniority(hireDate, m) {
     return Math.max(0, Math.floor((ref - hire) / (365.25 * 24 * 60 * 60 * 1000)));
 }
 
+function calcSeniorityPayAndLabel(hireDate, m) {
+    if (!hireDate) return { pay: 0, label: '' };
+    const hire = new Date(hireDate);
+    const [y, mo] = m.split('-').map(Number);
+    const ref = new Date(y, mo, 0);
+    const diffMs = ref - hire;
+    if (diffMs <= 0) return { pay: 0, label: '' };
+    const totalMonths = Math.floor(diffMs / (30.4375 * 24 * 60 * 60 * 1000));
+    if (totalMonths < 6) return { pay: 0, label: `${totalMonths}月` };
+    if (totalMonths < 12) return { pay: 500, label: '滿6月' };
+    const years = Math.floor(diffMs / (365.25 * 24 * 60 * 60 * 1000));
+    return { pay: years * 1000, label: `${years}年` };
+}
+
 function getSalaryParams(m) {
     const mp  = (settings.salarySettings?.monthlyParams || {})[m]  || {};
     const prevM  = prevMonth(m);
@@ -2262,7 +2512,7 @@ function getSalaryParams(m) {
     return {
         revenue:        mp.revenue        ?? 0,
         labFee:         mp.labFee         ?? 0,
-        assistantCost:  mp.assistantCost  !== undefined ? mp.assistantCost : calcPrevMonthAssistantCost(),
+        assistantCost:  mp.assistantCost  !== undefined ? mp.assistantCost : (prevMp.assistantCost !== undefined ? prevMp.assistantCost : calcPrevMonthAssistantCost()),
         utilities:      mp.utilities      ?? 0,
         rent:           mp.rent           !== undefined ? mp.rent : (prevMp.rent ?? 0),
         otherCost:      mp.otherCost      ?? 0,
@@ -2288,7 +2538,7 @@ function calcSalaryRows(m) {
         const asst = state.assistants.find(a => a.id === item.id) || {};
         const baseSalary = asst.baseSalary || 0;
         const years = calcSeniority(asst.hireDate, m);
-        const seniorityPay = years * seniorityRate;
+        const { pay: seniorityPay, label: seniorityLabel } = calcSeniorityPayAndLabel(asst.hireDate, m);
         const allowanceTotal = (asst.allowances || []).reduce((sum, k) => {
             const t = getAllowanceTypes().find(x => x.key === k);
             const amt = (asst.allowanceAmounts?.[k] !== undefined) ? asst.allowanceAmounts[k] : (t?.defaultAmount || 0);
@@ -2321,7 +2571,7 @@ function calcSalaryRows(m) {
         return {
             id: item.id, name: item.name, isEligible: item.isEligible,
             points: item.points, pct: item.pct,
-            baseSalary, years, seniorityPay, allowanceTotal, allowanceNames,
+            baseSalary, years, seniorityPay, seniorityLabel, allowanceTotal, allowanceNames,
             perfBonus, otPay, approvedMins, seasonalAdj,
             fullAttendance, fullAttendancePay, deduction,
             followFeePay, ffData, reconPay, implantPay, surgeryFeePay,
@@ -2341,7 +2591,7 @@ function renderSalaryContent() {
     const seasonalLabel = s.bonusStatus==='bonus' ? '＋500（達標）' : s.bonusStatus==='penalty' ? '－500（未達底線）' : '無調整';
     const seasonalColor = s.bonusStatus==='bonus' ? 'var(--green)' : s.bonusStatus==='penalty' ? 'var(--red)' : 'var(--text-muted)';
     const fmt = n => Math.round(n).toLocaleString();
-    const inpStyle = 'width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:9px;font-size:var(--fs-base);font-family:inherit;background:var(--surface);text-align:right';
+    const inpStyle = 'width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:4px;font-size:var(--fs-base);font-family:inherit;background:var(--surface);text-align:right';
     const lbl = (text, sub='') => `<div style="font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:5px">${text}${sub?`<span style="color:var(--text-muted);font-size:10px;margin-left:4px">${sub}</span>`:''}</div>`;
     const inp = (id,val,min=0,step=100) => `<input type="number" id="${id}" value="${val}" min="${min}" step="${step}" style="${inpStyle}">`;
     const thStyle = 'padding:9px 10px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-muted);white-space:nowrap;text-align:right';
@@ -2361,7 +2611,7 @@ function renderSalaryContent() {
                 <div>${lbl('房租（元）','（自動帶入前月）')}${inp('sal-rent',params.rent)}</div>
                 <div>${lbl('其他成本（元）')}${inp('sal-other',params.otherCost)}</div>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:12px 16px;background:var(--surface-alt);border-radius:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:12px 16px;background:var(--surface-alt);border-radius:4px">
                 <div style="display:flex;gap:28px;flex-wrap:wrap">
                     <div><div style="font-size:var(--fs-sm);color:var(--text-muted)">總成本</div><div style="font-size:var(--fs-sub);font-weight:700;color:var(--red)">${fmt(totalCost)}</div></div>
                     <div><div style="font-size:var(--fs-sm);color:var(--text-muted)">業績</div><div style="font-size:var(--fs-sub);font-weight:700">${fmt(params.revenue)}</div></div>
@@ -2382,9 +2632,9 @@ function renderSalaryContent() {
                 <div style="display:flex;align-items:center;gap:10px">
                     <div style="font-size:var(--fs-base);color:var(--text-secondary);white-space:nowrap">年資加給（元／年）</div>
                     <input type="number" id="sal-seniority-rate" value="${ss.seniorityRate??1000}" min="0" step="100"
-                        style="width:110px;padding:7px 10px;border:1px solid var(--border);border-radius:9px;font-size:var(--fs-base);font-family:inherit;text-align:right;background:var(--surface)">
+                        style="width:110px;padding:7px 10px;border:1px solid var(--border);border-radius:4px;font-size:var(--fs-base);font-family:inherit;text-align:right;background:var(--surface)">
                 </div>
-                <div style="font-size:var(--fs-sm);color:var(--text-muted)">依到職日自動計算年資，每滿1年增加對應加給</div>
+                <div style="font-size:var(--fs-sm);color:var(--text-muted)">第一年：滿6月＋500，滿1年＋1000；第二年起每滿1年依此設定增加</div>
             </div>
             <!-- 專跟費設定 -->
             <div style="margin-bottom:18px">
@@ -2419,12 +2669,12 @@ function renderSalaryContent() {
                     <div style="display:flex;align-items:center;gap:8px">
                         <div style="font-size:var(--fs-base);color:var(--text-secondary);white-space:nowrap">全口重建每台（元）</div>
                         <input type="number" id="sal-sf-recon" value="${params.surgeryFee.reconstruction?.feePerCase||0}" min="0" step="100"
-                            style="width:110px;padding:7px 10px;border:1px solid var(--border);border-radius:9px;font-size:var(--fs-base);font-family:inherit;text-align:right;background:var(--surface)">
+                            style="width:110px;padding:7px 10px;border:1px solid var(--border);border-radius:4px;font-size:var(--fs-base);font-family:inherit;text-align:right;background:var(--surface)">
                     </div>
                     <div style="display:flex;align-items:center;gap:8px">
                         <div style="font-size:var(--fs-base);color:var(--text-secondary);white-space:nowrap">植牙每台（元）</div>
                         <input type="number" id="sal-sf-implant" value="${params.surgeryFee.implant?.feePerCase||0}" min="0" step="100"
-                            style="width:110px;padding:7px 10px;border:1px solid var(--border);border-radius:9px;font-size:var(--fs-base);font-family:inherit;text-align:right;background:var(--surface)">
+                            style="width:110px;padding:7px 10px;border:1px solid var(--border);border-radius:4px;font-size:var(--fs-base);font-family:inherit;text-align:right;background:var(--surface)">
                     </div>
                 </div>
                 <div style="overflow-x:auto">
@@ -2478,10 +2728,10 @@ function renderSalaryContent() {
                         return `<tr style="${stripe}">
                             <td style="${tdStyle('text-align:left')}">
                                 <div style="font-weight:600">${r.name}</div>
-                                <div style="font-size:var(--fs-sm);color:var(--text-muted)">${r.isEligible?'正職':'試用'}${r.years>0?' · '+r.years+'年':''}</div>
+                                <div style="font-size:var(--fs-sm);color:var(--text-muted)">${r.isEligible?'正職':'試用'}${r.seniorityLabel?' · '+r.seniorityLabel:''}</div>
                             </td>
                             ${td(fmt(r.baseSalary))}
-                            ${td(r.seniorityPay>0?`<div style="font-weight:600">${fmt(r.seniorityPay)}</div><div style="font-size:10px;color:var(--text-muted)">${r.years}年×${(ss.seniorityRate??1000).toLocaleString()}</div>`:'—')}
+                            ${td(r.seniorityPay>0?`<div style="font-weight:600">${fmt(r.seniorityPay)}</div><div style="font-size:10px;color:var(--text-muted)">${r.seniorityLabel}</div>`:'—')}
                             ${td(r.isEligible?`<div style="font-weight:600">${fmt(r.perfBonus)}</div><div style="font-size:10px;color:var(--text-muted)">${r.pct.toFixed(1)}%×1%</div>`:'—')}
                             ${td(r.approvedMins>0?`<div>${fmt(r.otPay)}</div><div style="font-size:10px;color:var(--text-muted)">${r.approvedMins}分</div>`:'—')}
                             ${td(r.isEligible&&r.seasonalAdj!==0?`<span style="color:${r.seasonalAdj>0?'var(--green)':'var(--red)'};font-weight:600">${r.seasonalAdj>0?'+':''}${r.seasonalAdj}</span>`:'—')}
@@ -2633,13 +2883,13 @@ function renderAllowanceTypesList() {
     const types = getAllowanceTypes();
     if (!types.length) { el.innerHTML = '<div style="color:var(--text-muted);font-size:var(--fs-sm);padding:8px 0">尚無項目</div>'; return; }
     el.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">${types.map(t => `
-        <div id="at-row-${t.key}" style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:9px">
+        <div id="at-row-${t.key}" style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:4px">
             <span style="flex:1;font-weight:500">${t.name}</span>
             <span style="color:var(--text-muted);font-size:var(--fs-base)">${(t.defaultAmount||0).toLocaleString()} 元</span>
             <button class="btn btn-sm btn-outline" onclick="openEditAllowanceType('${t.key}')">編輯</button>
             <button class="btn btn-sm btn-danger" onclick="deleteAllowanceType('${t.key}')">刪除</button>
         </div>
-        <div id="at-edit-${t.key}" class="hidden" style="display:none;padding:10px 12px;background:var(--surface-alt);border:1px solid var(--border);border-radius:9px;gap:10px;align-items:center;flex-wrap:wrap">
+        <div id="at-edit-${t.key}" class="hidden" style="display:none;padding:10px 12px;background:var(--surface-alt);border:1px solid var(--border);border-radius:4px;gap:10px;align-items:center;flex-wrap:wrap">
             <input type="text" id="at-edit-name-${t.key}" value="${t.name}" style="padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:var(--fs-base);font-family:inherit;width:140px">
             <input type="number" id="at-edit-amt-${t.key}" value="${t.defaultAmount||0}" min="0" step="100" style="padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:var(--fs-base);font-family:inherit;width:100px;text-align:right">
             <span style="font-size:var(--fs-sm);color:var(--text-muted)">元</span>
@@ -2882,37 +3132,55 @@ function getSegmentName(seg) {
 function getShiftLabel(sh) { return sh.segments?.length ? sh.segments.map(s=>s.start+'-'+s.end).join('，') : (sh.endTime?'下班 '+sh.endTime:''); }
 function getShiftClass(shiftId) { const idx=settings.shifts.findIndex(s=>s.id===shiftId); return idx===0?'sm':idx===1?'sa':'se'; }
 
-function switchOTTab() {
-    otTab = otTab === 'apply' ? 'status' : 'apply';
+function switchOTTab() { /* legacy — no-op */ }
+function setOTTab(tab) {
+    otTab = tab;
     renderOvertimeApply();
 }
 
 function renderOvertimeApply() {
-    // Update header & toggle
     const titleEl   = document.getElementById('ot-page-title');
     const subEl     = document.getElementById('ot-page-sub');
-    const toggleBtn = document.getElementById('ot-tab-toggle');
     const applyForm = document.getElementById('ot-apply-form');
     const statusSec = document.getElementById('ot-status-content');
-    if (otTab === 'status') {
-        if (titleEl)   titleEl.textContent = '加班記錄';
-        if (subEl)     subEl.textContent   = '申請狀態及本月累計';
-        if (toggleBtn) toggleBtn.textContent = '＋ 申請加班';
-        if (applyForm) applyForm.style.display = 'none';
-        if (statusSec) statusSec.style.display = '';
-        renderOvertimeStatus();
+    const lvForm    = document.getElementById('lv-apply-form');
+    const recSec    = document.getElementById('combined-records-content');
+
+    // Update tab button active states
+    ['ot-apply','lv-apply','records'].forEach(t => {
+        document.getElementById('tbb-'+t)?.classList.toggle('active', otTab === t);
+    });
+
+    // Show/hide panels
+    const show = id => { const el = document.getElementById(id); if (el) el.style.display = ''; };
+    const hide = id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
+
+    if (otTab === 'records') {
+        if (titleEl) titleEl.textContent = '記錄';
+        if (subEl)   subEl.textContent   = '加班及請假申請記錄';
+        hide('ot-apply-form'); hide('ot-status-content'); hide('lv-apply-form');
+        show('combined-records-content');
+        renderCombinedRecords();
         return;
     }
-    if (titleEl)   titleEl.textContent = '申請加班';
-    if (subEl)     subEl.textContent   = '填寫加班申請單';
-    if (toggleBtn) toggleBtn.textContent = '📋 加班記錄';
-    if (applyForm) applyForm.style.display = '';
-    if (statusSec) statusSec.style.display = 'none';
+    if (otTab === 'lv-apply') {
+        if (titleEl) titleEl.textContent = '申請請假';
+        if (subEl)   subEl.textContent   = '填寫請假申請單';
+        hide('ot-apply-form'); hide('ot-status-content'); hide('combined-records-content');
+        show('lv-apply-form');
+        renderLeaveForm();
+        return;
+    }
+    // ot-apply (default)
+    if (titleEl) titleEl.textContent = '加班及請假';
+    if (subEl)   subEl.textContent   = '填寫加班申請單';
+    hide('ot-status-content'); hide('lv-apply-form'); hide('combined-records-content');
+    show('ot-apply-form');
 
     // Date — restrict to past 3 days
     const dateEl = document.getElementById('ot-date');
     const todayStr = today();
-    const d3 = new Date(); d3.setDate(d3.getDate() - 3);
+    const d3 = new Date(); d3.setDate(d3.getDate() - 2);
     const minStr = `${d3.getFullYear()}-${String(d3.getMonth()+1).padStart(2,'0')}-${String(d3.getDate()).padStart(2,'0')}`;
     dateEl.max = todayStr; dateEl.min = minStr;
     if (!dateEl.value || dateEl.value < minStr || dateEl.value > todayStr) dateEl.value = todayStr;
@@ -2924,7 +3192,7 @@ function renderOvertimeApply() {
             onclick="toggleOTWorkedShift('${sh.id}')">${sh.name}<br><span style="font-size:11.5px;font-weight:400;opacity:.8">${sh.segments?.map(s=>s.start+'–'+s.end).join('<br>') || (sh.endTime?sh.endTime:'')}</span></button>
     `).join('');
 
-    // OT shift section — show individual segments from all selected worked shifts
+    // OT shift section
     const otSec = document.getElementById('ot-overtime-section');
     if (!otState.workedShifts.length) { otSec.style.display='none'; return; }
     otSec.style.display='';
@@ -2958,7 +3226,6 @@ function renderOvertimeApply() {
             ? settings.doctors.map(d=>`<option value="${d.name}">${d.name}</option>`).join('')
             : '<option value="">（尚無醫師帳號）</option>';
     }
-
     updateOTCalc();
 }
 
@@ -3046,8 +3313,11 @@ async function submitOvertimeApply() {
 
 function renderOvertimeStatus() {
     const a = currentAssistantView; if (!a) return;
-    const myRecords = state.overtime.filter(r=>r.assistantId===a.id)
-        .sort((x,y)=>new Date(y.date)-new Date(x.date));
+    const months6 = last6Months();
+    const oldest = months6[months6.length - 1];
+    const myRecords = state.overtime
+        .filter(r => r.assistantId === a.id && r.date.slice(0, 7) >= oldest)
+        .sort((x,y) => new Date(y.date) - new Date(x.date));
     const m = currentMonth();
     const monthRecords = myRecords.filter(r=>r.date.startsWith(m));
     const totalMins = monthRecords.filter(r=>r.status==='approved').reduce((s,r)=>s+r.overtimeMinutes,0);
@@ -3085,8 +3355,8 @@ function renderOvertimeStatus() {
             ${pending.map(renderRecord).join('')}
         </div>` : ''}
         <div class="section">
-            <div class="sec-title" style="margin-bottom:10px">所有申請記錄</div>
-            ${myRecords.length ? myRecords.map(renderRecord).join('') : '<div class="empty-state"><p>尚無申請記錄</p></div>'}
+            <div class="sec-title" style="margin-bottom:10px">近 6 個月申請記錄</div>
+            ${myRecords.length ? myRecords.map(renderRecord).join('') : '<div class="empty-state"><p>近 6 個月尚無申請記錄</p></div>'}
         </div>`;
 }
 
@@ -3105,22 +3375,25 @@ function renderOvertimeApprove() {
         const m = currentMonth();
         const monthApproved = state.overtime.filter(r => r.status === 'approved' && r.date.startsWith(m));
         const totalMins = monthApproved.reduce((s,r) => s + r.overtimeMinutes, 0);
-        // per-assistant
-        const byAsst = {};
+        // Per-assistant — include ALL active assistants (even 0)
+        const byAsstId = {};
         monthApproved.forEach(r => {
-            byAsst[r.assistantName] = (byAsst[r.assistantName] || 0) + r.overtimeMinutes;
+            byAsstId[r.assistantId] = (byAsstId[r.assistantId] || 0) + r.overtimeMinutes;
         });
-        const asstCards = Object.entries(byAsst).sort((a,b)=>b[1]-a[1]).map(([name,mins])=>`
-            <div class="ot-stat-card">
-                <div class="sc-name">${name}</div>
-                <div class="sc-val">${formatOTDuration(mins)}</div>
+        const asstCards = state.assistants.filter(a=>a.active).sort((a,b)=>a.name.localeCompare(b.name,'zh-TW')).map(a => {
+            const mins = byAsstId[a.id] || 0;
+            return `<div class="ot-stat-card" style="position:relative">
+                <div class="sc-name">${a.name}</div>
+                <div class="sc-val" style="font-size:18px">${formatOTDuration(mins)}</div>
                 <div class="sc-sub">${mins} 分鐘</div>
-            </div>`).join('');
+                <button onclick="openOTHistory('${a.id}','${a.name}')" style="margin-top:8px;width:100%;padding:4px 0;font-size:11px;border:1px solid var(--border);border-radius:4px;background:var(--surface-alt);cursor:pointer;font-family:inherit;color:var(--text-secondary)">${PENCIL_ICON} 查看/調整</button>
+            </div>`;
+        }).join('');
 
         statsHtml = `
         <div class="section">
-            <div class="sec-header"><div class="sec-title">本月加班統計</div><span style="font-size:12.5px;color:var(--text-muted)">${m}</span></div>
-            <div class="ot-stat-grid">
+            <div class="sec-header"><div class="sec-title">本月加班時數總覽</div><span style="font-size:12.5px;color:var(--text-muted)">${m}</span></div>
+            <div class="ot-stat-grid" style="margin-bottom:14px">
                 <div class="ot-stat-card total-card">
                     <div class="sc-name">所有助理合計</div>
                     <div class="sc-val">${formatOTDuration(totalMins)}</div>
@@ -3168,6 +3441,7 @@ function renderOvertimeApprove() {
                     <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.9">
                         班別：${r.otShiftName}　下班：${r.scheduledEnd}　實際：${r.actualEnd}<br>
                         加班：<span class="pp" style="font-weight:700">${formatOTDuration(r.overtimeMinutes)}</span>
+                        ${isPrincipal?`<button class="btn btn-outline btn-sm" style="font-size:11px;padding:2px 7px;margin-left:8px" onclick="editOTMinutes('${r.id}',${r.overtimeMinutes})">${PENCIL_ICON} 調整</button>`:''}
                         ${r.note?`<br>備注：${r.note}`:''}
                     </div>
                     <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
@@ -3191,7 +3465,10 @@ function renderOvertimeApprove() {
                             ${isPrincipal?`<button class="btn btn-outline btn-sm" onclick="unapproveOTRecord('${r.id}')">取消簽核</button>`:''}
                         </div>
                     </div>
-                    <div style="font-size:12.5px;color:var(--text-muted)">${formatOTDuration(r.overtimeMinutes)}</div>
+                    <div style="font-size:12.5px;color:var(--text-muted)">
+                        ${formatOTDuration(r.overtimeMinutes)}
+                        ${isPrincipal?`<button class="btn btn-outline btn-sm" style="font-size:11px;padding:2px 7px;margin-left:8px" onclick="editOTMinutes('${r.id}',${r.overtimeMinutes})">${PENCIL_ICON} 調整</button>`:''}
+                    </div>
                     ${r.approverSignature?`<img class="ot-sig-img sig-zoomable" src="${r.approverSignature}" alt="簽名" onclick="openImgZoom(this.src)"><div style="font-size:10px;color:var(--text-muted);margin-top:3px">${r.approverName} 簽核${r.approvedAt?' · '+fmtTimestamp(r.approvedAt):''}</div>` : ''}
                 </div>
             </div>`).join('')}
@@ -3214,6 +3491,125 @@ function renderOvertimeApprove() {
 
     if (isPrincipal) setTimeout(() => renderOTChart(state.overtime), 50);
     updateOTSelBar();
+}
+
+async function editOTMinutes(id, currentMins) {
+    const input = prompt(`調整加班分鐘數（目前：${currentMins} 分鐘）\n請輸入新的分鐘數：`, currentMins);
+    if (input === null) return;
+    const newMins = parseInt(input);
+    if (isNaN(newMins) || newMins < 0) { toast('請輸入有效的分鐘數'); return; }
+    try {
+        await db.collection(col('overtime')).doc(id).update({ overtimeMinutes: newMins });
+        toast(`已更新為 ${formatOTDuration(newMins)}`);
+    } catch(e) { toast('更新失敗：' + e.message); }
+}
+
+async function addOTAdjustment(assistantId, assistantName) {
+    const m = currentMonth();
+    const monthApproved = state.overtime.filter(r => r.assistantId === assistantId && r.status === 'approved' && r.date.startsWith(m));
+    const currentTotal = monthApproved.reduce((s,r) => s + r.overtimeMinutes, 0);
+    const input = prompt(`${assistantName} 本月核准時數：${formatOTDuration(currentTotal)}（${currentTotal} 分鐘）\n請輸入調整分鐘數（正數加、負數減）：`, 0);
+    if (input === null) return;
+    const adj = parseInt(input);
+    if (isNaN(adj) || adj === 0) { toast('未輸入有效調整值'); return; }
+    const today = new Date().toISOString().slice(0,10);
+    try {
+        await db.collection(col('overtime')).add({
+            assistantId, assistantName, date: today,
+            workedShifts: [], otShiftId: 'manual', otShiftName: '手動調整',
+            scheduledEnd: '—', actualEnd: '—',
+            overtimeMinutes: adj,
+            approverName: '院長', status: 'approved', approverSignature: null,
+            note: `手動調整（${adj > 0 ? '+' : ''}${adj} 分鐘）`,
+            createdAt: new Date().toISOString(), type: 'adjustment'
+        });
+        toast(`已新增調整：${adj > 0 ? '+' : ''}${adj} 分鐘`);
+    } catch(e) { toast('新增失敗：' + e.message); }
+}
+
+// ─── OT History Modal (principal) ────────────────────────────────
+let _otHistAsstId = null, _otHistAsstName = '';
+function openOTHistory(assistantId, assistantName) {
+    _otHistAsstId = assistantId; _otHistAsstName = assistantName;
+    const titleEl = document.getElementById('ot-hist-title');
+    if (titleEl) titleEl.textContent = `${assistantName} — 近半年加班紀錄`;
+    renderOTHistoryModal();
+    document.getElementById('modal-ot-history')?.classList.remove('hidden');
+}
+function renderOTHistoryModal() {
+    const el = document.getElementById('ot-hist-body'); if (!el) return;
+    const months6 = last6Months();
+    const oldest = months6[months6.length - 1];
+    const todayStr = today();
+    // min date = first day of oldest month in window
+    const minDate = oldest + '-01';
+    const recs = state.overtime
+        .filter(r => r.assistantId === _otHistAsstId && r.date.slice(0,7) >= oldest)
+        .sort((a,b) => new Date(b.date) - new Date(a.date));
+    const totalApproved = recs.filter(r=>r.status==='approved').reduce((s,r)=>s+r.overtimeMinutes,0);
+    el.innerHTML = `
+        <div style="margin-bottom:12px;padding:10px 12px;background:var(--surface-alt);border-radius:6px;font-size:var(--fs-sm)">
+            <span style="color:var(--text-muted)">近半年核准合計：</span>
+            <span style="font-weight:700;color:var(--accent)">${formatOTDuration(totalApproved)}</span>
+            <span style="color:var(--text-muted);margin-left:4px">（${totalApproved} 分鐘）</span>
+        </div>
+        ${recs.length ? recs.map(r=>`
+        <div class="ot-record" style="margin-bottom:8px">
+            <div class="ot-record-hd">
+                <div>
+                    <span style="font-weight:600;font-size:var(--fs-base)">${r.date}</span>
+                    <span style="color:var(--text-muted);font-size:var(--fs-sm);margin-left:8px">${r.otShiftName}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <span class="${r.status==='approved'?'ot-appr':r.status==='rejected'?'badge br':'ot-pend'}">${r.status==='approved'?'已簽核':r.status==='rejected'?'已退回':'待簽核'}</span>
+                    <button class="btn btn-outline btn-sm" style="font-size:10px;padding:2px 6px" onclick="editOTMinutesAndRefresh('${r.id}',${r.overtimeMinutes})">${PENCIL_ICON} 調整</button>
+                </div>
+            </div>
+            <div style="font-size:var(--fs-sm);color:var(--text-secondary)">
+                ${formatOTDuration(r.overtimeMinutes)}
+                ${r.note?`<span style="color:var(--text-muted);margin-left:8px">${r.note}</span>`:''}
+            </div>
+        </div>`).join('') : '<div class="empty-state" style="margin-bottom:12px"><p>近半年無加班紀錄</p></div>'}
+        <div style="margin-top:14px;padding:14px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface-alt)">
+            <div style="font-size:var(--fs-sm);font-weight:700;color:var(--text-primary);margin-bottom:10px">新增調整紀錄</div>
+            <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+                <div>
+                    <div style="font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:4px">日期（近半年）</div>
+                    <input type="date" id="ot-adj-date" class="form-input" style="max-width:160px"
+                        min="${minDate}" max="${todayStr}" value="${todayStr}">
+                </div>
+                <div>
+                    <div style="font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:4px">調整分鐘數（正加 / 負減）</div>
+                    <input type="number" id="ot-adj-mins" class="form-input" style="max-width:120px" placeholder="例：30 或 -15">
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="submitOTAdjustmentFromModal()">新增</button>
+            </div>
+        </div>`;
+}
+async function editOTMinutesAndRefresh(id, currentMins) {
+    await editOTMinutes(id, currentMins);
+    renderOTHistoryModal();
+}
+async function submitOTAdjustmentFromModal() {
+    if (!_otHistAsstId) return;
+    const dateEl = document.getElementById('ot-adj-date');
+    const minsEl = document.getElementById('ot-adj-mins');
+    const dateVal = dateEl?.value;
+    const adj = parseInt(minsEl?.value);
+    if (!dateVal) { toast('請選擇日期'); return; }
+    if (isNaN(adj) || adj === 0) { toast('請輸入有效調整分鐘數（不可為 0）'); return; }
+    try {
+        await db.collection(col('overtime')).add({
+            assistantId: _otHistAsstId, assistantName: _otHistAsstName, date: dateVal,
+            workedShifts: [], otShiftId: 'manual', otShiftName: '手動調整',
+            scheduledEnd: '—', actualEnd: '—',
+            overtimeMinutes: adj, approverName: '院長', status: 'approved', approverSignature: null,
+            note: `手動調整（${adj > 0 ? '+' : ''}${adj} 分鐘）`,
+            createdAt: new Date().toISOString(), type: 'adjustment'
+        });
+        if (minsEl) minsEl.value = '';
+        toast(`已新增調整：${adj > 0 ? '+' : ''}${adj} 分鐘`);
+    } catch(e) { toast('新增失敗：' + e.message); }
 }
 
 function renderOTChart(records) {
@@ -3388,8 +3784,8 @@ function applyViewMode() {
         chip.className = 'mode-chip' + (isPrincipal||isManager?' admin':isAsst||isDoctor?' assistant':'');
     }
 
-    if (isPrincipal) { if (!['overview','record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report'].includes(currentPage)) navigate('overview'); else refreshPage(); return; }
-    if (isManager)   { if (currentPage !== 'record' && currentPage !== 'overview') navigate('record'); else refreshPage(); return; }
+    if (isPrincipal) { if (!['overview','record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report','leave','leave-approve'].includes(currentPage)) navigate('overview'); else refreshPage(); return; }
+    if (isManager)   { if (!['overview','leave-approve'].includes(currentPage)) navigate('overview'); else refreshPage(); return; }
     if (isDoctor)    { if (!['record','overtime-approve'].includes(currentPage)) navigate('record'); else refreshPage(); return; }
     if (isAsst)      { if (!['myview','overtime-apply'].includes(currentPage)) navigate('myview'); else refreshPage(); return; }
     if (currentPage !== 'overview') navigate('overview'); else refreshPage();
@@ -3496,6 +3892,127 @@ function attemptLoginScreen() {
     }
 }
 
+// ── Maintenance mode ──────────────────────────────────────────────
+
+function openMaintLogin() {
+    document.getElementById('maint-login-pw').value = '';
+    document.getElementById('maint-login-err').style.display = 'none';
+    showModal('modal-maint-login');
+    setTimeout(() => document.getElementById('maint-login-pw')?.focus(), 80);
+}
+
+function attemptMaintLogin() {
+    const pw = document.getElementById('maint-login-pw').value;
+    const errEl = document.getElementById('maint-login-err');
+    if (pw !== settings.maintPassword) {
+        errEl.textContent = '維護密碼錯誤';
+        errEl.style.display = 'block';
+        document.getElementById('maint-login-pw').select();
+        return;
+    }
+    hideModal('modal-maint-login');
+    openMaintPanel();
+}
+
+function openMaintPanel() {
+    document.getElementById('maint-new-pw').value = '';
+    document.getElementById('maint-confirm-pw').value = '';
+    renderMaintIdList();
+    showModal('modal-maint-panel');
+}
+
+function renderMaintIdList() {
+    const el = document.getElementById('maint-id-list');
+    if (!el) return;
+    let html = '';
+
+    // Assistants
+    html += `<div class="maint-section-label">助理（${state.assistants.length}）</div>`;
+    if (state.assistants.length === 0) {
+        html += `<div class="maint-empty">無助理帳號</div>`;
+    } else {
+        state.assistants.forEach(a => {
+            html += `<div class="maint-id-row">
+                <div class="maint-id-info">
+                    <span class="maint-id-name">${a.name}</span>
+                    <span class="maint-id-meta">PIN：${a.pin || '—'} · ${a.bonusEligible ? '正職' : '試用'}</span>
+                </div>
+                <button class="btn btn-sm btn-danger" onclick="deleteMaintId('assistant','${a.id}','${a.name}')">刪除</button>
+            </div>`;
+        });
+    }
+
+    // Managers
+    html += `<div class="maint-section-label">管理者（${settings.managers.length}）</div>`;
+    if (settings.managers.length === 0) {
+        html += `<div class="maint-empty">無管理者帳號</div>`;
+    } else {
+        settings.managers.forEach((m, i) => {
+            html += `<div class="maint-id-row">
+                <div class="maint-id-info">
+                    <span class="maint-id-name">${m.name}</span>
+                    <span class="maint-id-meta">密碼：${m.password}</span>
+                </div>
+                <button class="btn btn-sm btn-danger" onclick="deleteMaintId('manager',${i},'${m.name}')">刪除</button>
+            </div>`;
+        });
+    }
+
+    // Doctors
+    html += `<div class="maint-section-label">醫師（${settings.doctors.length}）</div>`;
+    if (settings.doctors.length === 0) {
+        html += `<div class="maint-empty">無醫師帳號</div>`;
+    } else {
+        settings.doctors.forEach((d, i) => {
+            html += `<div class="maint-id-row">
+                <div class="maint-id-info">
+                    <span class="maint-id-name">${d.name}</span>
+                    <span class="maint-id-meta">密碼：${d.password}</span>
+                </div>
+                <button class="btn btn-sm btn-danger" onclick="deleteMaintId('doctor',${i},'${d.name}')">刪除</button>
+            </div>`;
+        });
+    }
+
+    el.innerHTML = html;
+}
+
+async function deleteMaintId(type, idxOrId, name) {
+    if (!confirm(`確定要刪除「${name}」？此操作無法復原。`)) return;
+    try {
+        if (type === 'assistant') {
+            await db.collection(col('assistants')).doc(idxOrId).delete();
+            toast(`已刪除助理：${name}`);
+        } else if (type === 'manager') {
+            const idx = parseInt(idxOrId);
+            settings.managers.splice(idx, 1);
+            await db.collection(col('settings')).doc('main').set({ managers: settings.managers }, { merge: true });
+            toast(`已刪除管理者：${name}`);
+        } else if (type === 'doctor') {
+            const idx = parseInt(idxOrId);
+            settings.doctors.splice(idx, 1);
+            await db.collection(col('settings')).doc('main').set({ doctors: settings.doctors }, { merge: true });
+            toast(`已刪除醫師：${name}`);
+        }
+        renderMaintIdList();
+    } catch(e) { toast('刪除失敗：' + e.message); }
+}
+
+async function saveMaintPassword() {
+    const np = document.getElementById('maint-new-pw').value.trim();
+    const cp = document.getElementById('maint-confirm-pw').value.trim();
+    if (!np) { toast('請輸入新密碼'); return; }
+    if (np !== cp) { toast('兩次輸入密碼不一致'); return; }
+    try {
+        await db.collection(col('settings')).doc('main').set({ maintPassword: np }, { merge: true });
+        settings.maintPassword = np;
+        document.getElementById('maint-new-pw').value = '';
+        document.getElementById('maint-confirm-pw').value = '';
+        toast('維護密碼已更新');
+    } catch(e) { toast('儲存失敗：' + e.message); }
+}
+
+// ─────────────────────────────────────────────────────────────────
 let _mgrDraft = []; // temp list edited in settings modal
 
 function openSettings() {
@@ -3730,11 +4247,618 @@ async function saveSupportReport() {
     } catch(e) { toast('儲存失敗：'+e.message); }
 }
 
+// ================================================================
+// LEAVE SYSTEM
+// ================================================================
+
+const PENCIL_ICON = `<svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-1px;flex-shrink:0"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>`;
+
+let leaveSelected = new Set();
+
+const LEAVE_TYPES = [
+    { key: 'annual',   label: '特休',   cls: 'sel-annual',   badge: 'lb-annual' },
+    { key: 'sick',     label: '病假',   cls: 'sel-sick',     badge: 'lb-sick' },
+    { key: 'personal', label: '事假',   cls: 'sel-personal', badge: 'lb-personal' },
+    { key: 'other',    label: '其他',   cls: 'sel-other',    badge: 'lb-other' },
+];
+const LEAVE_SUB_TYPES = [
+    { key: 'menstrual',   label: '生理假' },
+    { key: 'bereavement', label: '喪假' },
+    { key: 'marriage',    label: '婚假' },
+    { key: 'maternity',   label: '產假' },
+    { key: 'workInjury',  label: '工傷病假' },
+];
+
+function leaveTypeLabel(type, subType) {
+    if (type === 'other' && subType) return LEAVE_SUB_TYPES.find(s=>s.key===subType)?.label || '其他';
+    return LEAVE_TYPES.find(t=>t.key===type)?.label || type;
+}
+function leaveTypeBadgeCls(type) {
+    return LEAVE_TYPES.find(t=>t.key===type)?.badge || 'lb-other';
+}
+function leaveStatusLabel(status) {
+    return { pending_supervisor:'待主管簽核', pending_principal:'待院長簽核', approved:'已批准', rejected:'已退回' }[status] || status;
+}
+function leaveStatusBadgeCls(status) {
+    return { pending_supervisor:'lb-pending-s', pending_principal:'lb-pending-p', approved:'lb-approved', rejected:'lb-rejected' }[status] || 'lb-other';
+}
+
+function calcAnnualLeaveEntitlement(asst, year) {
+    const ls = settings.leaveSettings || {};
+    const base = ls.annualLeaveDays ?? 7;
+    const increment = ls.annualLeaveIncrement ?? 1;
+    const adj = ls.leaveAdjustments?.[asst.id]?.[String(year)];
+    if (adj !== undefined) return adj;
+    if (!asst.hireDate) return base;
+    const hireYear = new Date(asst.hireDate).getFullYear();
+    const yearsOfService = Math.max(0, year - hireYear);
+    return base + yearsOfService * increment;
+}
+
+function calcAnnualLeaveUsed(asstId, year) {
+    return state.leaveRequests.filter(r =>
+        r.assistantId === asstId &&
+        r.leaveType === 'annual' &&
+        r.status === 'approved' &&
+        (r.dates || []).some(d => d.startsWith(String(year)))
+    ).reduce((sum, r) => sum + (r.dates || []).filter(d=>d.startsWith(String(year))).length, 0);
+}
+
+function calcTotalLeaveDays(asstId, year) {
+    return state.leaveRequests.filter(r =>
+        r.assistantId === asstId &&
+        r.status === 'approved' &&
+        (r.dates || []).some(d => d.startsWith(String(year)))
+    ).reduce((sum, r) => sum + (r.dates || []).filter(d=>d.startsWith(String(year))).length, 0);
+}
+
+function updateLeaveBadge() {
+    const isPrincipal = viewMode === 'principal';
+    const isMgr = viewMode === 'manager';
+    const count = state.leaveRequests.filter(r => {
+        if (isPrincipal) return r.status === 'pending_principal';
+        if (isMgr) return r.status === 'pending_supervisor' && r.approverName === currentOperator;
+        return false;
+    }).length;
+    const badge = document.getElementById('leave-pending-badge');
+    if (!badge) return;
+    badge.textContent = count;
+    badge.classList.toggle('hidden', count === 0);
+}
+
+// ─── renderLeave (principal annual overview page) ─────────────────
+function renderLeave() {
+    const el = document.getElementById('leave-content'); if (!el) return;
+    const year = new Date().getFullYear();
+    renderLeavePrincipal(el, year);
+}
+
+// ─── renderLeaveForm (injected into combined page for assistants) ──
+function renderLeaveForm() {
+    const asst = currentAssistantView;
+    const el = document.getElementById('lv-apply-form'); if (!el) return;
+    if (!asst) { el.innerHTML = '<div class="empty-state"><p>請先登入助理帳號</p></div>'; return; }
+    const year = new Date().getFullYear();
+    const entitled = calcAnnualLeaveEntitlement(asst, year);
+    const used = calcAnnualLeaveUsed(asst.id, year);
+    const remaining = Math.max(0, entitled - used);
+    const managers = settings.managers || [];
+
+    el.innerHTML = `
+        <div class="card section">
+            <div class="card-title">本年度特休（${year}）</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;text-align:center">
+                <div><div style="font-size:var(--fs-disp);font-weight:700;color:var(--accent)">${entitled}</div><div style="font-size:var(--fs-sm);color:var(--text-muted);margin-top:4px">應得天數</div></div>
+                <div><div style="font-size:var(--fs-disp);font-weight:700;color:var(--red)">${used}</div><div style="font-size:var(--fs-sm);color:var(--text-muted);margin-top:4px">已使用</div></div>
+                <div><div style="font-size:var(--fs-disp);font-weight:700;color:var(--green)">${remaining}</div><div style="font-size:var(--fs-sm);color:var(--text-muted);margin-top:4px">剩餘天數</div></div>
+            </div>
+        </div>
+        <div class="card section">
+            <div class="card-title">申請請假</div>
+            <div class="form-group">
+                <label class="form-label">假別</label>
+                <div class="leave-type-grid" id="lv-type-grid">
+                    ${LEAVE_TYPES.map(t=>`<button class="leave-type-btn" data-ltype="${t.key}" onclick="selectLeaveType('${t.key}')">${t.label}</button>`).join('')}
+                </div>
+            </div>
+            <div id="lv-subtype-wrap" style="display:none" class="form-group">
+                <label class="form-label">其他假別</label>
+                <select class="form-select" id="lv-subtype" style="max-width:200px">
+                    ${LEAVE_SUB_TYPES.map(s=>`<option value="${s.key}">${s.label}</option>`).join('')}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">請假日期（可複選多天）</label>
+                <div id="lv-dates-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                    <input type="date" class="form-input" id="lv-date-add" style="max-width:180px">
+                    <button class="btn btn-outline btn-sm" onclick="addLeaveDate()">＋ 加入日期</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">代理人</label>
+                <select class="form-select" id="lv-proxy" style="max-width:200px">
+                    <option value="">— 請選擇 —</option>
+                    ${state.assistants.filter(a=>a.active&&a.id!==asst.id).map(a=>`<option value="${a.id}" data-name="${a.name}">${a.name}</option>`).join('')}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">簽核主管</label>
+                <select class="form-select" id="lv-approver" style="max-width:200px">
+                    <option value="">— 請選擇 —</option>
+                    ${managers.length ? managers.map(m=>`<option value="${m.name}">${m.name}</option>`).join('') : '<option disabled>（尚無管理者帳號）</option>'}
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="submitLeaveRequest()">送出簽核申請</button>
+        </div>`;
+
+    const dateEl = document.getElementById('lv-date-add');
+    if (dateEl && !dateEl.value) dateEl.value = today();
+    window._leaveDates = [];
+}
+
+// ─── renderCombinedRecords (OT + Leave combined for assistant) ─────
+function renderCombinedRecords() {
+    const asst = currentAssistantView;
+    const el = document.getElementById('combined-records-content'); if (!el) return;
+    if (!asst) { el.innerHTML = '<div class="empty-state"><p>請先登入助理帳號</p></div>'; return; }
+    const months6 = last6Months();
+    const oldest = months6[months6.length - 1];
+    const m = currentMonth();
+
+    // OT records (last 6 months)
+    const otRecs = state.overtime
+        .filter(r => r.assistantId === asst.id && r.date.slice(0,7) >= oldest)
+        .sort((x,y) => new Date(y.date) - new Date(x.date));
+    const monthOT = otRecs.filter(r => r.date.startsWith(m) && r.status==='approved');
+    const totalMins = monthOT.reduce((s,r) => s+r.overtimeMinutes, 0);
+    const pendingOT = otRecs.filter(r => r.status === 'pending');
+
+    const renderOTRow = (r) => {
+        const sig = r.approverSignature ? `<img class="ot-sig-img sig-zoomable" src="${r.approverSignature}" alt="${r.approverName}簽名" onclick="openImgZoom(this.src)"><div style="font-size:10px;color:var(--text-muted);margin-top:3px">${r.approverName} 簽核${r.approvedAt?' · '+fmtTimestamp(r.approvedAt):''}</div>` : '';
+        return `<div class="ot-record">
+            <div class="ot-record-hd">
+                <div>
+                    <span style="font-weight:700;font-size:var(--fs-base)">${r.date}</span>
+                    <span style="color:var(--text-muted);font-size:var(--fs-sm);margin-left:8px">${r.otShiftName}</span>
+                </div>
+                <span class="${r.status==='approved'?'ot-appr':r.status==='rejected'?'badge br':'ot-pend'}">${r.status==='approved'?'已簽核':r.status==='rejected'?'已退回':'待簽核'}</span>
+            </div>
+            <div style="font-size:var(--fs-sm);color:var(--text-secondary);line-height:1.8">
+                ${r.scheduledEnd} → ${r.actualEnd}
+                <span class="pp" style="margin-left:8px">+${formatOTDuration(r.overtimeMinutes)}</span>
+                <span style="color:var(--text-muted);margin-left:8px">簽核：${r.approverName}</span>
+            </div>
+            ${r.note?`<div style="font-size:var(--fs-sm);color:var(--text-muted);margin-top:4px">${r.note}</div>`:''}
+            ${sig}
+        </div>`;
+    };
+
+    // Leave records (current year)
+    const thisYear = String(new Date().getFullYear());
+    const lvRecs = state.leaveRequests
+        .filter(r => r.assistantId === asst.id && (r.dates||[]).some(d => d.startsWith(thisYear)))
+        .sort((a,b) => (b.dates?.[0]||'') > (a.dates?.[0]||'') ? 1 : -1);
+    const pendingLV = lvRecs.filter(r => r.status === 'pending_supervisor' || r.status === 'pending_principal');
+    const doneLV    = lvRecs.filter(r => r.status === 'approved' || r.status === 'rejected');
+
+    el.innerHTML = `
+        <div class="stat-card section">
+            <div class="lb">本月已核加班時數</div>
+            <div class="val" style="color:var(--accent)">${formatOTDuration(totalMins)}</div>
+            <div class="sub">${monthOT.length} 筆已簽核</div>
+        </div>
+        ${pendingOT.length || pendingLV.length ? `<div class="section">
+            <div class="sec-title" style="margin-bottom:10px;color:var(--text-secondary)">待簽核（${pendingOT.length+pendingLV.length}）</div>
+            ${pendingOT.map(renderOTRow).join('')}
+            ${pendingLV.map(r=>renderLeaveCard(r)).join('')}
+        </div>` : ''}
+        <div class="section">
+            <div class="sec-title" style="margin-bottom:10px">加班記錄（近 6 個月）</div>
+            ${otRecs.filter(r=>r.status!=='pending').length ? otRecs.filter(r=>r.status!=='pending').map(renderOTRow).join('') : '<div class="empty-state"><p>近 6 個月尚無加班記錄</p></div>'}
+        </div>
+        <div class="section">
+            <div class="sec-title" style="margin-bottom:10px">請假記錄</div>
+            ${doneLV.length ? doneLV.map(r=>renderLeaveCard(r)).join('') : '<div class="empty-state"><p>尚無請假記錄</p></div>'}
+        </div>`;
+}
+
+function renderLeavePrincipal(el, year) {
+    const ls = settings.leaveSettings || {};
+    const increment = ls.annualLeaveIncrement ?? 1;
+    const activeAsts = state.assistants.filter(a=>a.active).sort((a,b)=>a.name.localeCompare(b.name,'zh-TW'));
+
+    const annualCards = activeAsts.map(a => {
+        const entitled = calcAnnualLeaveEntitlement(a, year);
+        const used     = calcAnnualLeaveUsed(a.id, year);
+        const remaining = Math.max(0, entitled - used);
+        const totalDays = calcTotalLeaveDays(a.id, year);
+        return `<div class="annual-card">
+            <div class="ac-name">${a.name}</div>
+            <div class="ac-bars">
+                <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--accent)">${entitled}</div><div class="ac-bar-lbl">特休總天數</div></div>
+                <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--green)">${remaining}</div><div class="ac-bar-lbl">特休剩餘</div></div>
+                <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--text-secondary)">${totalDays}</div><div class="ac-bar-lbl">總請假天數</div></div>
+            </div>
+            <button onclick="adjustAnnualLeave('${a.id}','${a.name}',${year},${entitled})" style="margin-top:10px;width:100%;display:flex;align-items:center;justify-content:center;gap:5px;padding:5px 0;font-size:var(--fs-sm);border:1px solid var(--border);border-radius:4px;background:var(--surface-alt);cursor:pointer;font-family:inherit;color:var(--text-secondary);transition:background .15s" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='var(--surface-alt)'">${PENCIL_ICON} 調整天數</button>
+        </div>`;
+    }).join('');
+
+    const sortedReqs = [...state.leaveRequests].sort((a,b)=>(b.dates?.[0]||'')>(a.dates?.[0]||'')?1:-1);
+    const pending  = sortedReqs.filter(r => r.status === 'pending_principal');
+    const others   = sortedReqs.filter(r => r.status !== 'pending_principal');
+
+    el.innerHTML = `
+        <div class="card section">
+            <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+                <span>各助理年假概況（${year}）</span>
+                <div style="display:flex;align-items:center;gap:10px;font-size:var(--fs-sm)">
+                <button class="btn btn-outline btn-sm" onclick="openAddLeaveModal()">＋ 新增請假紀錄</button>
+                    <span style="color:var(--text-muted)">特休每年增加：</span>
+                    <input type="number" id="leave-increment-input" value="${increment}" min="0" max="10" step="1"
+                        style="width:55px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:var(--fs-base);font-family:inherit;text-align:center;background:var(--surface)">
+                    <span style="color:var(--text-muted)">天</span>
+                    <button class="btn btn-outline btn-sm" onclick="saveLeaveIncrement()">儲存</button>
+                </div>
+            </div>
+            <div class="annual-grid">${annualCards}</div>
+        </div>
+        ${pending.length ? `<div class="section">
+            <div class="sec-title" style="margin-bottom:10px">待院長批核（${pending.length}）</div>
+            ${pending.map(r=>renderLeaveApproveCard(r,true)).join('')}
+        </div>` : ''}
+        ${others.length ? `<div class="section">
+            <div class="sec-header">
+                <div class="sec-title">所有假勤記錄</div>
+                <div style="display:flex;gap:8px">
+                    <button class="btn btn-outline btn-sm" id="lv-sel-toggle" onclick="toggleLeaveSelMode()"
+                        style="${leaveSelected.size>0?'display:flex':''}">多選刪除</button>
+                    ${leaveSelected.size>0?`<button class="btn btn-danger btn-sm" onclick="deleteSelectedLeave()">刪除（${leaveSelected.size}）</button>
+                    <button class="btn btn-outline btn-sm" onclick="clearLeaveSelection()">取消</button>`:''}
+                </div>
+            </div>
+            <div style="margin-top:10px">
+            ${others.map(r=>renderLeaveCard(r, true)).join('')}
+            </div>
+        </div>` : ''}`;
+}
+
+function renderLeaveCard(r, selectable) {
+    const typeLabel = leaveTypeLabel(r.leaveType, r.leaveSubType);
+    const badgeCls  = leaveTypeBadgeCls(r.leaveType);
+    const statusCls = leaveStatusBadgeCls(r.status);
+    const datesStr  = (r.dates || []).join('、');
+    const chkHtml = selectable
+        ? `<input type="checkbox" class="row-chk" data-lid="${r.id}" ${leaveSelected.has(r.id)?'checked':''} onchange="toggleLeaveRow('${r.id}',this)" style="margin-right:6px;flex-shrink:0">`
+        : '';
+    return `<div class="leave-card" style="display:flex;gap:8px;align-items:flex-start">
+        ${chkHtml}
+        <div style="flex:1;min-width:0">
+            <div class="leave-card-hd">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <span class="leave-badge ${badgeCls}">${typeLabel}</span>
+                    <span style="font-weight:600;font-size:var(--fs-base)">${datesStr}</span>
+                    <span style="font-size:var(--fs-sm);color:var(--text-muted)">（${(r.dates||[]).length}天）</span>
+                </div>
+                <span class="leave-badge ${statusCls}">${leaveStatusLabel(r.status)}</span>
+            </div>
+            <div style="font-size:var(--fs-sm);color:var(--text-muted);line-height:1.7">
+                代理：${r.proxyName||'—'}　主管：${r.approverName||'—'}
+            </div>
+            ${r.status==='rejected'?`<div style="font-size:var(--fs-sm);color:var(--red);margin-top:4px">退回原因：${r.rejectReason||'—'}</div>`:''}
+        </div>
+    </div>`;
+}
+
+function renderLeaveApproveCard(r, isPrincipalView) {
+    const typeLabel = leaveTypeLabel(r.leaveType, r.leaveSubType);
+    const badgeCls  = leaveTypeBadgeCls(r.leaveType);
+    const datesStr  = (r.dates || []).join('、');
+    return `<div class="leave-card">
+        <div class="leave-card-hd">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <span style="font-weight:700;font-size:var(--fs-sub)">${r.assistantName}</span>
+                <span class="leave-badge ${badgeCls}">${typeLabel}</span>
+                ${isPrincipalView?'':'<span class="leave-badge lb-pending-s">待主管簽核</span>'}
+                ${isPrincipalView?'<span class="leave-badge lb-pending-p">待院長批核</span>':''}
+            </div>
+        </div>
+        <div style="font-size:var(--fs-sm);color:var(--text-secondary);line-height:1.8;margin-bottom:8px">
+            日期：${datesStr}（${(r.dates||[]).length}天）<br>
+            代理：${r.proxyName||'—'}　主管：${r.approverName||'—'}
+            ${r.supervisorApprovedAt?`<br><span style="color:var(--green);font-size:var(--fs-xs)">✓ 主管已批核 ${fmtTimestamp(r.supervisorApprovedAt)}</span>`:''}
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-primary btn-sm" onclick="approveLeave('${r.id}')">批准</button>
+            <button class="btn btn-outline btn-sm" onclick="rejectLeave('${r.id}')" style="color:var(--red);border-color:var(--red-border)">退回</button>
+        </div>
+    </div>`;
+}
+
+// ─── renderLeaveApprove ──────────────────────────────────────────
+function renderLeaveApprove() {
+    const el = document.getElementById('leave-approve-content'); if (!el) return;
+    const isPrincipal = viewMode === 'principal';
+    const isMgr = viewMode === 'manager';
+
+    const pendingForMe = state.leaveRequests.filter(r => {
+        if (isPrincipal) return r.status === 'pending_principal';
+        if (isMgr)       return r.status === 'pending_supervisor' && r.approverName === currentOperator;
+        return false;
+    }).sort((a,b)=>(b.createdAt||'')>(a.createdAt||'')?1:-1);
+
+    const myName = isPrincipal ? '院長' : currentOperator;
+    const others = state.leaveRequests.filter(r => {
+        if (isPrincipal) return r.status !== 'pending_principal';
+        return r.approverName === myName && r.status !== 'pending_supervisor';
+    }).sort((a,b)=>(b.dates?.[0]||'')>(a.dates?.[0]||'')?1:-1);
+
+    document.getElementById('leave-approve-sub').textContent = isPrincipal ? '院長批核' : `主管簽核（${myName||''}）`;
+
+    el.innerHTML = `
+        <div class="section">
+            <div class="sec-title" style="margin-bottom:10px">待簽核（${pendingForMe.length}）</div>
+            ${pendingForMe.length
+                ? pendingForMe.map(r=>renderLeaveApproveCard(r, isPrincipal)).join('')
+                : '<div class="empty-state"><p>目前無待簽核申請</p></div>'}
+        </div>
+        ${others.length ? `<div class="section">
+            <div class="sec-title" style="margin-bottom:10px;color:var(--text-muted)">已處理記錄</div>
+            ${others.map(r=>renderLeaveCard(r)).join('')}
+        </div>` : ''}`;
+}
+
+// ─── Leave multi-select (principal) ─────────────────────────────
+function toggleLeaveSelMode() {
+    leaveSelected.clear();
+    renderLeave();
+}
+function toggleLeaveRow(id, el) {
+    if (el.checked) leaveSelected.add(id); else leaveSelected.delete(id);
+    // Update action buttons without full re-render
+    renderLeave();
+}
+function clearLeaveSelection() {
+    leaveSelected.clear();
+    renderLeave();
+}
+async function deleteSelectedLeave() {
+    if (!leaveSelected.size) return;
+    confirm2(`確定刪除選取的 ${leaveSelected.size} 筆請假記錄？`, async () => {
+        const ids = [...leaveSelected];
+        leaveSelected.clear();
+        try {
+            const batch = db.batch();
+            ids.forEach(id => batch.delete(db.collection(col('leaveRequests')).doc(id)));
+            await batch.commit();
+            toast(`已刪除 ${ids.length} 筆記錄`);
+        } catch(e) { toast('刪除失敗：'+e.message); }
+    });
+}
+
+// ─── Leave type selector ─────────────────────────────────────────
+let _selectedLeaveType = null;
+function selectLeaveType(type) {
+    _selectedLeaveType = type;
+    document.querySelectorAll('#lv-type-grid .leave-type-btn').forEach(btn => {
+        const t = LEAVE_TYPES.find(x=>x.key===btn.dataset.ltype);
+        btn.className = 'leave-type-btn' + (btn.dataset.ltype===type ? ` ${t?.cls||''}` : '');
+    });
+    const wrap = document.getElementById('lv-subtype-wrap');
+    if (wrap) wrap.style.display = type === 'other' ? '' : 'none';
+}
+
+// ─── Leave date list ─────────────────────────────────────────────
+if (!window._leaveDates) window._leaveDates = [];
+function addLeaveDate() {
+    const input = document.getElementById('lv-date-add'); if (!input?.value) return;
+    if (!window._leaveDates) window._leaveDates = [];
+    if (window._leaveDates.includes(input.value)) { toast('該日期已加入'); return; }
+    window._leaveDates.push(input.value);
+    window._leaveDates.sort();
+    refreshLeaveDateList();
+}
+function removeLvDate(d) {
+    window._leaveDates = (window._leaveDates||[]).filter(x=>x!==d);
+    refreshLeaveDateList();
+}
+function refreshLeaveDateList() {
+    const el = document.getElementById('lv-dates-list'); if (!el) return;
+    el.innerHTML = (window._leaveDates||[]).map(d=>`
+        <span style="display:inline-flex;align-items:center;gap:4px;background:var(--accent-light);color:var(--accent);padding:3px 10px;border-radius:4px;font-size:12.5px">
+            ${d}
+            <button onclick="removeLvDate('${d}')" style="background:none;border:none;cursor:pointer;color:var(--accent);font-size:14px;line-height:1;padding:0 2px">×</button>
+        </span>`).join('');
+}
+
+// ─── Submit leave request ─────────────────────────────────────────
+async function submitLeaveRequest() {
+    const asst = currentAssistantView; if (!asst) return;
+    if (!_selectedLeaveType) { toast('請選擇假別'); return; }
+    if (!(window._leaveDates||[]).length) { toast('請加入請假日期'); return; }
+    const proxyEl = document.getElementById('lv-proxy');
+    if (!proxyEl?.value) { toast('請選擇代理人'); return; }
+    const approverEl = document.getElementById('lv-approver');
+    if (!approverEl?.value) { toast('請選擇簽核主管'); return; }
+    const subTypeEl = document.getElementById('lv-subtype');
+    const subType = _selectedLeaveType === 'other' ? (subTypeEl?.value || '') : '';
+    const proxyOpt = proxyEl.options[proxyEl.selectedIndex];
+    try {
+        await db.collection(col('leaveRequests')).add({
+            assistantId: asst.id, assistantName: asst.name,
+            leaveType: _selectedLeaveType, leaveSubType: subType,
+            dates: [...window._leaveDates],
+            proxyId: proxyEl.value, proxyName: proxyOpt.dataset.name || proxyOpt.text,
+            approverName: approverEl.value,
+            status: 'pending_supervisor',
+            supervisorApprovedAt: null, principalApprovedAt: null,
+            rejectReason: '', rejectedBy: '',
+            createdAt: new Date().toISOString()
+        });
+        window._leaveDates = [];
+        _selectedLeaveType = null;
+        toast('申請已送出，等待主管簽核');
+        renderLeave();
+    } catch(e) { toast('送出失敗：'+e.message); }
+}
+
+// ─── Approve / reject leave ──────────────────────────────────────
+async function approveLeave(id) {
+    const r = state.leaveRequests.find(x=>x.id===id); if (!r) return;
+    const isPrincipal = viewMode === 'principal';
+    const now = new Date().toISOString();
+    try {
+        if (isPrincipal && r.status === 'pending_principal') {
+            await db.collection(col('leaveRequests')).doc(id).update({ status:'approved', principalApprovedAt: now });
+            toast('已批准');
+        } else if (!isPrincipal && r.status === 'pending_supervisor') {
+            await db.collection(col('leaveRequests')).doc(id).update({ status:'pending_principal', supervisorApprovedAt: now });
+            toast('已轉交院長審核');
+        } else {
+            toast('狀態不符，無法審核');
+        }
+    } catch(e) { toast('操作失敗：'+e.message); }
+}
+
+async function rejectLeave(id) {
+    const reason = prompt('退回原因（可留空）：') ?? null;
+    if (reason === null) return;
+    const rejectedBy = viewMode === 'principal' ? '院長' : (viewMode === 'manager' ? currentOperator : '主管');
+    try {
+        await db.collection(col('leaveRequests')).doc(id).update({
+            status: 'rejected', rejectReason: reason, rejectedBy,
+            rejectedAt: new Date().toISOString()
+        });
+        toast('已退回申請');
+    } catch(e) { toast('操作失敗：'+e.message); }
+}
+
+// ─── Principal: add manual leave record ──────────────────────────
+if (!window._adminLeaveDates) window._adminLeaveDates = [];
+let _adminLeaveType = null;
+function openAddLeaveModal() {
+    _adminLeaveType = null;
+    window._adminLeaveDates = [];
+    // Populate assistant dropdown
+    const asstSel = document.getElementById('al-asst');
+    if (asstSel) {
+        asstSel.innerHTML = '<option value="">— 請選擇 —</option>' +
+            state.assistants.filter(a=>a.active).sort((a,b)=>a.name.localeCompare(b.name,'zh-TW'))
+                .map(a=>`<option value="${a.id}" data-name="${a.name}">${a.name}</option>`).join('');
+    }
+    // Proxy dropdown (will update on assistant selection)
+    const proxySel = document.getElementById('al-proxy');
+    if (proxySel) {
+        proxySel.innerHTML = '<option value="">— 請選擇 —</option>' +
+            state.assistants.filter(a=>a.active).map(a=>`<option value="${a.id}" data-name="${a.name}">${a.name}</option>`).join('');
+    }
+    // Leave type grid
+    const grid = document.getElementById('al-type-grid');
+    if (grid) grid.innerHTML = LEAVE_TYPES.map(t=>`<button class="leave-type-btn" data-ltype="${t.key}" onclick="selectAdminLeaveType('${t.key}')">${t.label}</button>`).join('');
+    // Sub-type
+    const subSel = document.getElementById('al-subtype');
+    if (subSel) subSel.innerHTML = LEAVE_SUB_TYPES.map(s=>`<option value="${s.key}">${s.label}</option>`).join('');
+    // Date
+    const dateEl = document.getElementById('al-date-add');
+    if (dateEl) dateEl.value = today();
+    refreshAdminLeaveDateList();
+    document.getElementById('modal-add-leave')?.classList.remove('hidden');
+}
+function selectAdminLeaveType(type) {
+    _adminLeaveType = type;
+    document.querySelectorAll('#al-type-grid .leave-type-btn').forEach(btn => {
+        const t = LEAVE_TYPES.find(x=>x.key===btn.dataset.ltype);
+        btn.className = 'leave-type-btn' + (btn.dataset.ltype===type ? ` ${t?.cls||''}` : '');
+    });
+    const wrap = document.getElementById('al-subtype-wrap');
+    if (wrap) wrap.style.display = type === 'other' ? '' : 'none';
+}
+function addAdminLeaveDate() {
+    const input = document.getElementById('al-date-add'); if (!input?.value) return;
+    if (!window._adminLeaveDates) window._adminLeaveDates = [];
+    if (window._adminLeaveDates.includes(input.value)) { toast('該日期已加入'); return; }
+    window._adminLeaveDates.push(input.value);
+    window._adminLeaveDates.sort();
+    refreshAdminLeaveDateList();
+}
+function removeAdminLvDate(d) {
+    window._adminLeaveDates = (window._adminLeaveDates||[]).filter(x=>x!==d);
+    refreshAdminLeaveDateList();
+}
+function refreshAdminLeaveDateList() {
+    const el = document.getElementById('al-dates-list'); if (!el) return;
+    el.innerHTML = (window._adminLeaveDates||[]).map(d=>`
+        <span style="display:inline-flex;align-items:center;gap:4px;background:var(--accent-light);color:var(--accent);padding:3px 10px;border-radius:4px;font-size:12.5px">
+            ${d}<button onclick="removeAdminLvDate('${d}')" style="background:none;border:none;cursor:pointer;color:var(--accent);font-size:14px;line-height:1;padding:0 2px">×</button>
+        </span>`).join('');
+}
+async function submitManualLeave() {
+    if (!_adminLeaveType) { toast('請選擇假別'); return; }
+    if (!(window._adminLeaveDates||[]).length) { toast('請加入請假日期'); return; }
+    const asstEl = document.getElementById('al-asst');
+    if (!asstEl?.value) { toast('請選擇助理'); return; }
+    const asstOpt = asstEl.options[asstEl.selectedIndex];
+    const asstName = asstOpt.dataset.name || asstOpt.text;
+    const proxyEl = document.getElementById('al-proxy');
+    const proxyOpt = proxyEl?.options[proxyEl.selectedIndex];
+    const subTypeEl = document.getElementById('al-subtype');
+    const subType = _adminLeaveType === 'other' ? (subTypeEl?.value || '') : '';
+    const statusEl = document.getElementById('al-status');
+    const status = statusEl?.value || 'approved';
+    const now = new Date().toISOString();
+    try {
+        await db.collection(col('leaveRequests')).add({
+            assistantId: asstEl.value, assistantName: asstName,
+            leaveType: _adminLeaveType, leaveSubType: subType,
+            dates: [...window._adminLeaveDates],
+            proxyId: proxyEl?.value || '', proxyName: proxyOpt?.dataset.name || proxyOpt?.text || '—',
+            approverName: '院長',
+            status,
+            supervisorApprovedAt: status !== 'pending_supervisor' ? now : null,
+            principalApprovedAt: status === 'approved' ? now : null,
+            rejectReason: '', rejectedBy: '',
+            createdAt: now
+        });
+        hideModal('modal-add-leave');
+        toast('已新增請假紀錄');
+    } catch(e) { toast('新增失敗：' + e.message); }
+}
+
+// ─── Principal: adjust annual leave entitlement ──────────────────
+async function adjustAnnualLeave(asstId, asstName, year, currentEntitled) {
+    const input = prompt(`${asstName} ${year}年 特休天數（目前：${currentEntitled}天）\n請輸入新的應得天數：`, currentEntitled);
+    if (input === null) return;
+    const days = parseInt(input);
+    if (isNaN(days) || days < 0) { toast('請輸入有效天數'); return; }
+    const ls = settings.leaveSettings || {};
+    const adjs = { ...(ls.leaveAdjustments || {}) };
+    adjs[asstId] = { ...(adjs[asstId]||{}), [String(year)]: days };
+    try {
+        await db.collection(col('settings')).doc('main').update({ 'leaveSettings.leaveAdjustments': adjs });
+        settings.leaveSettings = { ...ls, leaveAdjustments: adjs };
+        toast(`已調整為 ${days} 天`);
+        renderLeave();
+    } catch(e) { toast('儲存失敗：'+e.message); }
+}
+
+async function saveLeaveIncrement() {
+    const val = parseInt(document.getElementById('leave-increment-input')?.value);
+    if (isNaN(val) || val < 0) { toast('請輸入有效數字'); return; }
+    const ls = settings.leaveSettings || {};
+    try {
+        await db.collection(col('settings')).doc('main').update({ 'leaveSettings.annualLeaveIncrement': val });
+        settings.leaveSettings = { ...ls, annualLeaveIncrement: val };
+        toast('已儲存');
+        renderLeave();
+    } catch(e) { toast('儲存失敗：'+e.message); }
+}
+
 // Login screen enter-key shortcuts
 ['ls-asst-pin','ls-admin-pw','ls-doctor-pw'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();attemptLoginScreen();}});
 });
+document.getElementById('maint-login-pw')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();attemptMaintLogin();}});
 document.getElementById('new-doc-pw')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addDoctorAccount();}});
 document.getElementById('new-shift-segs')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addShiftConfig();}});
 
