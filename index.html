@@ -9,6 +9,7 @@
     <title>加班＆點數系統</title>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1505,8 +1506,16 @@ function doConnect() {
         wsId = cfg.workspaceId;
         document.getElementById('ws-label').textContent = wsId;
         db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
-        subscribeData();
         setConn('connecting', '連線中…');
+        // 匿名登入後再訂閱資料，確保通過 Firestore 安全性規則
+        const auth = firebase.auth();
+        if (auth.currentUser) {
+            subscribeData();
+        } else {
+            auth.signInAnonymously()
+                .then(() => subscribeData())
+                .catch(e => { hideLoading(); showSetup('認證失敗：' + e.message); });
+        }
     } catch (e) { hideLoading(); showSetup('初始化失敗：' + e.message); }
 }
 
