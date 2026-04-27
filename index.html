@@ -902,12 +902,30 @@ appId: "..."'></textarea>
                 <div class="section" id="ot-overtime-section" style="display:none">
                     <div class="form-label" style="margin-bottom:10px">加班班次</div>
                     <div class="ot-shift-row" id="ot-ot-shift-btns"></div>
-                    <div style="margin-top:14px">
+                    <!-- 加班類型切換 -->
+                    <div style="display:flex;gap:0;margin-top:14px;border:1px solid var(--border);border-radius:4px;overflow:hidden;max-width:320px">
+                        <button id="ot-type-late" onclick="setOTType('late')"
+                            style="flex:1;padding:8px 0;border:none;font-size:var(--fs-sm);font-family:inherit;cursor:pointer;background:var(--accent);color:#fff;font-weight:700">延後結束</button>
+                        <button id="ot-type-early" onclick="setOTType('early')"
+                            style="flex:1;padding:8px 0;border:none;font-size:var(--fs-sm);font-family:inherit;cursor:pointer;background:var(--surface);color:var(--text-secondary)">提早上班</button>
+                    </div>
+                    <!-- 延後結束：輸入結束時間 -->
+                    <div id="ot-late-section" style="margin-top:14px">
                         <div class="form-label">加班結束時間（24 小時制）</div>
                         <div style="display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap">
                             <select class="form-select" id="ot-end-hour" style="width:90px" onchange="updateOTCalc()"></select>
                             <span style="font-weight:700">時</span>
                             <select class="form-select" id="ot-end-min" style="width:90px" onchange="updateOTCalc()"></select>
+                            <span style="font-weight:700">分</span>
+                        </div>
+                    </div>
+                    <!-- 提早上班：輸入開始時間 -->
+                    <div id="ot-early-section" style="display:none;margin-top:14px">
+                        <div class="form-label">提早上班時間（24 小時制）</div>
+                        <div style="display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap">
+                            <select class="form-select" id="ot-start-hour" style="width:90px" onchange="updateOTCalc()"></select>
+                            <span style="font-weight:700">時</span>
+                            <select class="form-select" id="ot-start-min" style="width:90px" onchange="updateOTCalc()"></select>
                             <span style="font-weight:700">分</span>
                         </div>
                     </div>
@@ -1395,7 +1413,7 @@ let settings = {
     }
 };
 // ── Overtime state ────────────────────────────────────────────────
-let otState = { workedShifts: [], otSegKey: null }; // otSegKey = 'shiftId:segIdx'
+let otState = { workedShifts: [], otSegKey: null, otType: 'late' }; // otSegKey = 'shiftId:segIdx', otType = 'late'|'early'
 let otTab = 'ot-apply'; // 'ot-apply' | 'lv-apply' | 'records'
 let currentOTId = null; // for doctor approval
 
@@ -3123,6 +3141,12 @@ function calcOTMinutes(scheduledEnd, actualEnd) {
     const [ah,am] = actualEnd.split(':').map(Number);
     return (ah*60+am) - (sh*60+sm);
 }
+function calcEarlyOTMinutes(scheduledStart, actualStart) {
+    if (!scheduledStart || !actualStart) return 0;
+    const [sh,sm] = scheduledStart.split(':').map(Number);
+    const [ah,am] = actualStart.split(':').map(Number);
+    return (sh*60+sm) - (ah*60+am); // positive = came early
+}
 
 function formatOTDuration(mins) {
     if (mins <= 0) return '0 分鐘';
@@ -3219,13 +3243,22 @@ function renderOvertimeApply() {
             onclick="selectOTSeg('${seg.key}')">${seg.label}<br><span style="font-size:11.5px;font-weight:400;opacity:.8">${seg.time}</span></button>
     `).join('');
 
-    // Hour/min selects
+    // Hour/min selects (end time)
     const hourEl = document.getElementById('ot-end-hour');
     const minEl = document.getElementById('ot-end-min');
     if (!hourEl.options.length) {
         for (let h=0;h<24;h++) hourEl.add(new Option(String(h).padStart(2,'0'),h));
         for (let m=0;m<60;m++) minEl.add(new Option(String(m).padStart(2,'0'),m));
     }
+    // Hour/min selects (start time — early OT)
+    const startHourEl = document.getElementById('ot-start-hour');
+    const startMinEl  = document.getElementById('ot-start-min');
+    if (startHourEl && !startHourEl.options.length) {
+        for (let h=0;h<24;h++) startHourEl.add(new Option(String(h).padStart(2,'0'),h));
+        for (let m=0;m<60;m++) startMinEl.add(new Option(String(m).padStart(2,'0'),m));
+    }
+    // Restore type toggle UI
+    setOTType(otState.otType || 'late');
 
     // Approver
     const aprEl = document.getElementById('ot-approver');
@@ -3252,6 +3285,17 @@ function selectOTSeg(key) {
     renderOvertimeApply();
 }
 
+function setOTType(type) {
+    otState.otType = type;
+    document.getElementById('ot-type-late').style.background  = type==='late'  ? 'var(--accent)' : 'var(--surface)';
+    document.getElementById('ot-type-late').style.color        = type==='late'  ? '#fff' : 'var(--text-secondary)';
+    document.getElementById('ot-type-early').style.background  = type==='early' ? 'var(--accent)' : 'var(--surface)';
+    document.getElementById('ot-type-early').style.color       = type==='early' ? '#fff' : 'var(--text-secondary)';
+    document.getElementById('ot-late-section').style.display   = type==='late'  ? '' : 'none';
+    document.getElementById('ot-early-section').style.display  = type==='early' ? '' : 'none';
+    updateOTCalc();
+}
+
 function updateOTCalc() {
     const resultEl = document.getElementById('ot-calc-result');
     if (!resultEl) return;
@@ -3260,19 +3304,35 @@ function updateOTCalc() {
     const sh = settings.shifts.find(s => s.id === shiftId);
     const seg = sh?.segments?.[parseInt(segIdx)];
     if (!seg) { resultEl.classList.add('hidden'); return; }
-    const h = document.getElementById('ot-end-hour')?.value;
-    const m = document.getElementById('ot-end-min')?.value;
-    if (h===undefined||h==='') { resultEl.classList.add('hidden'); return; }
-    const actualEnd = String(h).padStart(2,'0')+':'+String(m||0).padStart(2,'0');
-    const shEnd = seg.end;
-    const mins = calcOTMinutes(shEnd, actualEnd);
+
+    const isEarly = (otState.otType || 'late') === 'early';
+    let mins, label;
+
+    if (isEarly) {
+        const h = document.getElementById('ot-start-hour')?.value;
+        const m = document.getElementById('ot-start-min')?.value;
+        if (h===undefined||h==='') { resultEl.classList.add('hidden'); return; }
+        const actualStart = String(h).padStart(2,'0')+':'+String(m||0).padStart(2,'0');
+        mins = calcEarlyOTMinutes(seg.start, actualStart);
+        label = mins > 0 ? `提早上班加班：${formatOTDuration(mins)}（${actualStart} → ${seg.start}）`
+                         : '上班時間不早於班次開始，請確認';
+    } else {
+        const h = document.getElementById('ot-end-hour')?.value;
+        const m = document.getElementById('ot-end-min')?.value;
+        if (h===undefined||h==='') { resultEl.classList.add('hidden'); return; }
+        const actualEnd = String(h).padStart(2,'0')+':'+String(m||0).padStart(2,'0');
+        mins = calcOTMinutes(seg.end, actualEnd);
+        label = mins > 0 ? `加班時數：${formatOTDuration(mins)}（${seg.end} → ${actualEnd}）`
+                         : '結束時間早於下班時間，請確認';
+    }
+
     resultEl.classList.remove('hidden');
     if (mins <= 0) {
         resultEl.style.background='var(--red-light)';resultEl.style.color='var(--red)';resultEl.style.borderColor='var(--red-border)';
-        resultEl.textContent = '結束時間早於下班時間，請確認';
+        resultEl.textContent = label;
     } else {
         resultEl.style.background='var(--accent-light)';resultEl.style.color='var(--accent)';resultEl.style.borderColor='#bacde8';
-        resultEl.textContent = `加班時數：${formatOTDuration(mins)}（${shEnd} → ${actualEnd}）`;
+        resultEl.textContent = label;
     }
 }
 
@@ -3286,12 +3346,24 @@ async function submitOvertimeApply() {
     const seg = sh?.segments?.[parseInt(segIdx)];
     if (!seg) { toast('班次設定異常，請重新選擇'); return; }
     const segName = getSegmentName(seg);
-    const h = document.getElementById('ot-end-hour').value;
-    const m = document.getElementById('ot-end-min').value||'0';
-    const actualEnd = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
-    const shEnd = seg.end;
-    const mins = calcOTMinutes(shEnd, actualEnd);
-    if (mins <= 0) { toast('加班結束時間必須晚於下班時間'); return; }
+    const isEarly = (otState.otType || 'late') === 'early';
+    let scheduledEnd, actualEnd, mins;
+    if (isEarly) {
+        const h = document.getElementById('ot-start-hour').value;
+        const m = document.getElementById('ot-start-min').value||'0';
+        const actualStart = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+        mins = calcEarlyOTMinutes(seg.start, actualStart);
+        if (mins <= 0) { toast('提早上班時間必須早於班次開始時間'); return; }
+        scheduledEnd = actualStart;  // store actual start as scheduledEnd reference
+        actualEnd    = seg.start;    // store shift start as actualEnd reference
+    } else {
+        const h = document.getElementById('ot-end-hour').value;
+        const m = document.getElementById('ot-end-min').value||'0';
+        actualEnd    = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+        scheduledEnd = seg.end;
+        mins = calcOTMinutes(scheduledEnd, actualEnd);
+        if (mins <= 0) { toast('加班結束時間必須晚於下班時間'); return; }
+    }
     const approver = document.getElementById('ot-approver').value;
     if (!approver) { toast('請選擇簽核醫師'); return; }
     const reasons = [];
@@ -3307,11 +3379,11 @@ async function submitOvertimeApply() {
         await db.collection(col('overtime')).add({
             assistantId: a.id, assistantName: a.name, date,
             workedShifts: otState.workedShifts, otShiftId: shiftId,
-            otShiftName: `${sh.name}－${segName}`, scheduledEnd: shEnd, actualEnd, overtimeMinutes: mins,
+            otShiftName: `${sh.name}－${segName}${isEarly?' (提早上班)':''}`, scheduledEnd, actualEnd, overtimeMinutes: mins, otType: otState.otType || 'late',
             approverName: approver, status: 'pending', approverSignature: null, note,
             createdAt: new Date().toISOString()
         });
-        otState = { workedShifts: [], otSegKey: null };
+        otState = { workedShifts: [], otSegKey: null, otType: 'late' };
         document.getElementById('ot-date').value = today();
         ['ot-reason-a','ot-reason-b','ot-reason-c','ot-reason-d'].forEach(id=>{ const el=document.getElementById(id); if(el) el.checked=false; });
         const otherEl = document.getElementById('ot-note-other'); if(otherEl){otherEl.value='';otherEl.style.display='none';}
@@ -3343,7 +3415,7 @@ function renderOvertimeStatus() {
                 <span class="${r.status==='approved'?'ot-appr':r.status==='rejected'?'badge br':'ot-pend'}">${r.status==='approved'?'已簽核':r.status==='rejected'?'已退回':'待簽核'}</span>
             </div>
             <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.8">
-                ${r.scheduledEnd} → ${r.actualEnd}
+                ${r.otType==='early'?`提早：${r.scheduledEnd} → ${r.actualEnd}`:`${r.scheduledEnd} → ${r.actualEnd}`}
                 <span class="pp" style="margin-left:8px">+${formatOTDuration(r.overtimeMinutes)}</span>
                 <span style="color:var(--text-muted);margin-left:8px">簽核：${r.approverName}</span>
             </div>
@@ -3448,14 +3520,14 @@ function renderOvertimeApprove() {
                         <span class="ot-pend">待簽核</span>
                     </div>
                     <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.9">
-                        班別：${r.otShiftName}　下班：${r.scheduledEnd}　實際：${r.actualEnd}<br>
+                        班別：${r.otShiftName}　${r.otType==='early'?`提早：${r.scheduledEnd} → ${r.actualEnd}`:`下班：${r.scheduledEnd}　實際：${r.actualEnd}`}<br>
                         加班：<span class="pp" style="font-weight:700">${formatOTDuration(r.overtimeMinutes)}</span>
                         ${isPrincipal?`<button class="btn btn-outline btn-sm" style="font-size:11px;padding:2px 7px;margin-left:8px" onclick="editOTMinutes('${r.id}',${r.overtimeMinutes})">${PENCIL_ICON} 調整</button>`:''}
                         ${r.note?`<br>備注：${r.note}`:''}
                     </div>
                     <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
                         <button class="btn btn-primary btn-sm" onclick="openOTApproval('${r.id}','${r.assistantName}','${r.date}','${r.otShiftName}',${r.overtimeMinutes})">✍ 簽名確認</button>
-                        ${isPrincipal?`<button class="btn btn-danger btn-sm" onclick="rejectOTRecord('${r.id}')">退回申請</button>`:''}
+                        <button class="btn btn-danger btn-sm" onclick="rejectOTRecord('${r.id}')">退回申請</button>
                     </div>
                 </div>
             </div>`).join('') : '<div class="empty-state"><p>目前無待簽核申請</p></div>'}
@@ -3482,7 +3554,7 @@ function renderOvertimeApprove() {
                 </div>
             </div>`).join('')}
         </div>` : ''}
-        ${rejected.length && isPrincipal ? `
+        ${rejected.length ? `
         <div class="section">
             <div class="sec-title" style="margin-bottom:10px;color:var(--text-muted)">已退回記錄（${rejected.length}）</div>
             ${rejected.map(r=>`
