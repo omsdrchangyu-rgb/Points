@@ -437,25 +437,28 @@
 
         /* ─── Role-based nav visibility ─── */
         .nrec,.nfull,.nfull-lbl,.ndoc,.ndoc-lbl,.nasst,.nasst-lbl,.not,.not-lbl{display:none!important}
-        body.principal-mode .nrec,body.principal-mode .nfull,body.principal-mode .ndoc,
+        body.principal-mode .nrec,body.principal-mode .nfull,
         body.principal-mode .not{display:flex!important}
-        body.principal-mode .nfull-lbl,body.principal-mode .ndoc-lbl,
+        body.principal-mode .nfull-lbl,
         body.principal-mode .not-lbl{display:block!important}
-        /* manager-mode: 已移除記錄點數權限 */
+        body.manager-mode .nrec{display:flex!important}
         .nlv-approve,.mn-nlv-approve{display:none!important}
-        body.principal-mode .nlv-approve,body.manager-mode .nlv-approve{display:flex!important}
+        body.manager-mode .nlv-approve{display:flex!important}
         body.manager-mode .nlv-approve-lbl{display:block!important}
         body.principal-mode .mn-nlv-approve,body.manager-mode .mn-nlv-approve{display:flex!important}
         body.doctor-mode .nrec,body.doctor-mode .ndoc{display:flex!important}
         body.doctor-mode .ndoc-lbl{display:block!important}
         body.assistant-mode .nasst,body.assistant-mode .not{display:flex!important}
         body.assistant-mode .nasst-lbl,body.assistant-mode .not-lbl{display:block!important}
-        body.doctor-mode .n-overview,body.assistant-mode .n-overview{display:none!important}
+        body.principal-mode .n-overview,body.doctor-mode .n-overview,body.assistant-mode .n-overview{display:none!important}
+        body.doctor-mode .rec-mgmt-tab,body.manager-mode .rec-mgmt-tab{display:none!important}
+        body.manager-mode #mode-btn-add{display:none!important}
         /* Mobile nav role classes */
         .mn-nrec,.mn-nfull,.mn-ndoc,.mn-nasst,.mn-not{display:none!important}
         body.principal-mode .mn-nrec,body.principal-mode .mn-nfull,body.principal-mode .mn-ndoc,
         body.principal-mode .mn-not{display:flex!important}
-        /* manager-mode .mn-nrec: 已移除記錄點數權限 */
+        body.principal-mode .mn-overview{display:none!important}
+        body.manager-mode .mn-nrec{display:flex!important}
         body.doctor-mode .mn-nrec,body.doctor-mode .mn-ndoc{display:flex!important}
         body.doctor-mode .mn-overview,body.assistant-mode .mn-overview{display:none!important}
         body.assistant-mode .mn-nasst,body.assistant-mode .mn-not{display:flex!important}
@@ -645,9 +648,6 @@ appId: "..."'></textarea>
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"/></svg>記錄點數
         </button>
         <div class="nav-sec-label nfull-lbl">紀錄</div>
-        <button class="nav-item nfull" onclick="navigate('history')">
-            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>歷史紀錄
-        </button>
         <button class="nav-item nfull" onclick="navigate('settlement')">
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 00-2 0v2a1 1 0 102 0V9z" clip-rule="evenodd"/></svg>月結算
         </button>
@@ -657,9 +657,6 @@ appId: "..."'></textarea>
         <div class="nav-sec-label nfull-lbl">管理</div>
         <button class="nav-item nfull" onclick="navigate('assistants')">
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zM5 17a5 5 0 0110 0H5z"/></svg>助理管理
-        </button>
-        <button class="nav-item nfull" onclick="navigate('rules')">
-            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>規定管理
         </button>
         <!-- 個人 -->
         <div class="nav-sec-label nasst-lbl">個人</div>
@@ -671,8 +668,11 @@ appId: "..."'></textarea>
         <button class="nav-item not" onclick="navigate('overtime-apply')">
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>加班及請假
         </button>
-        <button class="nav-item nfull" onclick="navigate('leave')">
-            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>假勤總覽
+        <button class="nav-item nfull" onclick="navigate('attendance')" style="justify-content:space-between">
+            <span style="display:flex;align-items:center;gap:9px">
+                <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>假勤管理
+            </span>
+            <span id="att-pending-badge" class="hidden" style="background:var(--red);color:#fff;border-radius:999px;font-size:10px;font-weight:700;padding:1px 7px;min-width:18px;text-align:center"></span>
         </button>
         <div class="nav-sec-label ndoc-lbl nlv-approve-lbl">簽核</div>
         <button class="nav-item ndoc" onclick="navigate('overtime-approve')" style="justify-content:space-between">
@@ -724,7 +724,15 @@ appId: "..."'></textarea>
 
     <!-- ── 記錄點數 ── -->
     <div id="page-record" class="page">
-        <div class="page-header"><h2>記錄點數</h2><p>選擇助理，再選取獎勵或違規事項</p></div>
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <div><h2>記錄點數</h2><p>選擇助理，再選取獎勵或違規事項</p></div>
+            <div class="tab-btn-group">
+                <button class="tbb active" id="tbb-rec-record" onclick="setRecordTab('record')">記錄點數</button>
+                <button class="tbb rec-mgmt-tab" id="tbb-rec-history" onclick="setRecordTab('history')">歷史紀錄</button>
+                <button class="tbb rec-mgmt-tab" id="tbb-rec-rules" onclick="setRecordTab('rules')">管理規定</button>
+            </div>
+        </div>
+        <div id="rec-tab-record">
         <div class="rec-wrap">
             <div class="rec-scroll">
                 <div class="section">
@@ -758,15 +766,57 @@ appId: "..."'></textarea>
                 <button class="btn btn-outline" onclick="clearRecord()">清除</button>
             </div>
         </div>
+        </div><!-- /rec-tab-record -->
+        <div id="rec-tab-rules" class="hidden page-content">
+            <div class="section">
+                <div class="sec-header">
+                    <div class="sec-title">規定列表</div>
+                    <button class="btn btn-primary btn-sm" onclick="openAddRule()">+ 新增規定</button>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>規定名稱</th><th>點數</th><th>類別</th><th>說明</th><th>操作</th></tr></thead>
+                        <tbody id="rec-rules-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="rec-tab-history" class="hidden page-content">
+            <div class="month-tabs" id="rec-history-month-tabs"></div>
+            <div class="filter-row" style="flex-wrap:wrap;gap:8px">
+                <select class="form-select" id="rec-history-asst-filter" onchange="renderRecordHistory()" style="max-width:180px"><option value="">所有助理</option></select>
+                <select class="form-select" id="rec-history-type-filter" onchange="renderRecordHistory()" style="max-width:140px">
+                    <option value="">所有類型</option><option value="p">加分</option><option value="n">扣分</option>
+                </select>
+                <span id="rec-history-count" style="color:var(--text-muted);font-size:12.5px;"></span>
+                <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+                    <button id="rec-hist-sel-btn" class="btn btn-outline btn-sm" onclick="toggleRecHistSel()">選取刪除</button>
+                    <button id="rec-hist-del-btn" class="btn btn-danger btn-sm hidden" onclick="deleteSelectedRecHist()">刪除選取（<span id="rec-hist-sel-count">0</span>）</button>
+                    <button id="rec-hist-cancel-btn" class="btn btn-outline btn-sm hidden" onclick="toggleRecHistSel()">取消</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr id="rec-history-thead"><th>日期</th><th>助理</th><th>事項</th><th>點數</th><th>操作者</th><th>備注</th></tr></thead>
+                    <tbody id="rec-history-tbody"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <!-- ── 歷史紀錄 ── -->
     <div id="page-history" class="page">
         <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
             <div><h2>歷史紀錄</h2><p>最近六個月的點數記錄</p></div>
-            <button class="btn btn-outline btn-sm" onclick="exportToExcel('history')">↓ 匯出 Excel</button>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-outline btn-sm" id="hist-export-btn" onclick="exportToExcel('history')">↓ 匯出 Excel</button>
+                <div class="tab-btn-group">
+                    <button class="tbb active" id="tbb-hist-history" onclick="setHistoryTab('history')">歷史紀錄</button>
+                    <button class="tbb" id="tbb-hist-rules" onclick="setHistoryTab('rules')">管理規定</button>
+                </div>
+            </div>
         </div>
-        <div class="page-content">
+        <div id="hist-tab-history" class="page-content">
             <div class="month-tabs" id="history-month-tabs"></div>
             <div class="filter-row">
                 <select class="form-select" id="history-asst-filter" onchange="renderHistory()"><option value="">所有助理</option></select>
@@ -789,6 +839,9 @@ appId: "..."'></textarea>
                     <tbody id="history-tbody"></tbody>
                 </table>
             </div>
+        </div><!-- /hist-tab-history -->
+        <div id="hist-tab-rules" class="hidden page-content">
+            <div id="hist-rules-list"></div>
         </div>
     </div>
 
@@ -823,6 +876,27 @@ appId: "..."'></textarea>
             <div id="asst-info-box" class="info-box"></div>
             <div class="section">
                 <div class="sec-header">
+                    <div class="sec-title">助理列表</div>
+                    <button class="btn btn-primary btn-sm" onclick="openAddAssistant()">+ 新增助理</button>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>姓名 / 到職日</th><th>狀態</th><th>季獎金資格</th><th>底薪</th><th>勞健保級距 / 員工自負</th><th>額外津貼</th><th>本月點數</th><th>專屬密碼</th><th>操作</th></tr></thead>
+                        <tbody id="assistants-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 勞健保費用試算表 -->
+            <div class="section">
+                <div class="sec-header">
+                    <div class="sec-title">勞健保費用試算表</div>
+                    <button class="btn btn-outline btn-sm" onclick="saveLaborCostTable()">儲存</button>
+                </div>
+                <div id="labor-cost-table-wrap" style="overflow-x:auto"></div>
+            </div>
+            <!-- 額外津貼項目（移至最下方） -->
+            <div class="section">
+                <div class="sec-header">
                     <div class="sec-title">額外津貼項目</div>
                     <button class="btn btn-outline btn-sm" onclick="openAddAllowanceType()">+ 新增項目</button>
                 </div>
@@ -835,18 +909,37 @@ appId: "..."'></textarea>
                     <button class="btn btn-outline btn-sm" onclick="document.getElementById('allowance-type-add-form').classList.add('hidden')">取消</button>
                 </div>
             </div>
-            <div class="section">
-                <div class="sec-header">
-                    <div class="sec-title">助理列表</div>
-                    <button class="btn btn-primary btn-sm" onclick="openAddAssistant()">+ 新增助理</button>
-                </div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead><tr><th>姓名</th><th>狀態</th><th>季獎金資格</th><th>底薪</th><th>額外津貼</th><th>本月點數</th><th>專屬密碼</th><th>加入日期</th><th>操作</th></tr></thead>
-                        <tbody id="assistants-tbody"></tbody>
-                    </table>
+        </div>
+    </div>
+
+    <!-- ── 假勤管理（院長整合頁） ── -->
+    <div id="page-attendance" class="page">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <div><h2>假勤管理</h2><p id="att-page-sub">簽核、加班、請假一覽</p></div>
+            <div class="tab-btn-group">
+                <button class="tbb active" id="tbb-att-approval" onclick="setAttendanceTab('approval')">簽核頁面</button>
+                <button class="tbb" id="tbb-att-ot" onclick="setAttendanceTab('ot')">加班管理</button>
+                <button class="tbb" id="tbb-att-leave" onclick="setAttendanceTab('leave')">請假管理</button>
+            </div>
+        </div>
+        <!-- 簽核頁面 -->
+        <div id="att-tab-approval" class="page-content">
+            <div style="margin-bottom:16px">
+                <div class="tab-btn-group">
+                    <button class="tbb active" id="tbb-att-appr-ot" onclick="setAttendanceApprovalSubTab('ot')">加班</button>
+                    <button class="tbb" id="tbb-att-appr-lv" onclick="setAttendanceApprovalSubTab('leave')">請假</button>
                 </div>
             </div>
+            <div id="att-approval-ot-content"></div>
+            <div id="att-approval-lv-content" class="hidden"></div>
+        </div>
+        <!-- 加班管理 -->
+        <div id="att-tab-ot" class="page-content hidden">
+            <div id="att-ot-content"></div>
+        </div>
+        <!-- 請假管理 -->
+        <div id="att-tab-leave" class="page-content hidden">
+            <div id="att-leave-content"></div>
         </div>
     </div>
 
@@ -1021,10 +1114,6 @@ appId: "..."'></textarea>
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
       記錄
     </button>
-    <button class="mn-item mn-nfull" onclick="navigate('history')">
-      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
-      歷史
-    </button>
     <button class="mn-item mn-nfull" onclick="navigate('settlement')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
       結算
@@ -1036,10 +1125,6 @@ appId: "..."'></textarea>
     <button class="mn-item mn-nfull" onclick="navigate('assistants')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><line x1="16" y1="11" x2="22" y2="11"/><line x1="19" y1="8" x2="19" y2="14"/></svg>
       助理
-    </button>
-    <button class="mn-item mn-nfull" onclick="navigate('rules')">
-      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
-      規定
     </button>
     <button class="mn-item mn-nasst" onclick="navigate('myview')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -1086,9 +1171,14 @@ appId: "..."'></textarea>
             <div class="form-group">
                 <label class="form-label">季獎金資格</label>
                 <select class="form-select" id="asst-bonus-input">
-                    <option value="1">正職（參與分配）</option>
-                    <option value="0">試用期 / 不參與分配</option>
+                    <option value="full_dist">正職 — 參與分配</option>
+                    <option value="full_no_dist">正職 — 不參與分配</option>
+                    <option value="probation">試用期</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">勞健保投保級距</label>
+                <select class="form-select" id="asst-labor-grade"></select>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                 <div class="form-group">
@@ -1415,6 +1505,11 @@ let settings = {
 // ── Overtime state ────────────────────────────────────────────────
 let otState = { workedShifts: [], otSegKey: null, otType: 'late' }; // otSegKey = 'shiftId:segIdx', otType = 'late'|'early'
 let otTab = 'ot-apply'; // 'ot-apply' | 'lv-apply' | 'records'
+let recPageTab = 'record'; // 'record' | 'rules' | 'history'
+let histPageTab = 'history'; // 'history' | 'rules'
+let attendanceTab = 'approval'; // 'approval' | 'ot' | 'leave'
+let attendanceApprovalSubTab = 'ot'; // 'ot' | 'leave'
+let attendanceOTMonth = null; // for OT management month switcher
 let currentOTId = null; // for doctor approval
 
 // ── Salary page state ─────────────────────────────────────────────
@@ -1474,6 +1569,60 @@ const SEED_RULES = [
 ];
 
 const SEED_DOCTORS = ['黃敏琪','陳宥宇','張詠竣','王泓仁','陳啓榮','沈換喬','吳佳澤'];
+
+// 勞健保投保級距表（2024 台灣標準）
+// laborEmp = 勞保員工自負額, healthEmp = 健保員工自負額（無眷口）
+// totalEmp = 員工自負合計（薪資扣除額）
+const LABOR_INSURANCE_GRADES = [
+    { label:'26,400', salary:26400, laborEmp:574, healthEmp:410, totalEmp:984 },
+    { label:'27,600', salary:27600, laborEmp:600, healthEmp:428, totalEmp:1028 },
+    { label:'28,800', salary:28800, laborEmp:626, healthEmp:447, totalEmp:1073 },
+    { label:'30,300', salary:30300, laborEmp:659, healthEmp:470, totalEmp:1129 },
+    { label:'31,800', salary:31800, laborEmp:692, healthEmp:494, totalEmp:1186 },
+    { label:'33,300', salary:33300, laborEmp:724, healthEmp:517, totalEmp:1241 },
+    { label:'34,800', salary:34800, laborEmp:757, healthEmp:540, totalEmp:1297 },
+    { label:'36,300', salary:36300, laborEmp:789, healthEmp:563, totalEmp:1352 },
+    { label:'38,200', salary:38200, laborEmp:830, healthEmp:593, totalEmp:1423 },
+    { label:'40,100', salary:40100, laborEmp:872, healthEmp:622, totalEmp:1494 },
+    { label:'42,000', salary:42000, laborEmp:913, healthEmp:652, totalEmp:1565 },
+    { label:'43,900', salary:43900, laborEmp:955, healthEmp:681, totalEmp:1636 },
+    { label:'45,800', salary:45800, laborEmp:996, healthEmp:711, totalEmp:1707 },
+    { label:'48,200', salary:48200, laborEmp:1049, healthEmp:748, totalEmp:1797 },
+    { label:'50,600', salary:50600, laborEmp:1101, healthEmp:785, totalEmp:1886 },
+    { label:'53,000', salary:53000, laborEmp:1153, healthEmp:823, totalEmp:1976 },
+    { label:'55,400', salary:55400, laborEmp:1205, healthEmp:860, totalEmp:2065 },
+    { label:'57,800', salary:57800, laborEmp:1257, healthEmp:897, totalEmp:2154 },
+    { label:'60,800', salary:60800, laborEmp:1322, healthEmp:944, totalEmp:2266 },
+    { label:'63,800', salary:63800, laborEmp:1388, healthEmp:990, totalEmp:2378 },
+    { label:'66,800', salary:66800, laborEmp:1453, healthEmp:1037, totalEmp:2490 },
+    { label:'69,800', salary:69800, laborEmp:1519, healthEmp:1083, totalEmp:2602 },
+    { label:'72,800', salary:72800, laborEmp:1584, healthEmp:1130, totalEmp:2714 },
+    { label:'76,500', salary:76500, laborEmp:1664, healthEmp:1187, totalEmp:2851 },
+    { label:'80,200', salary:80200, laborEmp:1745, healthEmp:1245, totalEmp:2990 },
+    { label:'83,900', salary:83900, laborEmp:1826, healthEmp:1302, totalEmp:3128 },
+    { label:'87,600', salary:87600, laborEmp:1906, healthEmp:1359, totalEmp:3265 },
+    { label:'92,100', salary:92100, laborEmp:2004, healthEmp:1429, totalEmp:3433 },
+    { label:'96,600', salary:96600, laborEmp:2101, healthEmp:1499, totalEmp:3600 },
+    { label:'101,100', salary:101100, laborEmp:2199, healthEmp:1569, totalEmp:3768 },
+];
+
+// 正規化 bonusEligible 為三態字串（向下相容 boolean）
+function normalizeBonusEligible(val) {
+    if (val === 'probation' || val === 'full_no_dist' || val === 'full_dist') return val;
+    if (val === true || val === 1 || val === '1') return 'full_dist';
+    return 'probation';
+}
+
+function bonusEligibleLabel(val) {
+    const v = normalizeBonusEligible(val);
+    if (v === 'full_dist') return '正職/參與分配';
+    if (v === 'full_no_dist') return '正職/不分配';
+    return '試用期';
+}
+
+function getLaborInsuranceGrade(gradeLabel) {
+    return LABOR_INSURANCE_GRADES.find(g => g.label === gradeLabel) || null;
+}
 
 // ================================================================
 // FIREBASE INIT
@@ -1573,6 +1722,8 @@ function subscribeData() {
                   settings.salarySettings = { ...settings.salarySettings, ...d.salarySettings };
                   if (!settings.salarySettings.monthlyParams) settings.salarySettings.monthlyParams = {};
               }
+              if (d.laborCostTable !== undefined) settings.laborCostTable = d.laborCostTable;
+              if (d.leavePolicy !== undefined) settings.leavePolicy = d.leavePolicy;
               // Shifts: only load if new segment format
               if (d.shifts?.length && d.shifts[0].segments) settings.shifts = d.shifts;
               // principalPassword: prefer new field, fall back to old adminPassword
@@ -1666,7 +1817,7 @@ async function runSeed() {
 
     for (const name of SEED_ASSISTANTS) {
         const ref = db.collection(col('assistants')).doc();
-        batch1.set(ref, { name, active:true, bonusEligible:true, pin:generatePin(), createdAt:new Date().toISOString() });
+        batch1.set(ref, { name, active:true, bonusEligible:'full_dist', pin:generatePin(), createdAt:new Date().toISOString() });
         aRefs.push({ ref, name });
     }
     await batch1.commit();
@@ -1757,7 +1908,7 @@ function monthlyPoints(month) {
 function calcSettlement(month) {
     const pts = monthlyPoints(month);
     const allActive = state.assistants.filter(a=>a.active);
-    const eligible  = allActive.filter(a=>a.bonusEligible!==false);
+    const eligible  = allActive.filter(a=>normalizeBonusEligible(a.bonusEligible)==='full_dist');
     const n = allActive.length;
     const totalAll  = allActive.reduce((s,a)=>s+(pts[a.id]||0), 0);
     const eligiblePosTotal = eligible.reduce((s,a)=>s+Math.max(0, pts[a.id]||0), 0);
@@ -1767,9 +1918,10 @@ function calcSettlement(month) {
 
     const items = allActive.map(a => {
         const p = pts[a.id]||0;
-        const isEligible = a.bonusEligible!==false;
+        const be = normalizeBonusEligible(a.bonusEligible);
+        const isEligible = be === 'full_dist';
         const pct = isEligible && eligiblePosTotal>0 ? Math.max(0,p)/eligiblePosTotal*100 : 0;
-        return { id:a.id, name:a.name, points:p, pct, isEligible };
+        return { id:a.id, name:a.name, points:p, pct, isEligible, bonusEligible: be };
     }).sort((a,b)=>b.points-a.points);
 
     const bonusStatus = totalAll >= highThr ? 'bonus' : totalAll <= lowThr ? 'penalty' : 'normal';
@@ -1797,7 +1949,7 @@ function exportToExcel(source) {
     } else if (source === 'settlement') {
         const m = stlMonth || currentMonth();
         const s = calcSettlement(m);
-        const data = s.items.map((item,i)=>({'排名':i+1,'助理':item.name,'點數':item.points,'分配比例':item.isEligible?item.pct.toFixed(1)+'%':'—','資格':item.isEligible?'正職':'試用'}));
+        const data = s.items.map((item,i)=>({'排名':i+1,'助理':item.name,'點數':item.points,'分配比例':item.isEligible?item.pct.toFixed(1)+'%':'—','資格':bonusEligibleLabel(item.bonusEligible)}));
         const ws = XLSX.utils.json_to_sheet(data);
         XLSX.utils.book_append_sheet(wb, ws, '月結算');
         XLSX.writeFile(wb, `助理結算_${m}.xlsx`);
@@ -1910,8 +2062,9 @@ const DOC_PAGES  = ['overtime-approve'];
 const ASST_PAGES = ['myview','overtime-apply'];
 
 function navigate(p) {
+    if (p === 'overview' && viewMode === 'principal') p = 'settlement';
     if (viewMode === 'viewer' && p !== 'overview') { showLoginScreen(); return; }
-    if (viewMode === 'manager'   && !['overview','leave-approve'].includes(p)) return;
+    if (viewMode === 'manager'   && !['overview','record','leave-approve'].includes(p)) return;
     if (viewMode === 'doctor'    && !['overview','record','overtime-approve'].includes(p)) return;
     if (viewMode === 'assistant' && !['overview','myview','overtime-apply'].includes(p)) return;
     // principal can go anywhere
@@ -1929,6 +2082,7 @@ function renderPage(p) {
       settlement:renderSettlementPage,salary:renderSalaryPage,assistants:renderAssistants,rules:renderRules,
       myview:renderMyView,'overtime-apply':renderOvertimeApply,
       'overtime-approve':renderOvertimeApprove,
+      attendance:renderAttendance,
       leave:renderLeave,'leave-approve':renderLeaveApprove,
       'support-report':renderSupportReport})[p]?.();
 }
@@ -1990,7 +2144,7 @@ function renderOverview() {
             return `<div class="lb-item">
                 <div class="rn ${rc}">${i+1}</div>
                 <div class="lb-info">
-                    <div class="lb-name">${item.name}${flag}<span class="flag-pill ${item.isEligible?'fp-good':'fp-prob'}">${item.isEligible?'正職':'試用'}</span></div>
+                    <div class="lb-name">${item.name}${flag}<span class="flag-pill ${item.isEligible?'fp-good':'fp-prob'}">${bonusEligibleLabel(item.bonusEligible)}</span></div>
                     <div class="lb-bar"><div class="prog-wrap" style="width:130px"><div class="prog-fill" style="width:${item.pct}%;background:${bc}"></div></div></div>
                 </div>
                 <div class="lb-pts ${item.points>=0?'pp':'pn'}">${item.points>=0?'+':''}${item.points}</div>
@@ -2013,7 +2167,189 @@ function renderOverview() {
 // ================================================================
 // RECORD PAGE
 // ================================================================
+function renderRulesPanel(containerId) {
+    const catOrder=['個人能力','好評','業績','能力','負評','感控','態度','其他'];
+    const sorted=[...state.rules].sort((a,b)=>{
+        const ai=catOrder.indexOf(a.category); const bi=catOrder.indexOf(b.category);
+        if(ai!==bi) return (ai===-1?99:ai)-(bi===-1?99:bi);
+        return b.points-a.points;
+    });
+    const el=document.getElementById(containerId);
+    if(!el) return;
+    if(!sorted.length){el.innerHTML='<div class="empty-state"><p>尚無規定</p></div>';return;}
+    // group by category
+    const grouped={};
+    sorted.forEach(r=>{ (grouped[r.category]||(grouped[r.category]=[])).push(r); });
+    el.innerHTML=Object.entries(grouped).map(([cat,rules])=>`
+        <div class="card section" style="margin-bottom:12px">
+            <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:10px">${cat}</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+                ${rules.map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--surface-alt);border-radius:7px">
+                    <span class="badge ${r.points>=0?'bg':'br'}" style="flex-shrink:0">${r.points>0?'+':''}${r.points}pt</span>
+                    <span style="font-weight:600;flex:1">${r.name}</span>
+                    ${r.desc?`<span style="font-size:12px;color:var(--text-muted)">${r.desc}</span>`:''}
+                </div>`).join('')}
+            </div>
+        </div>`).join('');
+}
+
+function renderRecRules() {
+    const tbody = document.getElementById('rec-rules-tbody');
+    if (!tbody) return;
+    const catOrder = ['個人能力','好評','業績','能力','負評','感控','態度','其他'];
+    const sorted = [...state.rules].sort((a,b) => {
+        const ai = catOrder.indexOf(a.category), bi = catOrder.indexOf(b.category);
+        if (ai !== bi) return (ai===-1?99:ai) - (bi===-1?99:bi);
+        return b.points - a.points;
+    });
+    if (!sorted.length) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">尚無規定</td></tr>`; return; }
+    tbody.innerHTML = sorted.map(r => `
+        <tr>
+            <td style="font-weight:600">${r.name}</td>
+            <td><span class="badge ${r.points>=0?'bg':'br'}">${r.points>0?'+':''}${r.points} 點</span></td>
+            <td><span class="badge bb">${r.category}</span></td>
+            <td style="color:var(--text-muted);font-size:12.5px;max-width:180px">${r.desc||'—'}</td>
+            <td><div style="display:flex;gap:6px">
+                <button class="btn btn-sm btn-outline" onclick="editRule('${r.id}')">編輯</button>
+                <button class="btn btn-sm btn-danger" onclick="delRule('${r.id}')">刪除</button>
+            </div></td>
+        </tr>`).join('');
+}
+
+function setRecordTab(tab) {
+    recPageTab = tab;
+    document.getElementById('rec-tab-record').classList.toggle('hidden', tab!=='record');
+    document.getElementById('rec-tab-rules').classList.toggle('hidden', tab!=='rules');
+    document.getElementById('rec-tab-history').classList.toggle('hidden', tab!=='history');
+    document.getElementById('tbb-rec-record').classList.toggle('active', tab==='record');
+    document.getElementById('tbb-rec-rules').classList.toggle('active', tab==='rules');
+    document.getElementById('tbb-rec-history').classList.toggle('active', tab==='history');
+    if(tab==='rules') renderRecRules();
+    if(tab==='history') renderRecordHistory();
+}
+
+let recHistoryMonth = null;
+let recHistSelMode = false;
+let recHistSelected = new Set();
+
+function renderRecordHistory() {
+    if (!recHistoryMonth) recHistoryMonth = currentMonth();
+    document.getElementById('rec-history-month-tabs').innerHTML = last6Months().map(m =>
+        `<button class="month-tab ${m===recHistoryMonth?'active':''}" onclick="setRecHistoryMonth('${m}')">${monthLabel(m)}</button>`
+    ).join('');
+    const af = document.getElementById('rec-history-asst-filter');
+    const curAf = af.value;
+    af.innerHTML = '<option value="">所有助理</option>' + state.assistants.map(a=>`<option value="${a.id}" ${a.id===curAf?'selected':''}>${a.name}</option>`).join('');
+    let txns = state.transactions.filter(t => txnMonth(t) === recHistoryMonth);
+    if (af.value) txns = txns.filter(t => t.assistantId === af.value);
+    const tf = document.getElementById('rec-history-type-filter').value;
+    if (tf === 'p') txns = txns.filter(t => t.points > 0);
+    if (tf === 'n') txns = txns.filter(t => t.points < 0);
+    txns.sort((a,b) => new Date(b.date) - new Date(a.date));
+    document.getElementById('rec-history-count').textContent = `共 ${txns.length} 筆`;
+    // Selection mode header
+    const thead = document.getElementById('rec-history-thead');
+    if (thead) {
+        thead.innerHTML = recHistSelMode
+            ? `<th style="width:36px"><input type="checkbox" id="rec-hist-check-all" onchange="toggleAllRecHist(this.checked)" style="width:14px;height:14px"></th><th>日期</th><th>助理</th><th>事項</th><th>點數</th><th>操作者</th><th>備注</th>`
+            : `<th>日期</th><th>助理</th><th>事項</th><th>點數</th><th>操作者</th><th>備注</th>`;
+    }
+    const tbody = document.getElementById('rec-history-tbody');
+    tbody.innerHTML = txns.length ? txns.map(t => {
+        const a = findA(t.assistantId); const r = t.ruleId ? findR(t.ruleId) : null;
+        const checked = recHistSelected.has(t.id) ? 'checked' : '';
+        if (recHistSelMode) {
+            return `<tr style="${recHistSelected.has(t.id)?'background:var(--accent-light)':''}">
+                <td><input type="checkbox" ${checked} onchange="toggleRecHistRow('${t.id}',this.checked)" style="width:14px;height:14px"></td>
+                <td style="white-space:nowrap">${t.date}</td>
+                <td style="font-weight:500">${a?.name||'—'}</td>
+                <td>${r?.name||t.note||'自訂'}</td>
+                <td><span class="${t.points>=0?'pp':'pn'}">${t.points>=0?'+':''}${t.points}</span></td>
+                <td style="color:var(--text-muted);font-size:12.5px">${t.operator||'—'}</td>
+                <td style="color:var(--text-muted);font-size:12.5px">${t.note||''}</td>
+            </tr>`;
+        }
+        return `<tr>
+            <td style="white-space:nowrap">${t.date}</td>
+            <td style="font-weight:500">${a?.name||'—'}</td>
+            <td>${r?.name||t.note||'自訂'}</td>
+            <td><span class="${t.points>=0?'pp':'pn'}">${t.points>=0?'+':''}${t.points}</span></td>
+            <td style="color:var(--text-muted);font-size:12.5px">${t.operator||'—'}</td>
+            <td style="color:var(--text-muted);font-size:12.5px">${t.note||''}</td>
+        </tr>`;
+    }).join('') : `<tr><td colspan="${recHistSelMode?7:6}" style="text-align:center;padding:32px;color:var(--text-muted)">此月無記錄</td></tr>`;
+    _updateRecHistSelUI();
+}
+
+function setRecHistoryMonth(m) { recHistoryMonth = m; recHistSelected.clear(); renderRecordHistory(); }
+
+function toggleRecHistSel() {
+    recHistSelMode = !recHistSelMode;
+    recHistSelected.clear();
+    document.getElementById('rec-hist-sel-btn').classList.toggle('hidden', recHistSelMode);
+    document.getElementById('rec-hist-del-btn').classList.add('hidden');
+    document.getElementById('rec-hist-cancel-btn').classList.toggle('hidden', !recHistSelMode);
+    renderRecordHistory();
+}
+
+function toggleRecHistRow(id, checked) {
+    if (checked) recHistSelected.add(id); else recHistSelected.delete(id);
+    _updateRecHistSelUI();
+    const row = document.querySelector(`input[onchange*="'${id}'"]`)?.closest('tr');
+    if (row) row.style.background = checked ? 'var(--accent-light)' : '';
+}
+
+function toggleAllRecHist(checked) {
+    document.querySelectorAll('[onchange^="toggleRecHistRow"]').forEach(cb => {
+        const id = cb.getAttribute('onchange').match(/'([^']+)'/)?.[1];
+        if (id) { cb.checked = checked; if (checked) recHistSelected.add(id); else recHistSelected.delete(id); }
+        const row = cb.closest('tr');
+        if (row) row.style.background = checked ? 'var(--accent-light)' : '';
+    });
+    _updateRecHistSelUI();
+}
+
+function _updateRecHistSelUI() {
+    const n = recHistSelected.size;
+    const delBtn = document.getElementById('rec-hist-del-btn');
+    const countEl = document.getElementById('rec-hist-sel-count');
+    if (delBtn) delBtn.classList.toggle('hidden', n === 0);
+    if (countEl) countEl.textContent = n;
+}
+
+async function deleteSelectedRecHist() {
+    const ids = [...recHistSelected];
+    if (!ids.length) return;
+    confirm2(`確定要刪除選取的 ${ids.length} 筆記錄嗎？此操作無法還原。`, async () => {
+        showLoading();
+        try {
+            for (const id of ids) await delDoc('transactions', id);
+            recHistSelected.clear();
+            recHistSelMode = false;
+            document.getElementById('rec-hist-sel-btn')?.classList.remove('hidden');
+            document.getElementById('rec-hist-cancel-btn')?.classList.add('hidden');
+            toast(`已刪除 ${ids.length} 筆記錄`);
+            renderRecordHistory();
+        } catch(e) { toast('刪除失敗：'+e.message); }
+        hideLoading();
+    });
+}
+
+function setHistoryTab(tab) {
+    histPageTab = tab;
+    document.getElementById('hist-tab-history').classList.toggle('hidden', tab!=='history');
+    document.getElementById('hist-tab-rules').classList.toggle('hidden', tab!=='rules');
+    document.getElementById('tbb-hist-history').classList.toggle('active', tab==='history');
+    document.getElementById('tbb-hist-rules').classList.toggle('active', tab==='rules');
+    document.getElementById('hist-export-btn').classList.toggle('hidden', tab!=='history');
+    if(tab==='rules') renderRulesPanel('hist-rules-list');
+}
+
 function renderRecord() {
+    // manager/doctor can only see record tab
+    if ((viewMode === 'manager' || viewMode === 'doctor') && recPageTab !== 'record') recPageTab = 'record';
+    // sync tab UI state
+    setRecordTab(recPageTab);
     // 助理選取
     const active = state.assistants.filter(a=>a.active);
     document.getElementById('rec-asst-picker').innerHTML = !active.length
@@ -2333,6 +2669,8 @@ function renderMyView() {
 // HISTORY
 // ================================================================
 function renderHistory() {
+    // sync tab UI state
+    setHistoryTab(histPageTab);
     if(!historyMonth) historyMonth=currentMonth();
     document.getElementById('history-month-tabs').innerHTML=last6Months().map(m=>
         `<button class="month-tab ${m===historyMonth?'active':''}" onclick="setHistoryMonth('${m}')">${monthLabel(m)}</button>`
@@ -2439,7 +2777,7 @@ function renderStlContent() {
                         const rc=i===0?'rn1':i===1?'rn2':i===2?'rn3':'rnn';
                         const flagHtml = item.points>=INDIVIDUAL_HIGH?'<span class="flag-pill fp-good">優良 ≥'+INDIVIDUAL_HIGH+'</span>'
                             : item.points<INDIVIDUAL_ZERO?'<span class="flag-pill fp-bad">警告 &lt;0</span>':'';
-                        const eligHtml = !item.isEligible?'<span class="flag-pill fp-prob">試用</span>':'<span class="flag-pill fp-good">正職</span>';
+                        const eligHtml = item.isEligible?'<span class="flag-pill fp-good">正職/參與分配</span>':item.bonusEligible==='full_no_dist'?'<span class="flag-pill" style="background:var(--surface-alt);color:var(--text-secondary)">正職/不分配</span>':'<span class="flag-pill fp-prob">試用期</span>';
                         return `<tr>
                             <td style="padding:13px 0;border-bottom:1px solid var(--border)">
                                 <div style="display:flex;align-items:center;gap:9px"><div class="rn ${rc}">${i+1}</div><span style="font-weight:600">${item.name}</span></div>
@@ -2585,6 +2923,10 @@ function calcSalaryRows(m) {
         const fullAttendance = !!params.fullAttendance[item.id];
         const fullAttendancePay = fullAttendance ? perfBonus2 : 0;
         const deduction = Number(params.deductions[item.id] || 0);
+        const laborGrade = getLaborInsuranceGrade(asst.laborInsuranceGrade);
+        const laborInsuranceDeduction = laborGrade ? laborGrade.totalEmp : 0;
+        const laborInsuranceLaborEmp = laborGrade ? laborGrade.laborEmp : 0;
+        const laborInsuranceHealthEmp = laborGrade ? laborGrade.healthEmp : 0;
         // Follow fee
         const ffData = params.followFee[item.id] || {};
         const followFeePay = (ffData.feePerSession || 0) * (ffData.sessions || 0);
@@ -2593,16 +2935,85 @@ function calcSalaryRows(m) {
         const reconPay   = (sfCases.reconstruction || 0) * (params.surgeryFee.reconstruction?.feePerCase || 0);
         const implantPay = (sfCases.implant        || 0) * (params.surgeryFee.implant?.feePerCase        || 0);
         const surgeryFeePay = reconPay + implantPay;
+        // Leave deductions based on leave policy
+        const _mp = (settings.salarySettings?.monthlyParams || {})[m] || {};
+        const _lp = settings.leavePolicy || {};
+        const _lpBp = _lp.baseParams || {};
+        const _lpRules = _lp.rules || {};
+        const _lpBaseSal = _lpBp.baseSalary ?? 34000;
+        const _lpWorkDays = _lpBp.workDays ?? 30;
+        const _lpFABonus = _lpBp.fullAttendanceBonus ?? 2000;
+        // helper: dpd from impact value
+        function _lpDpd(impact, custom) {
+            if (!impact || impact === 'none' || impact === 'attendance_only') return 0;
+            if (impact === 'salary_only')           return _lpBaseSal / _lpWorkDays;
+            if (impact === 'salary_attendance')     return (_lpBaseSal + _lpFABonus) / _lpWorkDays;
+            if (impact === 'other')                 return custom || 0;
+            return 0;
+        }
+        // Group approved leave requests in this month by leave-type key
+        const _approvedInMonth = state.leaveRequests.filter(r =>
+            r.assistantId === item.id && r.status === 'approved' &&
+            (r.dates || []).some(d => d.startsWith(m))
+        );
+        const _leaveTypeGroups = {};
+        _approvedInMonth.forEach(r => {
+            const k = (r.leaveType === 'other' && r.leaveSubType) ? 'sub_' + r.leaveSubType : r.leaveType;
+            (_leaveTypeGroups[k] = _leaveTypeGroups[k] || []).push(r);
+        });
+        const leaveDeductions = [];
+        for (const [lpKey, typeReqs] of Object.entries(_leaveTypeGroups)) {
+            const daysInMonth = typeReqs.reduce((s, r) => s + (r.dates||[]).filter(d => d.startsWith(m)).length, 0);
+            if (daysInMonth === 0) continue;
+            const rule = _lpRules[lpKey] || {};
+            const impact   = rule.impact || 'none';
+            const normalDpd = _lpDpd(impact, rule.customAmount || 0);
+            let withinDays = daysInMonth, overDays = 0, overDpd = 0;
+            if (rule.limitType === 'limited' && (rule.limitDays || 0) > 0) {
+                // Determine period start: 年 → calendar year of m; 月 → current month
+                const [mYear] = m.split('-').map(Number);
+                const periodStart = (rule.limitPeriodUnit === '年') ? `${mYear}-01-01` : (m + '-01');
+                // All approved days of this type for this assistant in the period
+                const allDaysInPeriod = state.leaveRequests
+                    .filter(r => r.assistantId === item.id && r.status === 'approved')
+                    .filter(r => {
+                        const k = (r.leaveType === 'other' && r.leaveSubType) ? 'sub_' + r.leaveSubType : r.leaveType;
+                        return k === lpKey;
+                    })
+                    .flatMap(r => (r.dates || []).filter(d => d >= periodStart))
+                    .sort();
+                // Days used before this salary month (already count toward limit)
+                const daysBeforeThisMonth = allDaysInPeriod.filter(d => d < m + '-01').length;
+                const remaining = Math.max(0, rule.limitDays - daysBeforeThisMonth);
+                withinDays = Math.min(daysInMonth, remaining);
+                overDays   = daysInMonth - withinDays;
+                if (overDays > 0) overDpd = _lpDpd(rule.overLimitImpact || 'none', rule.overLimitCustomAmount || 0);
+            }
+            const normalAmount = Math.round(normalDpd * withinDays);
+            const overAmount   = Math.round(overDpd * overDays);
+            const amount = normalAmount + overAmount;
+            if (normalAmount === 0 && overAmount === 0) continue;
+            // Composite key per assistant+type+month (not per request) for checkbox persistence
+            const checkKey = item.id + '|' + lpKey + '|' + m;
+            const enabled  = _mp.leaveDeductionEnabled?.[checkKey] !== false;
+            const typeLabel = LEAVE_TYPES.find(t => t.key === lpKey)?.label
+                || LEAVE_SUB_TYPES.find(t => 'sub_' + t.key === lpKey)?.label
+                || (_lp.customTypes || []).find(t => 'custom_' + t.key === lpKey)?.label
+                || lpKey;
+            leaveDeductions.push({ id: checkKey, label: typeLabel, daysInMonth, withinDays, overDays, normalDpd, overDpd, normalAmount, overAmount, amount, enabled });
+        }
+        const leaveDeductionTotal = leaveDeductions.filter(ld => ld.enabled).reduce((s, ld) => s + ld.amount, 0);
 
-        const total = baseSalary + seniorityPay + perfBonus + otPay + seasonalAdj + allowanceTotal + fullAttendancePay + followFeePay + surgeryFeePay - deduction;
+        const total = baseSalary + seniorityPay + perfBonus + otPay + seasonalAdj + allowanceTotal + fullAttendancePay + followFeePay + surgeryFeePay - deduction - laborInsuranceDeduction - leaveDeductionTotal;
         return {
-            id: item.id, name: item.name, isEligible: item.isEligible,
+            id: item.id, name: item.name, isEligible: item.isEligible, bonusEligible: item.bonusEligible,
             points: item.points, pct: item.pct,
             baseSalary, years, seniorityPay, seniorityLabel, allowanceTotal, allowanceNames,
             perfBonus, otPay, approvedMins, seasonalAdj,
             fullAttendance, fullAttendancePay, deduction,
+            laborInsuranceDeduction, laborInsuranceLaborEmp, laborInsuranceHealthEmp,
             followFeePay, ffData, reconPay, implantPay, surgeryFeePay,
-            sfCases, total, bonusPool
+            sfCases, leaveDeductions, leaveDeductionTotal, total, bonusPool
         };
     });
 }
@@ -2733,9 +3144,10 @@ function renderSalaryContent() {
         <div class="card">
             <div class="card-title">${monthLabel(m)} 薪資明細</div>
             <div style="overflow-x:auto">
-            <table style="width:100%;border-collapse:collapse;min-width:1050px">
+            <table style="width:100%;border-collapse:collapse;min-width:1150px">
                 <thead><tr>
                     <th style="${thStyle};text-align:left">助理</th>
+                    <th style="${thStyle};text-align:center">類別</th>
                     <th style="${thStyle}">底薪</th>
                     <th style="${thStyle}">年資加給</th>
                     <th style="${thStyle}">績效獎金</th>
@@ -2745,41 +3157,72 @@ function renderSalaryContent() {
                     <th style="${thStyle}">全勤獎金</th>
                     <th style="${thStyle}">專跟費</th>
                     <th style="${thStyle}">跟刀費</th>
-                    <th style="${thStyle}">扣除</th>
-                    <th style="${thStyle}">實領薪資</th>
+                    <th style="${thStyle};color:var(--red)">其他扣除</th>
+                    <th style="${thStyle};color:var(--red)">勞保自負</th>
+                    <th style="${thStyle};color:var(--red)">健保自負</th>
+                    <th style="${thStyle};color:var(--accent)">實領薪資</th>
                 </tr></thead>
                 <tbody>
                     ${rows.map((r,i) => {
                         const stripe = i%2===1?'background:var(--surface-alt)':'';
-                        const td = (content, extra='') => `<td style="${tdStyle(extra)}">${content}</td>`;
-                        return `<tr style="${stripe}">
-                            <td style="${tdStyle('text-align:left')}">
+                        const borderTop = 'border-top:1px solid var(--border)';
+                        const borderBot = 'border-bottom:2px solid var(--border)';
+                        const tdA = (content,extra='') => `<td style="padding:8px 10px;text-align:right;${borderTop};${extra}">${content}</td>`;
+                        const tdD = (content,extra='') => `<td style="padding:8px 10px;text-align:right;${borderBot};${extra}">${content}</td>`;
+                        return `
+                        <tr style="${stripe}">
+                            <td style="padding:8px 10px;text-align:left;${borderTop}" rowspan="2">
                                 <div style="font-weight:600">${r.name}</div>
-                                <div style="font-size:var(--fs-sm);color:var(--text-muted)">${r.isEligible?'正職':'試用'}${r.seniorityLabel?' · '+r.seniorityLabel:''}</div>
+                                <div style="font-size:11.5px;color:var(--text-muted)">${bonusEligibleLabel(r.bonusEligible)}${r.seniorityLabel?' · '+r.seniorityLabel:''}</div>
                             </td>
-                            ${td(fmt(r.baseSalary))}
-                            ${td(r.seniorityPay>0?`<div style="font-weight:600">${fmt(r.seniorityPay)}</div><div style="font-size:10px;color:var(--text-muted)">${r.seniorityLabel}</div>`:'—')}
-                            ${td(r.isEligible?`<div style="font-weight:600">${fmt(r.perfBonus)}</div><div style="font-size:10px;color:var(--text-muted)">${r.pct.toFixed(1)}%×1%</div>`:'—')}
-                            ${td(r.approvedMins>0?`<div>${fmt(r.otPay)}</div><div style="font-size:10px;color:var(--text-muted)">${r.approvedMins}分</div>`:'—')}
-                            ${td(r.isEligible&&r.seasonalAdj!==0?`<span style="color:${r.seasonalAdj>0?'var(--green)':'var(--red)'};font-weight:600">${r.seasonalAdj>0?'+':''}${r.seasonalAdj}</span>`:'—')}
-                            ${td(r.allowanceTotal>0?`<div>${fmt(r.allowanceTotal)}</div><div style="font-size:10px;color:var(--text-muted)">${r.allowanceNames.join('、')}</div>`:'—')}
-                            <td style="${tdStyle()}">
+                            <td style="padding:8px 10px;text-align:center;${borderTop};font-size:11px;font-weight:700;color:var(--green);white-space:nowrap">加給</td>
+                            ${tdA(fmt(r.baseSalary))}
+                            ${tdA(r.seniorityPay>0?`<div style="font-weight:600">${fmt(r.seniorityPay)}</div><div style="font-size:10px;color:var(--text-muted)">${r.seniorityLabel}</div>`:'—')}
+                            ${tdA(r.isEligible?`<div style="font-weight:600">${fmt(r.perfBonus)}</div><div style="font-size:10px;color:var(--text-muted)">${r.pct.toFixed(1)}%×1%</div>`:'—')}
+                            ${tdA(r.approvedMins>0?`<div>${fmt(r.otPay)}</div><div style="font-size:10px;color:var(--text-muted)">${r.approvedMins}分</div>`:'—')}
+                            ${tdA(r.isEligible&&r.seasonalAdj!==0?`<span style="color:${r.seasonalAdj>0?'var(--green)':'var(--red)'};font-weight:600">${r.seasonalAdj>0?'+':''}${r.seasonalAdj}</span>`:'—')}
+                            ${tdA(r.allowanceTotal>0?`<div>${fmt(r.allowanceTotal)}</div><div style="font-size:10px;color:var(--text-muted)">${r.allowanceNames.join('、')}</div>`:'—')}
+                            <td style="padding:8px 10px;text-align:right;${borderTop}">
                                 <label style="display:flex;align-items:center;justify-content:flex-end;gap:6px;cursor:pointer">
                                     <input type="checkbox" data-fa="${r.id}" ${r.fullAttendance?'checked':''} style="width:14px;height:14px">
                                     <span style="font-size:var(--fs-sm);color:var(--text-muted)">2,000</span>
                                 </label>
                             </td>
-                            ${td(r.followFeePay>0?`<div>${fmt(r.followFeePay)}</div><div style="font-size:10px;color:var(--text-muted)">${r.ffData.sessions}診</div>`:'—')}
-                            ${td(r.surgeryFeePay>0?`<div>${fmt(r.surgeryFeePay)}</div>${r.reconPay>0?`<div style="font-size:10px;color:var(--text-muted)">全口${r.sfCases.reconstruction||0}台</div>`:''}${r.implantPay>0?`<div style="font-size:10px;color:var(--text-muted)">植牙${r.sfCases.implant||0}台</div>`:''}`:'—')}
-                            <td style="${tdStyle()}">
-                                <input type="number" data-deduct="${r.id}" value="${r.deduction}" min="0" step="100"
-                                    style="width:80px;padding:5px 8px;border:1px solid var(--border);border-radius:7px;font-size:var(--fs-base);font-family:inherit;text-align:right;color:var(--red);background:var(--surface)">
+                            ${tdA(r.followFeePay>0?`<div>${fmt(r.followFeePay)}</div><div style="font-size:10px;color:var(--text-muted)">${r.ffData.sessions}診</div>`:'—')}
+                            ${tdA(r.surgeryFeePay>0?`<div>${fmt(r.surgeryFeePay)}</div>${r.reconPay>0?`<div style="font-size:10px;color:var(--text-muted)">全口${r.sfCases.reconstruction||0}台</div>`:''}${r.implantPay>0?`<div style="font-size:10px;color:var(--text-muted)">植牙${r.sfCases.implant||0}台</div>`:''}`:'—')}
+                            <td style="padding:8px 10px;${borderTop}" colspan="3"></td>
+                            <td style="padding:8px 10px;text-align:right;${borderTop}" rowspan="2">
+                                <span style="font-size:var(--fs-sub);font-weight:800;color:${r.total>=0?'var(--text-primary)':'var(--red)'}">${fmt(r.total)}</span>
                             </td>
-                            ${td(`<span style="font-size:var(--fs-sub);font-weight:800;color:${r.total>=0?'var(--text-primary)':'var(--red)'}">${fmt(r.total)}</span>`)}
+                        </tr>
+                        <tr style="${stripe}">
+                            <td style="padding:8px 10px;text-align:center;${borderBot};font-size:11px;font-weight:700;color:var(--red);white-space:nowrap">扣除</td>
+                            <td colspan="9" style="padding:6px 8px;${borderBot}">
+                                ${r.leaveDeductions.length > 0 ? `<div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">
+                                    <span style="font-size:10px;color:var(--text-muted);margin-right:2px">請假扣除：</span>
+                                    ${r.leaveDeductions.map(ld => {
+                                        const detail = ld.overDays > 0
+                                            ? `${ld.withinDays}日(正常) + 超限${ld.overDays}日`
+                                            : `${ld.daysInMonth}日`;
+                                        const breakdown = ld.overDays > 0
+                                            ? `<span style="color:var(--text-muted);font-size:10px">−${fmt(ld.normalAmount)}+超限−${fmt(ld.overAmount)}</span>`
+                                            : '';
+                                        return `<label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:3px 7px;background:var(--surface);border-radius:20px;border:1px solid var(--border);font-size:11px;white-space:nowrap">
+                                            <input type="checkbox" data-lv-id="${ld.id}" ${ld.enabled?'checked':''} style="width:12px;height:12px;cursor:pointer">
+                                            <span style="color:var(--text-secondary)">${ld.label} ${detail}</span>
+                                            <span style="color:var(--red);font-weight:600">−${fmt(ld.amount)}</span>
+                                            ${breakdown}
+                                        </label>`;
+                                    }).join('')}
+                                </div>` : ''}
+                            </td>
+                            ${tdD(`<input type="number" data-deduct="${r.id}" value="${r.deduction}" min="0" step="100" style="width:80px;padding:4px 8px;border:1px solid var(--border);border-radius:7px;font-size:var(--fs-base);font-family:inherit;text-align:right;color:var(--red);background:var(--surface)">`)}
+                            ${tdD(r.laborInsuranceLaborEmp>0?`<span style="color:var(--red)">${fmt(r.laborInsuranceLaborEmp)}</span>`:'—')}
+                            ${tdD(r.laborInsuranceHealthEmp>0?`<span style="color:var(--red)">${fmt(r.laborInsuranceHealthEmp)}</span>`:'—')}
                         </tr>`;
                     }).join('')}
                     <tr style="background:var(--accent-light)">
-                        <td style="padding:11px 10px;font-weight:700;border-top:2px solid var(--border)">合計</td>
+                        <td style="padding:11px 10px;font-weight:700;border-top:2px solid var(--border)" colspan="2">合計</td>
                         <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border)">${fmt(rows.reduce((s,r)=>s+r.baseSalary,0))}</td>
                         <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border)">${fmt(rows.reduce((s,r)=>s+r.seniorityPay,0))}</td>
                         <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border)">${fmt(rows.reduce((s,r)=>s+r.perfBonus,0))}</td>
@@ -2790,6 +3233,8 @@ function renderSalaryContent() {
                         <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border)">${fmt(rows.reduce((s,r)=>s+r.followFeePay,0))}</td>
                         <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border)">${fmt(rows.reduce((s,r)=>s+r.surgeryFeePay,0))}</td>
                         <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border);color:var(--red)">${fmt(rows.reduce((s,r)=>s+r.deduction,0))}</td>
+                        <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border);color:var(--red)">${fmt(rows.reduce((s,r)=>s+r.laborInsuranceLaborEmp,0))}</td>
+                        <td style="padding:11px 10px;text-align:right;font-weight:700;border-top:2px solid var(--border);color:var(--red)">${fmt(rows.reduce((s,r)=>s+r.laborInsuranceHealthEmp,0))}</td>
                         <td style="padding:11px 10px;text-align:right;border-top:2px solid var(--border)"><span style="font-size:var(--fs-sub);font-weight:800;color:var(--accent)">${fmt(rows.reduce((s,r)=>s+r.total,0))}</span></td>
                     </tr>
                 </tbody>
@@ -2818,6 +3263,11 @@ async function saveSalarySettings() {
     document.querySelectorAll('[data-deduct]').forEach(inp => {
         const v = Number(inp.value) || 0;
         if (v) mp.deductions[inp.dataset.deduct] = v;
+    });
+    // Leave deduction enabled states
+    mp.leaveDeductionEnabled = {};
+    document.querySelectorAll('[data-lv-id]').forEach(cb => {
+        mp.leaveDeductionEnabled[cb.dataset.lvId] = cb.checked;
     });
     // Follow fee
     mp.followFee = {};
@@ -2982,30 +3432,145 @@ function renderAssistants() {
     const pts = monthlyPoints(currentMonth());
     const tbody = document.getElementById('assistants-tbody');
     if(!state.assistants.length){tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted)">尚無助理</td></tr>`;return;}
-    tbody.innerHTML=state.assistants.map(a=>`
-        <tr>
-            <td style="font-weight:600">${a.name}</td>
+    tbody.innerHTML=state.assistants.map(a=>{
+        const be = normalizeBonusEligible(a.bonusEligible);
+        const badgeCls = be==='full_dist'?'bb':be==='full_no_dist'?'bb':'bgr';
+        const grade = getLaborInsuranceGrade(a.laborInsuranceGrade);
+        const gradeText = grade ? `${a.laborInsuranceGrade}（員工 ${grade.totalEmp.toLocaleString()}）` : '— 未設定';
+        return `<tr>
+            <td>
+                <div style="font-weight:600">${a.name}</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px">到職：${a.hireDate||'—'}</div>
+            </td>
             <td><span class="badge ${a.active?'bg':'bgr'}">${a.active?'啟用':'停用'}</span></td>
-            <td><span class="badge ${a.bonusEligible!==false?'bb':'bgr'}">${a.bonusEligible!==false?'參與分配':'試用/不分配'}</span></td>
+            <td><span class="badge ${badgeCls}" style="font-size:11px;white-space:nowrap">${bonusEligibleLabel(be)}</span></td>
             <td style="color:var(--text-secondary)">${(a.baseSalary||0).toLocaleString()}</td>
+            <td style="font-size:12px;color:var(--text-secondary)">
+                <div>${a.laborInsuranceGrade ? a.laborInsuranceGrade : '—'}</div>
+                <div style="color:var(--text-muted)">${grade ? `員工自負 ${grade.totalEmp.toLocaleString()} 元` : '未設定'}</div>
+            </td>
             <td style="font-size:var(--fs-sm);color:var(--text-secondary)">${(a.allowances||[]).map(k=>getAllowanceTypes().find(t=>t.key===k)?.name||k).join('、')||'—'}</td>
             <td><span class="${(pts[a.id]||0)>=0?'pp':'pn'}">${(pts[a.id]||0)>=0?'+':''}${pts[a.id]||0}</span></td>
             <td><span class="pin-code">${a.pin||'—'}</span></td>
-            <td style="color:var(--text-muted);font-size:12.5px">${(a.createdAt||'').slice(0,10)}</td>
             <td><div style="display:flex;gap:6px;flex-wrap:wrap">
                 <button class="btn btn-sm btn-outline" onclick="editAssistant('${a.id}')">編輯</button>
                 <button class="btn btn-sm btn-outline" onclick="regenPin('${a.id}')">重設密碼</button>
                 <button class="btn btn-sm ${a.active?'btn-outline':'btn-success'}" onclick="toggleAsst('${a.id}')">${a.active?'停用':'啟用'}</button>
                 <button class="btn btn-sm btn-danger" onclick="delAsst('${a.id}')">刪除</button>
             </div></td>
-        </tr>`).join('');
+        </tr>`;
+    }).join('');
+    renderLaborCostTable();
 }
+
+function renderLaborCostTable() {
+    const wrap = document.getElementById('labor-cost-table-wrap');
+    if (!wrap) return;
+    const active = state.assistants.filter(a=>a.active);
+    if (!active.length) { wrap.innerHTML='<div style="color:var(--text-muted);padding:12px 0">尚無助理資料</div>'; return; }
+
+    const thS = 'padding:9px 10px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-muted);white-space:nowrap;text-align:right';
+    const thL = thS + ';text-align:left';
+    const tdS = 'padding:9px 10px;border-bottom:1px solid var(--border);text-align:right';
+    const tdL = tdS + ';text-align:left';
+
+    // Load extra employer fields from settings (editable)
+    const lct = (settings.laborCostTable || {});
+
+    const rows = active.map(a => {
+        const grade = getLaborInsuranceGrade(a.laborInsuranceGrade);
+        const laborEmp   = grade ? grade.laborEmp   : 0;
+        const healthEmp  = grade ? grade.healthEmp  : 0;
+        const totalEmp   = grade ? grade.totalEmp   : 0;
+        // 雇主負擔：勞保 = 70%/20% × 員工負擔 ≈ 3.5×員工, 健保 = 60%/30% × 員工負擔 = 2×員工, 勞退=6%
+        const laborEr    = grade ? Math.round(grade.salary * 0.08085) : 0; // ~employer 70% of 11.5%
+        const healthEr   = grade ? Math.round(grade.salary * 0.03102) : 0; // ~employer 60% of 5.17%
+        const pension    = Math.round((a.baseSalary||0) * 0.06); // 勞退 6%
+        const extras     = lct[a.id] || {};
+        return { a, grade, laborEmp, healthEmp, totalEmp, laborEr, healthEr, pension, extras };
+    });
+
+    wrap.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;min-width:900px">
+        <thead><tr>
+            <th style="${thL}">助理</th>
+            <th style="${thS}">投保薪資級距</th>
+            <th style="${thS}">勞保－員工自負</th>
+            <th style="${thS}">健保－員工自負</th>
+            <th style="${thS}">員工自負合計</th>
+            <th style="${thS}">勞保－雇主負擔</th>
+            <th style="${thS}">健保－雇主負擔</th>
+            <th style="${thS}">勞退（6%）</th>
+            <th style="${thS}">其他（可填）</th>
+            <th style="${thS}">雇主總成本</th>
+        </tr></thead>
+        <tbody>
+            ${rows.map((row,i)=>{
+                const {a,grade,laborEmp,healthEmp,totalEmp,laborEr,healthEr,pension,extras} = row;
+                const stripe = i%2===1?'background:var(--surface-alt)':'';
+                const other = extras.other || 0;
+                const erTotal = laborEr + healthEr + pension + other;
+                const inpStyle = 'width:80px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:var(--fs-base);font-family:inherit;text-align:right;background:var(--surface)';
+                return `<tr style="${stripe}">
+                    <td style="${tdL};font-weight:600">${a.name}<div style="font-size:11px;color:var(--text-muted)">${a.laborInsuranceGrade||'未設定級距'}</div></td>
+                    <td style="${tdS}">${grade?grade.label:'—'}</td>
+                    <td style="${tdS};color:var(--red)">${laborEmp?laborEmp.toLocaleString():'—'}</td>
+                    <td style="${tdS};color:var(--red)">${healthEmp?healthEmp.toLocaleString():'—'}</td>
+                    <td style="${tdS};font-weight:700;color:var(--red)">${totalEmp?totalEmp.toLocaleString():'—'}</td>
+                    <td style="${tdS}"><input type="number" data-lct-er-lab="${a.id}" value="${extras.laborEr!==undefined?extras.laborEr:laborEr}" min="0" step="1" style="${inpStyle}"></td>
+                    <td style="${tdS}"><input type="number" data-lct-er-hlt="${a.id}" value="${extras.healthEr!==undefined?extras.healthEr:healthEr}" min="0" step="1" style="${inpStyle}"></td>
+                    <td style="${tdS}"><input type="number" data-lct-pension="${a.id}" value="${extras.pension!==undefined?extras.pension:pension}" min="0" step="1" style="${inpStyle}"></td>
+                    <td style="${tdS}"><input type="number" data-lct-other="${a.id}" value="${other}" min="0" step="1" style="${inpStyle}"></td>
+                    <td style="${tdS};font-weight:700;color:var(--accent)" id="lct-total-${a.id}">${erTotal.toLocaleString()}</td>
+                </tr>`;
+            }).join('')}
+        </tbody>
+    </table>`;
+
+    // live total update
+    wrap.querySelectorAll('input[data-lct-er-lab],input[data-lct-er-hlt],input[data-lct-pension],input[data-lct-other]').forEach(inp=>{
+        inp.addEventListener('input', ()=>{
+            const id = (inp.dataset.lctErLab||inp.dataset.lctErHlt||inp.dataset.lctPension||inp.dataset.lctOther);
+            const erLab   = Number(wrap.querySelector(`[data-lct-er-lab="${id}"]`)?.value)||0;
+            const erHlt   = Number(wrap.querySelector(`[data-lct-er-hlt="${id}"]`)?.value)||0;
+            const pens    = Number(wrap.querySelector(`[data-lct-pension="${id}"]`)?.value)||0;
+            const oth     = Number(wrap.querySelector(`[data-lct-other="${id}"]`)?.value)||0;
+            const el = document.getElementById('lct-total-'+id);
+            if(el) el.textContent=(erLab+erHlt+pens+oth).toLocaleString();
+        });
+    });
+}
+
+async function saveLaborCostTable() {
+    const wrap = document.getElementById('labor-cost-table-wrap');
+    if (!wrap) return;
+    const lct = {};
+    state.assistants.filter(a=>a.active).forEach(a=>{
+        lct[a.id] = {
+            laborEr:  Number(wrap.querySelector(`[data-lct-er-lab="${a.id}"]`)?.value)||0,
+            healthEr: Number(wrap.querySelector(`[data-lct-er-hlt="${a.id}"]`)?.value)||0,
+            pension:  Number(wrap.querySelector(`[data-lct-pension="${a.id}"]`)?.value)||0,
+            other:    Number(wrap.querySelector(`[data-lct-other="${a.id}"]`)?.value)||0,
+        };
+    });
+    settings.laborCostTable = lct;
+    try {
+        await db.collection(col('settings')).doc('main').update({ laborCostTable: lct });
+        toast('勞健保費用表已儲存');
+    } catch(e) { toast('儲存失敗：'+e.message); }
+}
+
 function _resetAsstModal(a) {
     document.getElementById('edit-asst-id').value = a?.id || '';
     document.getElementById('asst-name-input').value = a?.name || '';
-    document.getElementById('asst-bonus-input').value = (a?.bonusEligible!==false) ? '1' : '0';
+    document.getElementById('asst-bonus-input').value = normalizeBonusEligible(a?.bonusEligible);
     document.getElementById('asst-base-salary').value = a?.baseSalary || 0;
     document.getElementById('asst-hire-date').value = a?.hireDate || '';
+    // populate labor grade dropdown
+    const gradeEl = document.getElementById('asst-labor-grade');
+    gradeEl.innerHTML = '<option value="">— 未設定 —</option>' +
+        LABOR_INSURANCE_GRADES.map(g=>`<option value="${g.label}">${g.label}（員工自負 ${g.totalEmp.toLocaleString()} 元）</option>`).join('');
+    gradeEl.value = a?.laborInsuranceGrade || '';
     const enabledKeys = a?.allowances || [];
     const amts = a?.allowanceAmounts || {};
     document.getElementById('asst-allowances').innerHTML = getAllowanceTypes().map(t => `
@@ -3032,7 +3597,8 @@ function editAssistant(id) {
 }
 async function saveAssistant() {
     const name=document.getElementById('asst-name-input').value.trim();
-    const bonusEligible=document.getElementById('asst-bonus-input').value==='1';
+    const bonusEligible=document.getElementById('asst-bonus-input').value || 'full_dist';
+    const laborInsuranceGrade=document.getElementById('asst-labor-grade').value||'';
     const baseSalary=Number(document.getElementById('asst-base-salary').value)||0;
     const hireDate=document.getElementById('asst-hire-date').value||'';
     const allowances=getAllowanceTypes().filter(t=>document.getElementById('al-cb-'+t.key)?.checked).map(t=>t.key);
@@ -3041,10 +3607,10 @@ async function saveAssistant() {
     if(!name){toast('請輸入姓名');return;}
     const editId=document.getElementById('edit-asst-id').value;
     try {
-        if(editId){ await updDoc('assistants',editId,{name,bonusEligible,baseSalary,hireDate,allowances,allowanceAmounts}); toast('已更新'); }
+        if(editId){ await updDoc('assistants',editId,{name,bonusEligible,laborInsuranceGrade,baseSalary,hireDate,allowances,allowanceAmounts}); toast('已更新'); }
         else {
             const pin = generatePin();
-            const ref = await addDoc('assistants',{name,active:true,bonusEligible,baseSalary,hireDate,allowances,allowanceAmounts,pin});
+            const ref = await addDoc('assistants',{name,active:true,bonusEligible,laborInsuranceGrade,baseSalary,hireDate,allowances,allowanceAmounts,pin});
             await addDoc('transactions',{assistantId:ref.id,ruleId:null,points:settings.startingPts,date:today(),note:'月初起始點數',operator:currentOperator||''});
             toast(`已新增「${name}」，專屬密碼：${pin}`);
         }
@@ -3125,11 +3691,12 @@ async function saveRule() {
         if(editId){ await updDoc('rules',editId,{name,points,category:cat,desc}); toast('已更新規定'); }
         else { await addDoc('rules',{name,points,category:cat,desc}); toast(`已新增「${name}」`); }
         hideModal('modal-rule');
+        renderRules(); renderRecRules();
     } catch(e){toast('儲存失敗：'+e.message);}
 }
 function delRule(id) {
     const r=findR(id);
-    confirm2(`確定要刪除規定「${r?.name}」嗎？`,async()=>{ await delDoc('rules',id); toast('已刪除規定'); });
+    confirm2(`確定要刪除規定「${r?.name}」嗎？`,async()=>{ await delDoc('rules',id); toast('已刪除規定'); renderRules(); renderRecRules(); });
 }
 
 // ================================================================
@@ -3830,13 +4397,15 @@ async function unapproveOTRecord(id) {
 
 function updateDocBadge() {
     const badge = document.getElementById('doc-pending-badge');
-    if (!badge) return;
-    const doc = currentDoctor;
-    const count = state.overtime.filter(r =>
-        r.status === 'pending' && (viewMode === 'principal' || !doc || r.approverName === doc.name)
-    ).length;
-    badge.textContent = count;
-    badge.classList.toggle('hidden', count === 0);
+    if (badge) {
+        const doc = currentDoctor;
+        const count = state.overtime.filter(r =>
+            r.status === 'pending' && (viewMode === 'principal' || !doc || r.approverName === doc.name)
+        ).length;
+        badge.textContent = count;
+        badge.classList.toggle('hidden', count === 0);
+    }
+    updateAttBadge();
 }
 
 // ================================================================
@@ -3865,8 +4434,8 @@ function applyViewMode() {
         chip.className = 'mode-chip' + (isPrincipal||isManager?' admin':isAsst||isDoctor?' assistant':'');
     }
 
-    if (isPrincipal) { if (!['overview','record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report','leave','leave-approve'].includes(currentPage)) navigate('overview'); else refreshPage(); return; }
-    if (isManager)   { if (!['overview','leave-approve'].includes(currentPage)) navigate('overview'); else refreshPage(); return; }
+    if (isPrincipal) { if (!['record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report','leave','leave-approve','attendance'].includes(currentPage)) navigate('settlement'); else refreshPage(); return; }
+    if (isManager)   { if (!['overview','record','leave-approve'].includes(currentPage)) navigate('overview'); else refreshPage(); return; }
     if (isDoctor)    { if (!['record','overtime-approve'].includes(currentPage)) navigate('record'); else refreshPage(); return; }
     if (isAsst)      { if (!['myview','overtime-apply'].includes(currentPage)) navigate('myview'); else refreshPage(); return; }
     if (currentPage !== 'overview') navigate('overview'); else refreshPage();
@@ -4016,7 +4585,7 @@ function renderMaintIdList() {
             html += `<div class="maint-id-row">
                 <div class="maint-id-info">
                     <span class="maint-id-name">${a.name}</span>
-                    <span class="maint-id-meta">PIN：${a.pin || '—'} · ${a.bonusEligible ? '正職' : '試用'}</span>
+                    <span class="maint-id-meta">PIN：${a.pin || '—'} · ${bonusEligibleLabel(a.bonusEligible)}</span>
                 </div>
                 <button class="btn btn-sm btn-danger" onclick="deleteMaintId('assistant','${a.id}','${a.name}')">刪除</button>
             </div>`;
@@ -4407,6 +4976,506 @@ function updateLeaveBadge() {
     badge.classList.toggle('hidden', count === 0);
 }
 
+// ================================================================
+// ATTENDANCE MANAGEMENT (unified page for principal)
+// ================================================================
+function updateAttBadge() {
+    const badge = document.getElementById('att-pending-badge');
+    if (!badge) return;
+    const otPending = state.overtime.filter(r => r.status === 'pending').length;
+    const lvPending = state.leaveRequests.filter(r => r.status === 'pending_principal').length;
+    const count = otPending + lvPending;
+    badge.textContent = count;
+    badge.classList.toggle('hidden', count === 0);
+}
+
+function setAttendanceTab(tab) {
+    attendanceTab = tab;
+    ['approval','ot','leave'].forEach(t => {
+        document.getElementById('att-tab-'+t).classList.toggle('hidden', t !== tab);
+        document.getElementById('tbb-att-'+t).classList.toggle('active', t === tab);
+    });
+    if (tab === 'approval') { renderAttendanceOTApproval(); renderAttendanceLeaveApproval(); }
+    if (tab === 'ot')       renderAttendanceOTMgmt();
+    if (tab === 'leave')    renderAttendanceLeaveMgmt();
+}
+
+function setAttendanceApprovalSubTab(subTab) {
+    attendanceApprovalSubTab = subTab;
+    document.getElementById('att-approval-ot-content').classList.toggle('hidden', subTab !== 'ot');
+    document.getElementById('att-approval-lv-content').classList.toggle('hidden', subTab !== 'leave');
+    document.getElementById('tbb-att-appr-ot').classList.toggle('active', subTab === 'ot');
+    document.getElementById('tbb-att-appr-lv').classList.toggle('active', subTab === 'leave');
+}
+
+function renderAttendance() {
+    setAttendanceTab(attendanceTab);
+}
+
+// ── 簽核頁面 ── OT approval ──────────────────────────────────────
+function renderAttendanceOTApproval() {
+    const el = document.getElementById('att-approval-ot-content'); if (!el) return;
+    const allVisible = state.overtime.sort((x,y) => new Date(y.date) - new Date(x.date));
+    const pending  = allVisible.filter(r => r.status === 'pending');
+    const approved = allVisible.filter(r => r.status === 'approved');
+    const rejected = allVisible.filter(r => r.status === 'rejected');
+
+    const selBarHtml = `
+        <div class="sel-bar" id="att-ot-sel-bar">
+            <input type="checkbox" class="row-chk" id="att-ot-chk-all" onchange="toggleAllAttOT()">
+            <label for="att-ot-chk-all" style="font-size:12.5px;font-weight:600;cursor:pointer">全選</label>
+            <span id="att-ot-sel-count" style="font-size:12.5px;color:var(--accent);font-weight:600">已選 0 筆</span>
+            <button class="btn btn-danger btn-sm" onclick="deleteSelectedAttOT()">刪除選取</button>
+            <button class="btn btn-outline btn-sm" onclick="clearAttOTSelection()">取消</button>
+        </div>`;
+
+    const chkHtml = (r) => `<input type="checkbox" class="row-chk att-ot-chk" data-id="${r.id}" ${otSelected.has(r.id)?'checked':''} onchange="toggleOTRow('${r.id}',this)" style="margin-right:6px;flex-shrink:0">`;
+
+    const renderOTCard = (r, showChk=false) => `
+        <div class="ot-record" style="display:flex;gap:8px;align-items:flex-start">
+            ${showChk ? chkHtml(r) : ''}
+            <div style="flex:1;min-width:0">
+                <div class="ot-record-hd">
+                    <div><span style="font-weight:700;font-size:15px">${r.assistantName}</span><span style="color:var(--text-muted);font-size:12.5px;margin-left:8px">${r.date}</span></div>
+                    <span class="${r.status==='approved'?'ot-appr':r.status==='rejected'?'badge br':'ot-pend'}">${r.status==='approved'?'已簽核':r.status==='rejected'?'已退回':'待簽核'}</span>
+                </div>
+                <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.9">
+                    班別：${r.otShiftName}　加班：<span class="pp" style="font-weight:700">${formatOTDuration(r.overtimeMinutes)}</span>
+                    ${r.status==='pending'?`<br><button class="btn btn-primary btn-sm" onclick="approveOT('${r.id}')">簽核</button> <button class="btn btn-outline btn-sm" onclick="rejectOT('${r.id}')">退回</button>`:''}
+                    ${r.status==='approved'&&r.approverSignature?`<br><img class="ot-sig-img" src="${r.approverSignature}" style="max-height:32px;margin-top:4px;cursor:zoom-in" onclick="openImgZoom(this.src)"> <span style="font-size:11px;color:var(--text-muted)">${r.approverName} ${r.approvedAt?fmtTimestamp(r.approvedAt):''}</span>`:''}
+                </div>
+            </div>
+        </div>`;
+
+    el.innerHTML = `
+        ${selBarHtml}
+        <div class="section">
+            <div class="sec-title" style="margin-bottom:10px">待簽核加班（${pending.length}）</div>
+            ${pending.length ? pending.map(r=>renderOTCard(r,true)).join('') : '<div class="empty-state"><p>目前無待簽核申請</p></div>'}
+        </div>
+        ${approved.length||rejected.length ? `<div class="section">
+            <div class="sec-title" style="margin-bottom:10px;color:var(--text-muted)">加班紀錄（${approved.length+rejected.length}）</div>
+            ${[...approved,...rejected].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(r=>renderOTCard(r,true)).join('')}
+        </div>` : ''}`;
+    updateAttOTSelBar();
+}
+
+function updateAttOTSelBar() {
+    const bar = document.getElementById('att-ot-sel-bar');
+    if (!bar) return;
+    const n = otSelected.size;
+    document.getElementById('att-ot-sel-count').textContent = `已選 ${n} 筆`;
+    bar.classList.toggle('active', n > 0);
+}
+function toggleAllAttOT() {
+    const checked = document.getElementById('att-ot-chk-all').checked;
+    document.querySelectorAll('.att-ot-chk').forEach(cb => {
+        cb.checked = checked;
+        if (checked) otSelected.add(cb.dataset.id); else otSelected.delete(cb.dataset.id);
+    });
+    updateAttOTSelBar();
+}
+function deleteSelectedAttOT() {
+    if (!otSelected.size) return;
+    confirm2(`確定刪除選取的 ${otSelected.size} 筆加班記錄？`, async () => {
+        const ids = [...otSelected]; otSelected.clear();
+        try {
+            const batch = db.batch();
+            ids.forEach(id => batch.delete(db.collection(col('overtime')).doc(id)));
+            await batch.commit(); toast(`已刪除 ${ids.length} 筆記錄`);
+        } catch(e) { toast('刪除失敗：'+e.message); }
+    });
+}
+function clearAttOTSelection() { otSelected.clear(); renderAttendanceOTApproval(); }
+
+// ── 簽核頁面 ── Leave approval ────────────────────────────────────
+function renderAttendanceLeaveApproval() {
+    const el = document.getElementById('att-approval-lv-content'); if (!el) return;
+    const pending = state.leaveRequests.filter(r => r.status === 'pending_principal')
+        .sort((a,b) => (b.createdAt||'') > (a.createdAt||'') ? 1 : -1);
+    const others  = state.leaveRequests.filter(r => r.status !== 'pending_principal')
+        .sort((a,b) => (b.dates?.[0]||'') > (a.dates?.[0]||'') ? 1 : -1);
+
+    el.innerHTML = `
+        <div class="section">
+            <div class="sec-title" style="margin-bottom:10px">待院長批核（${pending.length}）</div>
+            ${pending.length ? pending.map(r => renderLeaveApproveCard(r, true)).join('') : '<div class="empty-state"><p>目前無待批核申請</p></div>'}
+        </div>
+        ${others.length ? `<div class="section">
+            <div class="sec-header">
+                <div class="sec-title" style="color:var(--text-muted)">所有假勤記錄</div>
+                <div style="display:flex;gap:8px">
+                    ${leaveSelected.size>0?`<button class="btn btn-danger btn-sm" onclick="deleteSelectedLeave()">刪除（${leaveSelected.size}）</button>
+                    <button class="btn btn-outline btn-sm" onclick="clearLeaveSelectionAndRefreshAtt()">取消</button>`:'<button class="btn btn-outline btn-sm" onclick="toggleLeaveSelModeAtt()">多選刪除</button>'}
+                </div>
+            </div>
+            <div style="margin-top:10px">${others.map(r => renderLeaveCard(r, true)).join('')}</div>
+        </div>` : ''}`;
+}
+
+function toggleLeaveSelModeAtt() { leaveSelected.clear(); renderAttendanceLeaveApproval(); }
+function clearLeaveSelectionAndRefreshAtt() { leaveSelected.clear(); renderAttendanceLeaveApproval(); }
+
+// ── 加班管理 ─────────────────────────────────────────────────────
+function renderAttendanceOTMgmt() {
+    if (!attendanceOTMonth) attendanceOTMonth = currentMonth();
+    const el = document.getElementById('att-ot-content'); if (!el) return;
+    const m = attendanceOTMonth;
+    const monthApproved = state.overtime.filter(r => r.status === 'approved' && r.date.startsWith(m));
+    const totalMins = monthApproved.reduce((s,r) => s + r.overtimeMinutes, 0);
+    const byAsstId = {};
+    monthApproved.forEach(r => { byAsstId[r.assistantId] = (byAsstId[r.assistantId]||0) + r.overtimeMinutes; });
+    const asstCards = state.assistants.filter(a=>a.active).sort((a,b)=>a.name.localeCompare(b.name,'zh-TW')).map(a => {
+        const mins = byAsstId[a.id] || 0;
+        return `<div class="ot-stat-card" style="position:relative">
+            <div class="sc-name">${a.name}</div>
+            <div class="sc-val" style="font-size:18px">${formatOTDuration(mins)}</div>
+            <div class="sc-sub">${mins} 分鐘</div>
+            <button onclick="openOTHistory('${a.id}','${a.name}')" style="margin-top:8px;width:100%;padding:4px 0;font-size:11px;border:1px solid var(--border);border-radius:4px;background:var(--surface-alt);cursor:pointer;font-family:inherit;color:var(--text-secondary)">${PENCIL_ICON} 查看/調整</button>
+        </div>`;
+    }).join('');
+
+    el.innerHTML = `
+        <div class="section">
+            <div class="sec-header">
+                <div class="sec-title">加班時數總覽</div>
+                <div class="month-tabs" style="margin:0">${last6Months().map(mo=>`<button class="month-tab ${mo===m?'active':''}" onclick="setAttOTMonth('${mo}')">${monthLabel(mo)}</button>`).join('')}</div>
+            </div>
+            <div class="ot-stat-grid" style="margin-bottom:14px;margin-top:12px">
+                <div class="ot-stat-card total-card">
+                    <div class="sc-name">所有助理合計</div>
+                    <div class="sc-val">${formatOTDuration(totalMins)}</div>
+                    <div class="sc-sub">${totalMins} 分鐘</div>
+                </div>
+                ${asstCards}
+            </div>
+        </div>
+        <div class="section">
+            <div class="sec-title" style="margin-bottom:12px">加班趨勢（近 6 個月）</div>
+            <div class="ot-chart-wrap"><canvas id="att-ot-trend-chart" height="260"></canvas></div>
+        </div>`;
+    setTimeout(() => renderAttOTChart(state.overtime), 50);
+}
+
+function setAttOTMonth(m) { attendanceOTMonth = m; renderAttendanceOTMgmt(); }
+
+function renderAttOTChart(records) {
+    const canvas = document.getElementById('att-ot-trend-chart');
+    if (!canvas) return;
+    if (window._attOTChart) { window._attOTChart.destroy(); window._attOTChart = null; }
+    const months = last6Months().slice().reverse();
+    const labels = months.map(m => { const [y,mo]=m.split('-'); return `${y}/${mo}`; });
+    const approved = records.filter(r => r.status === 'approved');
+    const aidSet = new Set(approved.filter(r => months.some(m => r.date.startsWith(m))).map(r => r.assistantId));
+    const aids = [...aidSet];
+    const nameMap = Object.fromEntries(state.assistants.map(a => [a.id, a.name]));
+    const totalByMonth = months.map(() => 0);
+    const datasets = aids.map((aid, idx) => {
+        const data = months.map((m, mi) => {
+            const sum = approved.filter(r => r.assistantId === aid && r.date.startsWith(m)).reduce((s,r) => s + r.overtimeMinutes, 0);
+            totalByMonth[mi] += sum;
+            return Math.round(sum / 60 * 10) / 10;
+        });
+        return { label: nameMap[aid]||aid, data, borderColor: OT_PALETTE[idx%OT_PALETTE.length], backgroundColor:'transparent', borderWidth:2, tension:0.3, pointRadius:4 };
+    });
+    datasets.push({ label:'總計', data: totalByMonth.map(v=>Math.round(v/60*10)/10), borderColor:'#4a6fa5', backgroundColor:'rgba(74,111,165,0.06)', borderWidth:3, tension:0.3, pointRadius:5, fill:true });
+    window._attOTChart = new Chart(canvas, {
+        type:'line', data:{labels, datasets},
+        options:{ responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{position:'bottom',labels:{font:{size:11},padding:12,boxWidth:14}}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}h`}} },
+            scales:{ x:{grid:{color:'#f0f0ec'},ticks:{font:{size:11}}}, y:{grid:{color:'#f0f0ec'},ticks:{font:{size:11},callback:v=>v+'h'},beginAtZero:true} }
+        }
+    });
+}
+
+// ── 請假管理 ─────────────────────────────────────────────────────
+function renderAttendanceLeaveMgmt() {
+    const el = document.getElementById('att-leave-content'); if (!el) return;
+    const year = new Date().getFullYear();
+    const ls = settings.leaveSettings || {};
+    const increment = ls.annualLeaveIncrement ?? 1;
+    const activeAsts = state.assistants.filter(a=>a.active).sort((a,b)=>a.name.localeCompare(b.name,'zh-TW'));
+
+    const annualCards = activeAsts.map(a => {
+        const entitled = calcAnnualLeaveEntitlement(a, year);
+        const used     = calcAnnualLeaveUsed(a.id, year);
+        const remaining = Math.max(0, entitled - used);
+        const totalDays = calcTotalLeaveDays(a.id, year);
+        return `<div class="annual-card">
+            <div class="ac-name">${a.name}</div>
+            <div class="ac-bars">
+                <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--accent)">${entitled}</div><div class="ac-bar-lbl">特休總天數</div></div>
+                <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--green)">${remaining}</div><div class="ac-bar-lbl">特休剩餘</div></div>
+                <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--text-secondary)">${totalDays}</div><div class="ac-bar-lbl">總請假天數</div></div>
+            </div>
+            <button onclick="adjustAnnualLeave('${a.id}','${a.name}',${year},${entitled})" style="margin-top:10px;width:100%;display:flex;align-items:center;justify-content:center;gap:5px;padding:5px 0;font-size:var(--fs-sm);border:1px solid var(--border);border-radius:4px;background:var(--surface-alt);cursor:pointer;font-family:inherit;color:var(--text-secondary)">${PENCIL_ICON} 調整天數</button>
+        </div>`;
+    }).join('');
+
+    const lp = settings.leavePolicy || {};
+    const bp = lp.baseParams || {};
+    const fullAttBonus = bp.fullAttendanceBonus ?? 2000;
+    const baseSalary   = bp.baseSalary ?? 34000;
+    const workDays     = bp.workDays ?? 30;
+    const lpRules      = lp.rules || {};
+    const customTypes  = lp.customTypes || [];
+
+    const allLeaveTypes = [
+        ...LEAVE_TYPES.map(t => ({ key: t.key, label: t.label })),
+        ...LEAVE_SUB_TYPES.map(t => ({ key: 'sub_'+t.key, label: t.label })),
+        ...customTypes.map(t => ({ key: 'custom_'+t.key, label: t.label })),
+    ];
+
+    const impactOptions = [
+        { value: 'none',               label: '不影響全勤且不影響薪資' },
+        { value: 'attendance_only',    label: '影響全勤，不影響薪資' },
+        { value: 'salary_only',        label: '不影響全勤，按比例扣除薪資' },
+        { value: 'salary_attendance',  label: '按比例扣薪資及全勤' },
+        { value: 'other',              label: '其他（自訂金額）' },
+    ];
+
+    function calcDeductionPerDay(impact, custom) {
+        if (impact === 'none' || impact === 'attendance_only') return 0;
+        if (impact === 'salary_only')       return baseSalary / workDays;
+        if (impact === 'salary_attendance') return (baseSalary + fullAttBonus) / workDays;
+        if (impact === 'other')             return custom || 0;
+        return 0;
+    }
+
+    function impactDeductLabel(impact, custom) {
+        if (impact === 'attendance_only') return '<span style="color:var(--orange,#f97316);font-weight:600">影響全勤</span>';
+        const dpd = calcDeductionPerDay(impact, custom);
+        return dpd > 0 ? `<span style="color:var(--red)">${Math.round(dpd).toLocaleString()} 元/日</span>` : '<span style="color:var(--text-muted)">不扣</span>';
+    }
+
+    function makeImpactSelect(idPrefix, key, currentImpact) {
+        return `<select class="form-select" id="${idPrefix}-${key}" onchange="onLPImpactChange('${key}','${idPrefix}')" style="font-size:var(--fs-sm);min-width:200px">
+            ${impactOptions.map(o=>`<option value="${o.value}" ${currentImpact===o.value?'selected':''}>${o.label}</option>`).join('')}
+        </select>`;
+    }
+
+    const leaveTypeRows = allLeaveTypes.map(t => {
+        const rule = lpRules[t.key] || {};
+        const impact = rule.impact || 'none';
+        const custom = rule.customAmount || 0;
+        const limitType = rule.limitType || 'unlimited';
+        const limitDays = rule.limitDays || '';
+        const limitPV   = rule.limitPeriodValue || 1;
+        const limitPU   = rule.limitPeriodUnit || '年';
+        const olImpact  = rule.overLimitImpact || 'none';
+        const olCustom  = rule.overLimitCustomAmount || 0;
+        const isLimited = limitType === 'limited';
+        const tdBase = 'padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top';
+        return `<tr>
+            <td style="${tdBase};font-weight:600;white-space:nowrap">${t.label}</td>
+            <td style="${tdBase}">
+                ${makeImpactSelect('lp-impact',t.key,impact)}
+                <div id="lp-custom-cell-${t.key}" style="margin-top:5px">
+                    ${impact==='other'?`<input type="number" id="lp-custom-${t.key}" value="${custom}" min="0" step="1" style="width:90px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:var(--fs-base);font-family:inherit;text-align:right" onchange="onLPCustomChange('${t.key}')"> 元/日`:''}
+                </div>
+            </td>
+            <td style="${tdBase};font-weight:600;text-align:right" id="lp-deduct-${t.key}">${impactDeductLabel(impact,custom)}</td>
+            <td style="${tdBase}">
+                <select id="lp-lim-${t.key}" onchange="onLPLimitChange('${t.key}')" style="font-size:var(--fs-sm)">
+                    <option value="unlimited" ${!isLimited?'selected':''}>無上限</option>
+                    <option value="limited"   ${isLimited?'selected':''}>有上限</option>
+                </select>
+                <div id="lp-lim-detail-${t.key}" style="margin-top:6px;display:${isLimited?'flex':'none'};align-items:center;gap:4px;flex-wrap:wrap;font-size:var(--fs-sm)">
+                    <span style="color:var(--text-muted)">每</span>
+                    <input type="number" id="lp-lim-pv-${t.key}" value="${limitPV}" min="1" step="1" style="width:44px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:var(--fs-sm);font-family:inherit;text-align:center">
+                    <select id="lp-lim-pu-${t.key}" style="font-size:var(--fs-sm);padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-family:inherit">
+                        <option value="年" ${'年'===limitPU?'selected':''}>年</option>
+                        <option value="月" ${'月'===limitPU?'selected':''}>月</option>
+                        <option value="日" ${'日'===limitPU?'selected':''}>日</option>
+                    </select>
+                    <span style="color:var(--text-muted)">最多</span>
+                    <input type="number" id="lp-lim-days-${t.key}" value="${limitDays}" min="1" step="1" style="width:50px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:var(--fs-sm);font-family:inherit;text-align:center">
+                    <span style="color:var(--text-muted)">天</span>
+                </div>
+            </td>
+            <td style="${tdBase};${isLimited?'':'opacity:0.35;pointer-events:none'}" id="lp-ol-col-${t.key}">
+                ${makeImpactSelect('lp-ol-impact',t.key,olImpact)}
+                <div id="lp-ol-custom-cell-${t.key}" style="margin-top:5px">
+                    ${olImpact==='other'?`<input type="number" id="lp-ol-custom-${t.key}" value="${olCustom}" min="0" step="1" style="width:90px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:var(--fs-base);font-family:inherit;text-align:right" onchange="onLPOLCustomChange('${t.key}')"> 元/日`:''}
+                </div>
+            </td>
+            <td style="${tdBase};font-weight:600;text-align:right;${isLimited?'':'opacity:0.35'}" id="lp-ol-deduct-${t.key}">${isLimited?impactDeductLabel(olImpact,olCustom):'—'}</td>
+        </tr>`;
+    }).join('');
+
+    el.innerHTML = `
+        <div class="card section">
+            <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+                <span>各助理年假概況（${year}）</span>
+                <div style="display:flex;align-items:center;gap:10px;font-size:var(--fs-sm)">
+                    <button class="btn btn-outline btn-sm" onclick="openAddLeaveModal()">＋ 新增請假紀錄</button>
+                    <span style="color:var(--text-muted)">特休每年增加：</span>
+                    <input type="number" id="att-leave-increment" value="${increment}" min="0" max="10" step="1"
+                        style="width:55px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:var(--fs-base);font-family:inherit;text-align:center;background:var(--surface)">
+                    <span style="color:var(--text-muted)">天</span>
+                    <button class="btn btn-outline btn-sm" onclick="saveLeaveIncrementAtt()">儲存</button>
+                </div>
+            </div>
+            <div class="annual-grid">${annualCards}</div>
+        </div>
+        <div class="card section">
+            <div class="card-title">請假規範專區</div>
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px;padding:12px 16px;background:var(--surface-alt);border-radius:8px">
+                <div style="display:flex;align-items:center;gap:6px;font-size:var(--fs-sm)">
+                    <label style="color:var(--text-muted)">全勤獎金：</label>
+                    <input type="number" id="lp-full-att-bonus" value="${fullAttBonus}" min="0" step="100" style="width:90px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:var(--fs-base);font-family:inherit;text-align:right" onchange="updateLPFormulas()">
+                    <span style="color:var(--text-muted)">元</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:var(--fs-sm)">
+                    <label style="color:var(--text-muted)">薪資：</label>
+                    <input type="number" id="lp-base-salary" value="${baseSalary}" min="0" step="100" style="width:100px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:var(--fs-base);font-family:inherit;text-align:right" onchange="updateLPFormulas()">
+                    <span style="color:var(--text-muted)">元</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:var(--fs-sm)">
+                    <label style="color:var(--text-muted)">出勤日：</label>
+                    <input type="number" id="lp-work-days" value="${workDays}" min="1" step="1" style="width:70px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:var(--fs-base);font-family:inherit;text-align:right" onchange="updateLPFormulas()">
+                    <span style="color:var(--text-muted)">日</span>
+                </div>
+            </div>
+            <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;min-width:900px">
+                <thead><tr>
+                    <th style="padding:9px 10px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;color:var(--text-muted);text-align:left;white-space:nowrap">假別</th>
+                    <th style="padding:9px 10px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;color:var(--text-muted)">正常薪資影響</th>
+                    <th style="padding:9px 10px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;color:var(--text-muted);text-align:right;white-space:nowrap">每日扣除額</th>
+                    <th style="padding:9px 10px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;color:var(--text-muted);white-space:nowrap">天數上限</th>
+                    <th style="padding:9px 10px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;color:var(--text-muted)">超限後薪資影響</th>
+                    <th style="padding:9px 10px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;color:var(--text-muted);text-align:right;white-space:nowrap">超限每日扣除</th>
+                </tr></thead>
+                <tbody>${leaveTypeRows}</tbody>
+            </table>
+            </div>
+            <div style="margin-top:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <div style="font-size:var(--fs-sm);font-weight:600;color:var(--text-secondary)">新增假別：</div>
+                <input type="text" id="lp-new-type-name" placeholder="假別名稱" style="padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:var(--fs-base);font-family:inherit;width:140px">
+                <button class="btn btn-outline btn-sm" onclick="addLPCustomType()">新增</button>
+                <button class="btn btn-primary btn-sm" onclick="saveLeavePolicySettings()" style="margin-left:auto">儲存規範設定</button>
+            </div>
+        </div>`;
+}
+
+async function saveLeaveIncrementAtt() {
+    const v = Number(document.getElementById('att-leave-increment')?.value) || 0;
+    if (!settings.leaveSettings) settings.leaveSettings = {};
+    settings.leaveSettings.annualLeaveIncrement = v;
+    try { await db.collection(col('settings')).doc('main').set({ leaveSettings: settings.leaveSettings }, { merge: true }); toast('已儲存'); } catch(e) { toast('儲存失敗'); }
+}
+
+function onLPImpactChange(key, prefix) {
+    prefix = prefix || 'lp-impact';
+    const impact = document.getElementById(prefix+'-'+key)?.value;
+    if (prefix === 'lp-impact') {
+        const cell = document.getElementById('lp-custom-cell-'+key);
+        if (cell) cell.innerHTML = impact==='other' ? `<input type="number" id="lp-custom-${key}" value="0" min="0" step="1" style="width:90px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:var(--fs-base);font-family:inherit;text-align:right" onchange="onLPCustomChange('${key}')"> 元/日` : '';
+    } else {
+        const cell = document.getElementById('lp-ol-custom-cell-'+key);
+        if (cell) cell.innerHTML = impact==='other' ? `<input type="number" id="lp-ol-custom-${key}" value="0" min="0" step="1" style="width:90px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:var(--fs-base);font-family:inherit;text-align:right" onchange="onLPOLCustomChange('${key}')"> 元/日` : '';
+    }
+    updateLPFormulas();
+}
+
+function onLPCustomChange(key) { updateLPFormulas(); }
+function onLPOLCustomChange(key) { updateLPFormulas(); }
+
+function onLPLimitChange(key) {
+    const isLimited = document.getElementById('lp-lim-'+key)?.value === 'limited';
+    const detail = document.getElementById('lp-lim-detail-'+key);
+    const olCol  = document.getElementById('lp-ol-col-'+key);
+    const olDeduct = document.getElementById('lp-ol-deduct-'+key);
+    if (detail)  detail.style.display = isLimited ? 'flex' : 'none';
+    if (olCol)   { olCol.style.opacity = isLimited ? '1' : '0.35'; olCol.style.pointerEvents = isLimited ? '' : 'none'; }
+    if (olDeduct){ olDeduct.style.opacity = isLimited ? '1' : '0.35'; if (!isLimited) olDeduct.textContent = '—'; }
+    updateLPFormulas();
+}
+
+function updateLPFormulas() {
+    const fullAttBonus = Number(document.getElementById('lp-full-att-bonus')?.value) || 0;
+    const baseSalary   = Number(document.getElementById('lp-base-salary')?.value)   || 0;
+    const workDays     = Number(document.getElementById('lp-work-days')?.value)     || 30;
+    const lp = settings.leavePolicy || {};
+    const customTypes = lp.customTypes || [];
+    const allLeaveTypes = [
+        ...LEAVE_TYPES.map(t=>({key:t.key})),
+        ...LEAVE_SUB_TYPES.map(t=>({key:'sub_'+t.key})),
+        ...customTypes.map(t=>({key:'custom_'+t.key})),
+    ];
+    function calcDpd(impact, custom) {
+        if (!impact || impact==='none' || impact==='attendance_only') return 0;
+        if (impact==='salary_only')       return baseSalary / workDays;
+        if (impact==='salary_attendance') return (baseSalary + fullAttBonus) / workDays;
+        if (impact==='other')             return custom || 0;
+        return 0;
+    }
+    function deductHTML(impact, dpd) {
+        if (impact==='attendance_only') return '<span style="color:var(--orange,#f97316);font-weight:600">影響全勤</span>';
+        return dpd>0 ? `<span style="color:var(--red)">${Math.round(dpd).toLocaleString()} 元/日</span>` : '<span style="color:var(--text-muted)">不扣</span>';
+    }
+    allLeaveTypes.forEach(t => {
+        const impact = document.getElementById('lp-impact-'+t.key)?.value || 'none';
+        const custom = Number(document.getElementById('lp-custom-'+t.key)?.value) || 0;
+        const cell = document.getElementById('lp-deduct-'+t.key);
+        if (cell) cell.innerHTML = deductHTML(impact, calcDpd(impact, custom));
+        // over-limit
+        const isLimited = document.getElementById('lp-lim-'+t.key)?.value === 'limited';
+        if (isLimited) {
+            const olImpact = document.getElementById('lp-ol-impact-'+t.key)?.value || 'none';
+            const olCustom = Number(document.getElementById('lp-ol-custom-'+t.key)?.value) || 0;
+            const olCell = document.getElementById('lp-ol-deduct-'+t.key);
+            if (olCell) olCell.innerHTML = deductHTML(olImpact, calcDpd(olImpact, olCustom));
+        }
+    });
+}
+
+function addLPCustomType() {
+    const name = document.getElementById('lp-new-type-name')?.value.trim();
+    if (!name) { toast('請輸入假別名稱'); return; }
+    const key = 'ct_' + Date.now();
+    if (!settings.leavePolicy) settings.leavePolicy = {};
+    if (!settings.leavePolicy.customTypes) settings.leavePolicy.customTypes = [];
+    settings.leavePolicy.customTypes.push({ key, label: name });
+    renderAttendanceLeaveMgmt();
+}
+
+async function saveLeavePolicySettings() {
+    const fullAttBonus = Number(document.getElementById('lp-full-att-bonus')?.value) || 0;
+    const baseSalary   = Number(document.getElementById('lp-base-salary')?.value)   || 0;
+    const workDays     = Number(document.getElementById('lp-work-days')?.value)     || 30;
+    if (!settings.leavePolicy) settings.leavePolicy = {};
+    settings.leavePolicy.baseParams = { fullAttendanceBonus: fullAttBonus, baseSalary, workDays };
+    if (!settings.leavePolicy.rules) settings.leavePolicy.rules = {};
+    const lp = settings.leavePolicy;
+    const customTypes = lp.customTypes || [];
+    const allLeaveTypes = [
+        ...LEAVE_TYPES.map(t=>({key:t.key})),
+        ...LEAVE_SUB_TYPES.map(t=>({key:'sub_'+t.key})),
+        ...customTypes.map(t=>({key:'custom_'+t.key})),
+    ];
+    allLeaveTypes.forEach(t => {
+        const impact    = document.getElementById('lp-impact-'+t.key)?.value || 'none';
+        const custom    = Number(document.getElementById('lp-custom-'+t.key)?.value) || 0;
+        const limitType = document.getElementById('lp-lim-'+t.key)?.value || 'unlimited';
+        const limitDays = Number(document.getElementById('lp-lim-days-'+t.key)?.value) || 0;
+        const limitPV   = Number(document.getElementById('lp-lim-pv-'+t.key)?.value) || 1;
+        const limitPU   = document.getElementById('lp-lim-pu-'+t.key)?.value || '年';
+        const olImpact  = document.getElementById('lp-ol-impact-'+t.key)?.value || 'none';
+        const olCustom  = Number(document.getElementById('lp-ol-custom-'+t.key)?.value) || 0;
+        settings.leavePolicy.rules[t.key] = {
+            impact, customAmount: custom,
+            limitType, limitDays, limitPeriodValue: limitPV, limitPeriodUnit: limitPU,
+            overLimitImpact: olImpact, overLimitCustomAmount: olCustom,
+        };
+    });
+    try {
+        await db.collection(col('settings')).doc('main').update({ leavePolicy: settings.leavePolicy });
+        toast('請假規範已儲存');
+    } catch(e) { toast('儲存失敗：'+e.message); }
+}
+
 // ─── renderLeave (principal annual overview page) ─────────────────
 function renderLeave() {
     const el = document.getElementById('leave-content'); if (!el) return;
@@ -4692,16 +5761,18 @@ function renderLeaveApprove() {
 // ─── Leave multi-select (principal) ─────────────────────────────
 function toggleLeaveSelMode() {
     leaveSelected.clear();
-    renderLeave();
+    if (currentPage === 'attendance') renderAttendanceLeaveApproval();
+    else renderLeave();
 }
 function toggleLeaveRow(id, el) {
     if (el.checked) leaveSelected.add(id); else leaveSelected.delete(id);
-    // Update action buttons without full re-render
-    renderLeave();
+    if (currentPage === 'attendance') renderAttendanceLeaveApproval();
+    else renderLeave();
 }
 function clearLeaveSelection() {
     leaveSelected.clear();
-    renderLeave();
+    if (currentPage === 'attendance') renderAttendanceLeaveApproval();
+    else renderLeave();
 }
 async function deleteSelectedLeave() {
     if (!leaveSelected.size) return;
