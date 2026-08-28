@@ -316,8 +316,16 @@
         .tbl-icon-btn{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:3px 7px;border-radius:4px;font-size:var(--fs-base);}
         .tbl-icon-btn:hover{color:var(--red);}
 
+        /* ─── 手機版：左上角選單按鈕 + 側邊抽屜 ─── */
+        .menu-btn{display:none;position:fixed;top:0;left:0;width:52px;height:53px;align-items:center;justify-content:center;padding:0;border:none;background:none;color:var(--text-primary);cursor:pointer;z-index:902;-webkit-tap-highlight-color:transparent;}
+        .menu-btn svg{width:24px;height:24px;}
+        .menu-btn:active{background:var(--surface-alt);}
+        .menu-badge{position:absolute;top:12px;right:10px;width:9px;height:9px;border-radius:50%;background:var(--red);border:2px solid var(--surface);}
+        .drawer-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:899;}
+
         /* ─── Mobile bottom nav ─── */
         .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:101;padding-bottom:env(safe-area-inset-bottom,0px);}
+        body.drawer-open .mobile-nav{z-index:98;}
         .mobile-nav-inner{display:flex;}
         .mn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 4px 7px;cursor:pointer;color:var(--text-muted);font-size:var(--fs-xs);font-weight:500;border:none;background:none;font-family:inherit;transition:color .15s;-webkit-tap-highlight-color:transparent;}
         .mn-item.active{color:var(--text-primary);}
@@ -325,22 +333,38 @@
 
         @media(max-width:900px){.grid-4{grid-template-columns:1fr 1fr;}.grid-3{grid-template-columns:1fr 1fr;}}
         @media(max-width:700px){
-            :root{--sw:0px;--mnav:calc(52px + env(safe-area-inset-bottom,0px));}
-            .sidebar{display:none;}
+            :root{--sw:0px;--mnav:calc(59px + env(safe-area-inset-bottom,0px));}
+            /* 側邊欄改為左側抽屜：沿用完全相同的 DOM 與權限 class */
+            .sidebar{display:flex;width:min(84vw,290px);z-index:900;
+                     transform:translateX(-100%);transition:transform .22s ease;
+                     pointer-events:none;box-shadow:0 0 26px rgba(0,0,0,.18);}
+            body.drawer-open .sidebar{transform:none;pointer-events:auto;}
+            /* 讓出左上角 ☰ 的位置，再按一次 ☰ 可收合 */
+            .sidebar-brand{padding-left:56px;}
+            body.drawer-open .drawer-backdrop{display:block;}
+            .menu-btn{display:flex;}
             .mobile-nav{display:block;}
+            /* 項目變少 → 每個按鈕更大更好按 */
+            .mn-item{height:58px;justify-content:center;gap:2px;padding:6px 4px;font-size:var(--fs-cap);line-height:1.2;}
+            .mn-icon{width:24px;height:24px;}
             .main{margin-left:0;}
             .grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}
-            .page-content{padding:14px;padding-bottom:calc(14px + var(--mnav));}
-            .rec-scroll{padding:14px;}
-            .page-header{padding:12px 16px;}
+            .page-content{padding:14px;padding-bottom:calc(16px + var(--mnav));}
+            .rec-scroll{padding:14px;padding-bottom:20px;}
+            .page-header{padding:12px 16px 12px 56px;}
             .confirm-bar{padding:10px 14px;flex-wrap:wrap;}
             #rec-note{max-width:100%;}
+            /* 記錄點數頁採「頁首固定＋內容內捲」，整頁必須可壓縮到視窗高度，
+               否則底部確認列會被功能列蓋住。min-height:0 只套用在這一頁。 */
+            #page-record.page.active{flex:0 0 auto;height:100vh;height:100dvh;min-height:0;overflow:hidden;}
+            #rec-tab-record{flex:1;min-height:0;display:flex;flex-direction:column;}
             .rec-wrap{
-                height:calc(100vh - 57px - var(--mnav));
-                height:calc(100dvh - 57px - var(--mnav));
+                height:auto;flex:1;min-height:0;
+                padding-bottom:calc(var(--mnav) + 16px);
             }
             .donut-wrap{justify-content:center;}
-            body.admin-mode .toast{bottom:calc(22px + var(--mnav));}
+            .toast{bottom:calc(14px + var(--mnav));left:14px;right:14px;text-align:center;}
+            body.viewer-mode .toast{bottom:14px;}
             .mode-btns{gap:8px;}
             .mode-btn{padding:12px 8px;font-size:var(--fs-sub);}
             .personal-pts{font-size:var(--fs-disp);}
@@ -442,28 +466,35 @@
         body.principal-mode .nfull-lbl,
         body.principal-mode .not-lbl{display:block!important}
         body.manager-mode .nrec{display:flex!important}
-        .nlv-approve,.mn-nlv-approve{display:none!important}
+        .nlv-approve{display:none!important}
         body.manager-mode .nlv-approve{display:flex!important}
         body.manager-mode .nlv-approve-lbl{display:block!important}
-        body.principal-mode .mn-nlv-approve,body.manager-mode .mn-nlv-approve{display:flex!important}
         body.doctor-mode .nrec,body.doctor-mode .ndoc{display:flex!important}
         body.doctor-mode .ndoc-lbl{display:block!important}
         body.assistant-mode .nasst,body.assistant-mode .not{display:flex!important}
         body.assistant-mode .nasst-lbl,body.assistant-mode .not-lbl{display:block!important}
         body.principal-mode .n-overview,body.doctor-mode .n-overview,body.assistant-mode .n-overview{display:none!important}
+        body.assistant-mode .n-overview-lbl{display:none!important}
         body.doctor-mode .rec-mgmt-tab,body.manager-mode .rec-mgmt-tab{display:none!important}
         body.manager-mode #mode-btn-add{display:none!important}
-        /* Mobile nav role classes */
-        .mn-nrec,.mn-nfull,.mn-ndoc,.mn-nasst,.mn-not{display:none!important}
-        body.principal-mode .mn-nrec,body.principal-mode .mn-nfull,body.principal-mode .mn-ndoc,
-        body.principal-mode .mn-not{display:flex!important}
-        body.principal-mode .mn-overview{display:none!important}
-        body.manager-mode .mn-nrec{display:flex!important}
-        body.doctor-mode .mn-nrec,body.doctor-mode .mn-ndoc{display:flex!important}
-        body.doctor-mode .mn-overview,body.assistant-mode .mn-overview{display:none!important}
-        body.assistant-mode .mn-nasst,body.assistant-mode .mn-not{display:flex!important}
-        .mn-nlogin{display:none!important}
-        body.principal-mode .mn-nlogin,body.manager-mode .mn-nlogin,body.doctor-mode .mn-nlogin,body.assistant-mode .mn-nlogin{display:flex!important}
+        /* 手機底部列：每個角色只露出 2–3 個最常用頁面，其餘走左上角選單。
+           這裡的可見頁面完全落在 navigate() 允許的範圍內。 */
+        .mnb-overview,.mnb-record,.mnb-settlement,.mnb-attendance,
+        .mnb-myview,.mnb-otapply,.mnb-otapprove,.mnb-lvapprove{display:none!important}
+        /* 院長：月結算 / 記錄點數 / 假勤管理 */
+        body.principal-mode .mnb-settlement,
+        body.principal-mode .mnb-record,
+        body.principal-mode .mnb-attendance{display:flex!important}
+        /* 管理者：本月總覽 / 記錄點數 / 假勤簽核 */
+        body.manager-mode .mnb-overview,
+        body.manager-mode .mnb-record,
+        body.manager-mode .mnb-lvapprove{display:flex!important}
+        /* 醫師：記錄點數 / 待簽核 */
+        body.doctor-mode .mnb-record,
+        body.doctor-mode .mnb-otapprove{display:flex!important}
+        /* 助理：個人點數 / 加班請假 */
+        body.assistant-mode .mnb-myview,
+        body.assistant-mode .mnb-otapply{display:flex!important}
 
         @media(max-width:700px){
             .ls-card{max-width:100%;}
@@ -633,14 +664,21 @@ appId: "..."'></textarea>
     <p>正在連線資料庫…</p>
 </div>
 
-<!-- ══ Sidebar ══ -->
+<!-- ══ 手機版：左上角選單按鈕與遮罩 ══ -->
+<button class="menu-btn" id="menu-btn" onclick="toggleDrawer()" aria-label="開啟功能選單" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    <span class="menu-badge hidden" id="menu-badge"></span>
+</button>
+<div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
+
+<!-- ══ Sidebar（手機版即為左側抽屜選單） ══ -->
 <nav class="sidebar">
     <div class="sidebar-brand">
         <h1>加班＆點數系統</h1>
         <p id="ws-label">—</p>
     </div>
     <div class="sidebar-nav">
-        <div class="nav-sec-label">概覽</div>
+        <div class="nav-sec-label n-overview-lbl">概覽</div>
         <button class="nav-item n-overview active" onclick="navigate('overview')">
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>本月總覽
         </button>
@@ -1031,25 +1069,7 @@ appId: "..."'></textarea>
                     </div>
                     <div class="form-group">
                         <label class="form-label">加班原因（可複選）</label>
-                        <div style="display:flex;flex-direction:column;gap:9px;margin-top:6px">
-                            <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
-                                <input type="checkbox" id="ot-reason-a" style="width:15px;height:15px;accent-color:var(--accent);flex-shrink:0">
-                                <span>醫師延遲下診</span>
-                            </label>
-                            <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
-                                <input type="checkbox" id="ot-reason-b" style="width:15px;height:15px;accent-color:var(--accent);flex-shrink:0">
-                                <span>流動器械量大</span>
-                            </label>
-                            <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
-                                <input type="checkbox" id="ot-reason-c" style="width:15px;height:15px;accent-color:var(--accent);flex-shrink:0">
-                                <span>櫃檯帳務 / 患者相關</span>
-                            </label>
-                            <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
-                                <input type="checkbox" id="ot-reason-d" style="width:15px;height:15px;accent-color:var(--accent);flex-shrink:0" onchange="document.getElementById('ot-note-other').style.display=this.checked?'':'none'">
-                                <span>其他</span>
-                            </label>
-                            <input type="text" class="form-input" id="ot-note-other" placeholder="請說明…" style="display:none;margin-top:2px;max-width:280px">
-                        </div>
+                        <div id="ot-reason-list" style="display:flex;flex-direction:column;gap:9px;margin-top:6px"></div>
                     </div>
                     <button class="btn btn-primary" onclick="submitOvertimeApply()">送出申請</button>
                 </div>
@@ -1104,59 +1124,41 @@ appId: "..."'></textarea>
 
 </main>
 
+<!-- ══ 手機版底部功能列：每個角色僅保留 2–3 個最常用頁面，
+     其餘功能一律收進左上角三橫線選單（＝側邊欄，權限完全一致） ══ -->
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
-    <button class="mn-item mn-overview active" onclick="navigate('overview')">
+    <button class="mn-item mnb-overview" onclick="navigate('overview')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       總覽
     </button>
-    <button class="mn-item mn-nrec" onclick="navigate('record')">
+    <button class="mn-item mnb-record" onclick="navigate('record')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-      記錄
+      記錄點數
     </button>
-    <button class="mn-item mn-nfull" onclick="navigate('settlement')">
+    <button class="mn-item mnb-settlement" onclick="navigate('settlement')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-      結算
+      月結算
     </button>
-    <button class="mn-item mn-nfull" onclick="navigate('salary')">
-      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 14.25c0 1.243 1.343 2.25 3 2.25s3-1.007 3-2.25c0-1.243-1.343-2.25-3-2.25S9 11.507 9 10.25C9 9.007 10.343 8 12 8s3 1.007 3 2.25"/><line x1="12" y1="6.5" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="17.5"/></svg>
-      薪資
-    </button>
-    <button class="mn-item mn-nfull" onclick="navigate('assistants')">
-      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><line x1="16" y1="11" x2="22" y2="11"/><line x1="19" y1="8" x2="19" y2="14"/></svg>
-      助理
-    </button>
-    <button class="mn-item mn-nasst" onclick="navigate('myview')">
-      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      我的點數
-    </button>
-    <button class="mn-item mn-not" onclick="navigate('overtime-apply')">
-      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="7" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="14"/></svg>
-      加班及請假
-    </button>
-    <button class="mn-item mn-nfull" onclick="navigate('leave')">
+    <button class="mn-item mnb-attendance" onclick="navigate('attendance')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      假勤總覽
+      假勤管理
     </button>
-    <button class="mn-item mn-nlv-approve" onclick="navigate('leave-approve')">
+    <button class="mn-item mnb-myview" onclick="navigate('myview')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      個人點數
+    </button>
+    <button class="mn-item mnb-otapply" onclick="navigate('overtime-apply')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="7" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="14"/></svg>
+      加班請假
+    </button>
+    <button class="mn-item mnb-otapprove" onclick="navigate('overtime-approve')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      待簽核
+    </button>
+    <button class="mn-item mnb-lvapprove" onclick="navigate('leave-approve')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
       假勤簽核
-    </button>
-    <button class="mn-item mn-ndoc" onclick="navigate('overtime-approve')">
-      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      簽核
-    </button>
-    <button class="mn-item mn-nfull" onclick="openSettings()">
-      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      設定
-    </button>
-    <button class="mn-item mn-nlogin" onclick="logoutAll()">
-      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      登出
-    </button>
-    <button class="mn-item" onclick="showSetup()">
-      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 6s0-3 3-3 3 3 3 3"/><path d="M23 18s0 3-3 3-3-3-3-3"/><path d="M8 11.5A6.5 6.5 0 0 1 21 9"/><path d="M16 12.5A6.5 6.5 0 0 1 3 15"/></svg>
-      重新連線
     </button>
   </div>
 </nav>
@@ -1377,6 +1379,14 @@ appId: "..."'></textarea>
                 <button class="btn btn-outline btn-sm" onclick="addShiftConfig()" style="flex-shrink:0">+ 新增</button>
             </div>
             <div class="divider"></div>
+            <div class="form-label" style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:10px">加班原因設定（助理申請單勾選項）</div>
+            <div id="ot-reason-list-ui" class="mgr-list"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <input type="text" class="form-input" id="new-ot-reason" placeholder="加班原因（如：支援其他診間）" style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter'){event.preventDefault();addOTReason();}">
+                <button class="btn btn-outline btn-sm" onclick="addOTReason()" style="flex-shrink:0">+ 新增</button>
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:6px">「其他（自行填寫）」為系統固定選項，會自動顯示於清單最後。</div>
+            <div class="divider"></div>
             <div class="form-label" style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:12px">院長密碼變更</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                 <div class="form-group">
@@ -1456,6 +1466,9 @@ const DEFAULT_ALLOWANCE_TYPES = [
 ];
 // Runtime: use settings.allowanceTypes (loaded from Firestore, editable)
 function getAllowanceTypes() { return settings.allowanceTypes?.length ? settings.allowanceTypes : DEFAULT_ALLOWANCE_TYPES; }
+// 加班原因（院長可於系統設定新增／移除；「其他」永遠保留為自由填寫欄位）
+const DEFAULT_OT_REASONS = ['醫師延遲下診', '流動器械量大', '櫃檯帳務 / 患者相關'];
+function getOTReasons() { return Array.isArray(settings.otReasons) ? settings.otReasons : DEFAULT_OT_REASONS; }
 const STARTING_PTS_LOW = 10;
 const INDIVIDUAL_HIGH = 35;
 const INDIVIDUAL_ZERO = 0;
@@ -1486,6 +1499,7 @@ let settings = {
     ],
     doctorSupport: {}, // { doctorName: { nhi: '12-digit', idNum: 'A123456789' } }
     allowanceTypes: [], // dynamic, loaded from Firestore; falls back to DEFAULT_ALLOWANCE_TYPES
+    otReasons: null,    // dynamic, loaded from Firestore; null = 未設定，套用 DEFAULT_OT_REASONS
     salarySettings: {
         otRatePerMinute: 4,
         perfectAttendanceBonus: 2000,
@@ -1527,6 +1541,7 @@ let _visibleTxnIds = []; // txn ids currently visible in history table
 // ── Settings draft ───────────────────────────────────────────────
 let _docDraft = [];   // doctor accounts draft
 let _shiftDraft = []; // shift config draft
+let _otReasonDraft = []; // overtime reason options draft
 
 // ── Login screen tab state ───────────────────────────────────────
 let lsTab = 'asst'; // 'asst' | 'doctor' | 'admin'
@@ -1630,6 +1645,13 @@ function getLaborInsuranceGrade(gradeLabel) {
 function init() {
     // Apply viewer mode immediately so admin nav items are hidden by default
     document.body.classList.add('viewer-mode');
+    // 抽屜：點到裡面任何一顆按鈕（含設定／登出／重新連線）就收合
+    document.querySelector('.sidebar')?.addEventListener('click', e => {
+        if (e.target.closest('button')) closeDrawer();
+    });
+    // 轉成桌機寬度時強制收合，避免殘留狀態
+    window.addEventListener('resize', () => { if (window.innerWidth > 700) closeDrawer(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
     const saved = localStorage.getItem(CFG_KEY);
     if (saved) {
         try { cfg = JSON.parse(saved); hideSetup(); showLoading(); doConnect(); }
@@ -1718,6 +1740,7 @@ function subscribeData() {
               if (d.doctors         !== undefined) settings.doctors         = d.doctors;
               if (d.doctorSupport   !== undefined) settings.doctorSupport   = d.doctorSupport;
               if (Array.isArray(d.allowanceTypes)) settings.allowanceTypes = d.allowanceTypes;
+              if (Array.isArray(d.otReasons)) settings.otReasons = d.otReasons;
               if (d.salarySettings  !== undefined) {
                   settings.salarySettings = { ...settings.salarySettings, ...d.salarySettings };
                   if (!settings.salarySettings.monthlyParams) settings.salarySettings.monthlyParams = {};
@@ -1747,7 +1770,7 @@ function subscribeData() {
     db.collection(col('overtime')).orderBy('date','desc').limit(200)
       .onSnapshot(snap => {
           state.overtime = snap.docs.map(d=>({id:d.id,...d.data()}));
-          if (currentPage==='overtime-apply'||currentPage==='overtime-approve') refreshPage();
+          if (currentPage==='overtime-apply'||currentPage==='overtime-approve'||currentPage==='attendance') refreshPage();
           if (_otHistAsstId && !document.getElementById('modal-ot-history')?.classList.contains('hidden')) renderOTHistoryModal();
           updateDocBadge();
       }, e => console.error('overtime', e));
@@ -2075,8 +2098,36 @@ function navigate(p) {
     el.classList.add('active');
     document.querySelectorAll('.nav-item').forEach(el=>{ if(el.getAttribute('onclick')?.includes("'"+p+"'")) el.classList.add('active'); });
     document.querySelectorAll('.mn-item').forEach(el=>{ el.classList.toggle('active', el.getAttribute('onclick')?.includes("'"+p+"'")); });
+    closeDrawer();
     currentPage=p; renderPage(p);
 }
+// ================================================================
+// 手機版側邊抽屜選單（沿用側邊欄本體，權限與桌機完全一致）
+// ================================================================
+function openDrawer() {
+    document.body.classList.add('drawer-open');
+    document.getElementById('menu-btn')?.setAttribute('aria-expanded', 'true');
+}
+function closeDrawer() {
+    document.body.classList.remove('drawer-open');
+    document.getElementById('menu-btn')?.setAttribute('aria-expanded', 'false');
+}
+function toggleDrawer() {
+    document.body.classList.contains('drawer-open') ? closeDrawer() : openDrawer();
+}
+// 左上角選單紅點：抽屜內若有「當前角色看得到」的待簽核項目才顯示
+function updateMenuBadge() {
+    const dot = document.getElementById('menu-badge');
+    if (!dot) return;
+    const has = ['doc-pending-badge','att-pending-badge','leave-pending-badge'].some(id => {
+        const b = document.getElementById(id);
+        if (!b || b.classList.contains('hidden')) return false;
+        const item = b.closest('.nav-item');
+        return !item || getComputedStyle(item).display !== 'none';
+    });
+    dot.classList.toggle('hidden', !has);
+}
+
 function renderPage(p) {
     ({overview:renderOverview,record:renderRecord,history:renderHistory,
       settlement:renderSettlementPage,salary:renderSalaryPage,assistants:renderAssistants,rules:renderRules,
@@ -3792,6 +3843,9 @@ function renderOvertimeApply() {
             onclick="toggleOTWorkedShift('${sh.id}')">${sh.name}<br><span style="font-size:11.5px;font-weight:400;opacity:.8">${sh.segments?.map(s=>s.start+'–'+s.end).join('<br>') || (sh.endTime?sh.endTime:'')}</span></button>
     `).join('');
 
+    // 加班原因（動態，院長可於系統設定調整）— 須在提前 return 之前渲染
+    renderOTReasonChecks();
+
     // OT shift section
     const otSec = document.getElementById('ot-overtime-section');
     if (!otState.workedShifts.length) { otSec.style.display='none'; return; }
@@ -3836,6 +3890,45 @@ function renderOvertimeApply() {
             : '<option value="">（尚無醫師帳號）</option>';
     }
     updateOTCalc();
+}
+
+// 依系統設定渲染加班原因勾選項（保留已勾選狀態），「其他」永遠置於最後
+function renderOTReasonChecks() {
+    const el = document.getElementById('ot-reason-list');
+    if (!el) return;
+    const reasons = getOTReasons();
+    // 保留目前勾選狀態，避免重新渲染時被清空
+    const checkedTexts = new Set();
+    el.querySelectorAll('input.ot-reason-chk:checked').forEach(c => checkedTexts.add(c.dataset.reason));
+    const otherChecked = el.querySelector('#ot-reason-other')?.checked;
+    const otherVal     = el.querySelector('#ot-note-other')?.value || '';
+
+    el.innerHTML = reasons.map((txt, i) => `
+        <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
+            <input type="checkbox" class="ot-reason-chk" id="ot-reason-${i}" data-reason="${txt.replace(/"/g,'&quot;')}"
+                ${checkedTexts.has(txt)?'checked':''}
+                style="width:15px;height:15px;accent-color:var(--accent);flex-shrink:0">
+            <span>${txt}</span>
+        </label>`).join('') + `
+        <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
+            <input type="checkbox" id="ot-reason-other" ${otherChecked?'checked':''}
+                style="width:15px;height:15px;accent-color:var(--accent);flex-shrink:0"
+                onchange="document.getElementById('ot-note-other').style.display=this.checked?'':'none'">
+            <span>其他</span>
+        </label>
+        <input type="text" class="form-input" id="ot-note-other" placeholder="請說明…" value="${otherVal.replace(/"/g,'&quot;')}"
+            style="display:${otherChecked?'':'none'};margin-top:2px;max-width:280px">`;
+}
+
+// 收集使用者勾選的加班原因
+function collectOTReasons() {
+    const reasons = [];
+    document.querySelectorAll('#ot-reason-list input.ot-reason-chk:checked').forEach(c => reasons.push(c.dataset.reason));
+    if (document.getElementById('ot-reason-other')?.checked) {
+        const other = document.getElementById('ot-note-other')?.value.trim();
+        reasons.push(other ? `其他：${other}` : '其他');
+    }
+    return reasons;
 }
 
 function toggleOTWorkedShift(sid) {
@@ -3933,14 +4026,7 @@ async function submitOvertimeApply() {
     }
     const approver = document.getElementById('ot-approver').value;
     if (!approver) { toast('請選擇簽核醫師'); return; }
-    const reasons = [];
-    if (document.getElementById('ot-reason-a')?.checked) reasons.push('醫師延遲下診');
-    if (document.getElementById('ot-reason-b')?.checked) reasons.push('流動器械量大');
-    if (document.getElementById('ot-reason-c')?.checked) reasons.push('櫃檯帳務/患者相關');
-    if (document.getElementById('ot-reason-d')?.checked) {
-        const other = document.getElementById('ot-note-other')?.value.trim();
-        reasons.push(other ? `其他：${other}` : '其他');
-    }
+    const reasons = collectOTReasons();
     const note = reasons.join('、');
     try {
         await db.collection(col('overtime')).add({
@@ -3952,7 +4038,7 @@ async function submitOvertimeApply() {
         });
         otState = { workedShifts: [], otSegKey: null, otType: 'late' };
         document.getElementById('ot-date').value = today();
-        ['ot-reason-a','ot-reason-b','ot-reason-c','ot-reason-d'].forEach(id=>{ const el=document.getElementById(id); if(el) el.checked=false; });
+        document.querySelectorAll('#ot-reason-list input[type=checkbox]').forEach(c => c.checked = false);
         const otherEl = document.getElementById('ot-note-other'); if(otherEl){otherEl.value='';otherEl.style.display='none';}
         renderOvertimeApply();
         toast('申請已送出，等待醫師簽核');
@@ -4034,7 +4120,7 @@ function renderOvertimeApprove() {
                 <div class="sc-name">${a.name}</div>
                 <div class="sc-val" style="font-size:18px">${formatOTDuration(mins)}</div>
                 <div class="sc-sub">${mins} 分鐘</div>
-                <button onclick="openOTHistory('${a.id}','${a.name}')" style="margin-top:8px;width:100%;padding:4px 0;font-size:11px;border:1px solid var(--border);border-radius:4px;background:var(--surface-alt);cursor:pointer;font-family:inherit;color:var(--text-secondary)">${PENCIL_ICON} 查看/調整</button>
+                <button onclick="openOTHistory('${a.id}','${a.name}','${m}')" style="margin-top:8px;width:100%;padding:4px 0;font-size:11px;border:1px solid var(--border);border-radius:4px;background:var(--surface-alt);cursor:pointer;font-family:inherit;color:var(--text-secondary)">${PENCIL_ICON} 查看/調整</button>
             </div>`;
         }).join('');
 
@@ -4088,6 +4174,7 @@ function renderOvertimeApprove() {
                     </div>
                     <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.9">
                         班別：${r.otShiftName}　${r.otType==='early'?`提早：${r.scheduledEnd} → ${r.actualEnd}`:`下班：${r.scheduledEnd}　實際：${r.actualEnd}`}<br>
+                        簽核醫師：<span style="font-weight:700;color:var(--text-primary)">${r.approverName||'—'}</span><br>
                         加班：<span class="pp" style="font-weight:700">${formatOTDuration(r.overtimeMinutes)}</span>
                         ${isPrincipal?`<button class="btn btn-outline btn-sm" style="font-size:11px;padding:2px 7px;margin-left:8px" onclick="editOTMinutes('${r.id}',${r.overtimeMinutes})">${PENCIL_ICON} 調整</button>`:''}
                         ${r.note?`<br>備注：${r.note}`:''}
@@ -4115,6 +4202,7 @@ function renderOvertimeApprove() {
                     </div>
                     <div style="font-size:12.5px;color:var(--text-muted)">
                         ${formatOTDuration(r.overtimeMinutes)}
+                        <span style="margin-left:8px">簽核醫師：<span style="font-weight:600;color:var(--text-secondary)">${r.approverName||'—'}</span></span>
                         ${isPrincipal?`<button class="btn btn-outline btn-sm" style="font-size:11px;padding:2px 7px;margin-left:8px" onclick="editOTMinutes('${r.id}',${r.overtimeMinutes})">${PENCIL_ICON} 調整</button>`:''}
                     </div>
                     ${r.approverSignature?`<img class="ot-sig-img sig-zoomable" src="${r.approverSignature}" alt="簽名" onclick="openImgZoom(this.src)"><div style="font-size:10px;color:var(--text-muted);margin-top:3px">${r.approverName} 簽核${r.approvedAt?' · '+fmtTimestamp(r.approvedAt):''}</div>` : ''}
@@ -4132,7 +4220,7 @@ function renderOvertimeApprove() {
                         <span style="font-weight:600">${r.assistantName}　${r.date}</span>
                         <span class="badge br">已退回</span>
                     </div>
-                    <div style="font-size:12.5px;color:var(--text-muted)">${r.otShiftName}　${formatOTDuration(r.overtimeMinutes)}</div>
+                    <div style="font-size:12.5px;color:var(--text-muted)">${r.otShiftName}　${formatOTDuration(r.overtimeMinutes)}　簽核醫師：${r.approverName||'—'}</div>
                 </div>
             </div>`).join('')}
         </div>` : ''}`;
@@ -4177,13 +4265,15 @@ async function addOTAdjustment(assistantId, assistantName) {
 
 // ─── OT History Modal (principal) ────────────────────────────────
 let _otHistAsstId = null, _otHistAsstName = '';
-function openOTHistory(assistantId, assistantName) {
+let _otHistMonth = null; // 'YYYY-MM' 或 'all'（近半年全部）
+function openOTHistory(assistantId, assistantName, month) {
     _otHistAsstId = assistantId; _otHistAsstName = assistantName;
-    const titleEl = document.getElementById('ot-hist-title');
-    if (titleEl) titleEl.textContent = `${assistantName} — 近半年加班紀錄`;
+    // 預設顯示點進來時所在的月份，而非全部紀錄
+    _otHistMonth = month || currentMonth();
     renderOTHistoryModal();
     document.getElementById('modal-ot-history')?.classList.remove('hidden');
 }
+function setOTHistMonth(m) { _otHistMonth = m; renderOTHistoryModal(); }
 function renderOTHistoryModal() {
     const el = document.getElementById('ot-hist-body'); if (!el) return;
     const months6 = last6Months();
@@ -4191,15 +4281,31 @@ function renderOTHistoryModal() {
     const todayStr = today();
     // min date = first day of oldest month in window
     const minDate = oldest + '-01';
+    if (!_otHistMonth) _otHistMonth = currentMonth();
+    const isAll = _otHistMonth === 'all';
+    const periodLabel = isAll ? '近半年' : monthLabel(_otHistMonth);
+
+    const titleEl = document.getElementById('ot-hist-title');
+    if (titleEl) titleEl.textContent = `${_otHistAsstName} — ${periodLabel}加班紀錄`;
+
     const recs = state.overtime
         .filter(r => r.assistantId === _otHistAsstId && r.date.slice(0,7) >= oldest)
+        .filter(r => isAll || r.date.startsWith(_otHistMonth))
         .sort((a,b) => new Date(b.date) - new Date(a.date));
     const totalApproved = recs.filter(r=>r.status==='approved').reduce((s,r)=>s+r.overtimeMinutes,0);
+
+    const monthTabs = `
+        <div class="month-tabs" style="margin:0 0 12px">
+            ${months6.map(mo=>`<button class="month-tab ${mo===_otHistMonth?'active':''}" onclick="setOTHistMonth('${mo}')">${monthLabel(mo)}</button>`).join('')}
+            <button class="month-tab ${isAll?'active':''}" onclick="setOTHistMonth('all')">近半年全部</button>
+        </div>`;
+
     el.innerHTML = `
+        ${monthTabs}
         <div style="margin-bottom:12px;padding:10px 12px;background:var(--surface-alt);border-radius:6px;font-size:var(--fs-sm)">
-            <span style="color:var(--text-muted)">近半年核准合計：</span>
+            <span style="color:var(--text-muted)">${periodLabel}核准合計：</span>
             <span style="font-weight:700;color:var(--accent)">${formatOTDuration(totalApproved)}</span>
-            <span style="color:var(--text-muted);margin-left:4px">（${totalApproved} 分鐘）</span>
+            <span style="color:var(--text-muted);margin-left:4px">（${totalApproved} 分鐘・${recs.length} 筆紀錄）</span>
         </div>
         ${recs.length ? recs.map(r=>`
         <div class="ot-record" style="margin-bottom:8px">
@@ -4215,16 +4321,18 @@ function renderOTHistoryModal() {
             </div>
             <div style="font-size:var(--fs-sm);color:var(--text-secondary)">
                 ${formatOTDuration(r.overtimeMinutes)}
+                <span style="color:var(--text-muted);margin-left:8px">簽核醫師：${r.approverName||'—'}</span>
                 ${r.note?`<span style="color:var(--text-muted);margin-left:8px">${r.note}</span>`:''}
             </div>
-        </div>`).join('') : '<div class="empty-state" style="margin-bottom:12px"><p>近半年無加班紀錄</p></div>'}
+        </div>`).join('') : `<div class="empty-state" style="margin-bottom:12px"><p>${periodLabel}無加班紀錄</p></div>`}
         <div style="margin-top:14px;padding:14px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface-alt)">
             <div style="font-size:var(--fs-sm);font-weight:700;color:var(--text-primary);margin-bottom:10px">新增調整紀錄</div>
             <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
                 <div>
                     <div style="font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:4px">日期（近半年）</div>
                     <input type="date" id="ot-adj-date" class="form-input" style="max-width:160px"
-                        min="${minDate}" max="${todayStr}" value="${todayStr}">
+                        min="${minDate}" max="${todayStr}"
+                        value="${(!isAll && !todayStr.startsWith(_otHistMonth)) ? _otHistMonth+'-01' : todayStr}">
                 </div>
                 <div>
                     <div style="font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:4px">調整分鐘數（正加 / 負減）</div>
@@ -4375,7 +4483,7 @@ async function confirmOTApproval() {
         });
         hideModal('modal-ot-signature');
         toast('已完成簽核');
-        renderOvertimeApprove();
+        refreshPage();
     } catch(e) { toast('儲存失敗：'+e.message); }
 }
 
@@ -4423,7 +4531,9 @@ function applyViewMode() {
 
     document.getElementById('btn-settings').classList.toggle('hidden', !isPrincipal);
     document.getElementById('btn-logout').classList.toggle('hidden', !loggedIn);
+    closeDrawer();
     updateDocBadge();
+    updateLeaveBadge();
 
     const chip = document.getElementById('mode-chip');
     if (chip) {
@@ -4680,10 +4790,13 @@ function openSettings() {
     document.getElementById('new-shift-name').value = '';
     const newShiftSegs = document.getElementById('new-shift-segs');
     if (newShiftSegs) newShiftSegs.value = '';
+    const newOtReason = document.getElementById('new-ot-reason');
+    if (newOtReason) newOtReason.value = '';
     _mgrDraft   = settings.managers.map(m=>typeof m==='string'?{name:m,password:''}:{...m});
     _docDraft   = settings.doctors.map(d=>({...d}));
     _shiftDraft = settings.shifts.map(s=>({...s}));
-    renderMgrListUI(); renderDocListUI(); renderShiftListUI();
+    _otReasonDraft = getOTReasons().slice();
+    renderMgrListUI(); renderDocListUI(); renderShiftListUI(); renderOTReasonListUI();
     showModal('modal-settings');
 }
 
@@ -4794,6 +4907,44 @@ function removeShiftConfig(i) {
     renderShiftListUI();
 }
 
+// ── 加班原因設定 ─────────────────────────────────────────────────
+function renderOTReasonListUI() {
+    const el = document.getElementById('ot-reason-list-ui');
+    if (!el) return;
+    el.innerHTML = _otReasonDraft.map((r,i)=>`
+        <div class="mgr-row">
+            <span class="mgr-name">${r}</span>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+                <button class="btn btn-sm btn-outline" onclick="moveOTReason(${i},-1)" ${i===0?'disabled style="opacity:.4"':''}>↑</button>
+                <button class="btn btn-sm btn-outline" onclick="moveOTReason(${i},1)" ${i===_otReasonDraft.length-1?'disabled style="opacity:.4"':''}>↓</button>
+                <button class="btn btn-sm btn-danger" onclick="removeOTReason(${i})">移除</button>
+            </div>
+        </div>`).join('') || '<div style="font-size:12.5px;color:var(--text-muted);padding:4px 0">尚無加班原因，助理僅能填寫「其他」</div>';
+}
+
+function addOTReason() {
+    const input = document.getElementById('new-ot-reason');
+    const txt = input?.value.trim();
+    if (!txt) { toast('請輸入加班原因'); return; }
+    if (txt === '其他') { toast('「其他」為系統固定選項，無需新增'); return; }
+    if (_otReasonDraft.includes(txt)) { toast('此加班原因已存在'); return; }
+    _otReasonDraft.push(txt);
+    input.value = '';
+    renderOTReasonListUI();
+}
+
+function removeOTReason(i) {
+    _otReasonDraft.splice(i, 1);
+    renderOTReasonListUI();
+}
+
+function moveOTReason(i, dir) {
+    const j = i + dir;
+    if (j < 0 || j >= _otReasonDraft.length) return;
+    [_otReasonDraft[i], _otReasonDraft[j]] = [_otReasonDraft[j], _otReasonDraft[i]];
+    renderOTReasonListUI();
+}
+
 async function saveSettings() {
     const high = parseInt(document.getElementById('setting-bonus-high').value);
     const low  = parseInt(document.getElementById('setting-bonus-low').value);
@@ -4809,7 +4960,7 @@ async function saveSettings() {
     const update = {
         bonusHighFactor: high, bonusLowFactor: low, managers: _mgrDraft,
         startingPts: sp, startingPtsLow: spLow,
-        doctors: _docDraft, shifts: _shiftDraft
+        doctors: _docDraft, shifts: _shiftDraft, otReasons: _otReasonDraft
     };
     if (newPw) update.principalPassword = newPw;
     try {
@@ -4817,6 +4968,7 @@ async function saveSettings() {
         settings.bonusHighFactor = high; settings.bonusLowFactor = low; settings.managers = _mgrDraft;
         settings.startingPts = sp; settings.startingPtsLow = spLow;
         settings.doctors = _docDraft; settings.shifts = _shiftDraft;
+        settings.otReasons = _otReasonDraft;
         if (newPw) settings.principalPassword = newPw;
         hideModal('modal-settings');
         toast('設定已儲存');
@@ -4974,6 +5126,7 @@ function updateLeaveBadge() {
     if (!badge) return;
     badge.textContent = count;
     badge.classList.toggle('hidden', count === 0);
+    updateMenuBadge();
 }
 
 // ================================================================
@@ -4987,6 +5140,7 @@ function updateAttBadge() {
     const count = otPending + lvPending;
     badge.textContent = count;
     badge.classList.toggle('hidden', count === 0);
+    updateMenuBadge();
 }
 
 function setAttendanceTab(tab) {
@@ -5040,8 +5194,9 @@ function renderAttendanceOTApproval() {
                     <span class="${r.status==='approved'?'ot-appr':r.status==='rejected'?'badge br':'ot-pend'}">${r.status==='approved'?'已簽核':r.status==='rejected'?'已退回':'待簽核'}</span>
                 </div>
                 <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.9">
-                    班別：${r.otShiftName}　加班：<span class="pp" style="font-weight:700">${formatOTDuration(r.overtimeMinutes)}</span>
-                    ${r.status==='pending'?`<br><button class="btn btn-primary btn-sm" onclick="approveOT('${r.id}')">簽核</button> <button class="btn btn-outline btn-sm" onclick="rejectOT('${r.id}')">退回</button>`:''}
+                    班別：${r.otShiftName}　加班：<span class="pp" style="font-weight:700">${formatOTDuration(r.overtimeMinutes)}</span><br>
+                    簽核醫師：<span style="font-weight:700;color:var(--text-primary)">${r.approverName||'—'}</span>
+                    ${r.status==='pending'?`<br><button class="btn btn-primary btn-sm" onclick="openOTApproval('${r.id}','${r.assistantName}','${r.date}','${r.otShiftName}',${r.overtimeMinutes})">✍ 簽名確認</button> <button class="btn btn-outline btn-sm" onclick="rejectOTRecord('${r.id}')">退回</button>`:''}
                     ${r.status==='approved'&&r.approverSignature?`<br><img class="ot-sig-img" src="${r.approverSignature}" style="max-height:32px;margin-top:4px;cursor:zoom-in" onclick="openImgZoom(this.src)"> <span style="font-size:11px;color:var(--text-muted)">${r.approverName} ${r.approvedAt?fmtTimestamp(r.approvedAt):''}</span>`:''}
                 </div>
             </div>
@@ -5131,7 +5286,7 @@ function renderAttendanceOTMgmt() {
             <div class="sc-name">${a.name}</div>
             <div class="sc-val" style="font-size:18px">${formatOTDuration(mins)}</div>
             <div class="sc-sub">${mins} 分鐘</div>
-            <button onclick="openOTHistory('${a.id}','${a.name}')" style="margin-top:8px;width:100%;padding:4px 0;font-size:11px;border:1px solid var(--border);border-radius:4px;background:var(--surface-alt);cursor:pointer;font-family:inherit;color:var(--text-secondary)">${PENCIL_ICON} 查看/調整</button>
+            <button onclick="openOTHistory('${a.id}','${a.name}','${m}')" style="margin-top:8px;width:100%;padding:4px 0;font-size:11px;border:1px solid var(--border);border-radius:4px;background:var(--surface-alt);cursor:pointer;font-family:inherit;color:var(--text-secondary)">${PENCIL_ICON} 查看/調整</button>
         </div>`;
     }).join('');
 
@@ -5548,6 +5703,22 @@ function renderLeaveForm() {
 }
 
 // ─── renderCombinedRecords (OT + Leave combined for assistant) ─────
+// 助理自行刪除加班申請（僅限本人、且尚未簽核／已退回的紀錄）
+async function deleteMyOTRecord(id) {
+    const asst = currentAssistantView;
+    const rec = state.overtime.find(r => r.id === id);
+    if (!rec) { toast('找不到該筆加班紀錄'); return; }
+    if (!asst || rec.assistantId !== asst.id) { toast('僅能刪除自己的加班單'); return; }
+    if (rec.status === 'approved') { toast('已簽核的加班單無法刪除，請聯絡院長'); return; }
+    confirm2(`確定要刪除 ${rec.date}（${rec.otShiftName}）的加班申請嗎？此操作無法復原。`, async () => {
+        try {
+            await db.collection(col('overtime')).doc(id).delete();
+            toast('已刪除加班申請');
+            renderCombinedRecords();
+        } catch(e) { toast('刪除失敗：'+e.message); }
+    });
+}
+
 function renderCombinedRecords() {
     const asst = currentAssistantView;
     const el = document.getElementById('combined-records-content'); if (!el) return;
@@ -5566,6 +5737,11 @@ function renderCombinedRecords() {
 
     const renderOTRow = (r) => {
         const sig = r.approverSignature ? `<img class="ot-sig-img sig-zoomable" src="${r.approverSignature}" alt="${r.approverName}簽名" onclick="openImgZoom(this.src)"><div style="font-size:10px;color:var(--text-muted);margin-top:3px">${r.approverName} 簽核${r.approvedAt?' · '+fmtTimestamp(r.approvedAt):''}</div>` : '';
+        // 助理僅能自行刪除「待簽核」或「已退回」的加班單；已簽核者需請院長處理
+        const canDelete = r.status === 'pending' || r.status === 'rejected';
+        const delBtn = canDelete
+            ? `<div style="margin-top:8px"><button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red-border)" onclick="deleteMyOTRecord('${r.id}')">刪除申請</button></div>`
+            : '';
         return `<div class="ot-record">
             <div class="ot-record-hd">
                 <div>
@@ -5581,6 +5757,7 @@ function renderCombinedRecords() {
             </div>
             ${r.note?`<div style="font-size:var(--fs-sm);color:var(--text-muted);margin-top:4px">${r.note}</div>`:''}
             ${sig}
+            ${delBtn}
         </div>`;
     };
 
@@ -5601,7 +5778,7 @@ function renderCombinedRecords() {
         ${pendingOT.length || pendingLV.length ? `<div class="section">
             <div class="sec-title" style="margin-bottom:10px;color:var(--text-secondary)">待簽核（${pendingOT.length+pendingLV.length}）</div>
             ${pendingOT.map(renderOTRow).join('')}
-            ${pendingLV.map(r=>renderLeaveCard(r)).join('')}
+            ${pendingLV.map(r=>renderLeaveCard(r, false, false)).join('')}
         </div>` : ''}
         <div class="section">
             <div class="sec-title" style="margin-bottom:10px">加班記錄（近 6 個月）</div>
@@ -5609,7 +5786,7 @@ function renderCombinedRecords() {
         </div>
         <div class="section">
             <div class="sec-title" style="margin-bottom:10px">請假記錄</div>
-            ${doneLV.length ? doneLV.map(r=>renderLeaveCard(r)).join('') : '<div class="empty-state"><p>尚無請假記錄</p></div>'}
+            ${doneLV.length ? doneLV.map(r=>renderLeaveCard(r, false, false)).join('') : '<div class="empty-state"><p>尚無請假記錄</p></div>'}
         </div>`;
 }
 
@@ -5673,7 +5850,9 @@ function renderLeavePrincipal(el, year) {
         </div>` : ''}`;
 }
 
-function renderLeaveCard(r, selectable) {
+// showName：管理端（院長／主管）即使已完成簽核，仍需顯示申請人姓名；
+//            助理檢視自己的紀錄時傳 false。
+function renderLeaveCard(r, selectable, showName = true) {
     const typeLabel = leaveTypeLabel(r.leaveType, r.leaveSubType);
     const badgeCls  = leaveTypeBadgeCls(r.leaveType);
     const statusCls = leaveStatusBadgeCls(r.status);
@@ -5681,11 +5860,15 @@ function renderLeaveCard(r, selectable) {
     const chkHtml = selectable
         ? `<input type="checkbox" class="row-chk" data-lid="${r.id}" ${leaveSelected.has(r.id)?'checked':''} onchange="toggleLeaveRow('${r.id}',this)" style="margin-right:6px;flex-shrink:0">`
         : '';
+    const nameHtml = (showName && r.assistantName)
+        ? `<span style="font-weight:700;font-size:var(--fs-sub)">${r.assistantName}</span>`
+        : '';
     return `<div class="leave-card" style="display:flex;gap:8px;align-items:flex-start">
         ${chkHtml}
         <div style="flex:1;min-width:0">
             <div class="leave-card-hd">
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    ${nameHtml}
                     <span class="leave-badge ${badgeCls}">${typeLabel}</span>
                     <span style="font-weight:600;font-size:var(--fs-base)">${datesStr}</span>
                     <span style="font-size:var(--fs-sm);color:var(--text-muted)">（${(r.dates||[]).length}天）</span>
@@ -5694,6 +5877,7 @@ function renderLeaveCard(r, selectable) {
             </div>
             <div style="font-size:var(--fs-sm);color:var(--text-muted);line-height:1.7">
                 代理：${r.proxyName||'—'}　主管：${r.approverName||'—'}
+                ${r.status==='approved'&&r.principalApprovedAt?`　<span style="color:var(--green)">✓ 院長批核 ${fmtTimestamp(r.principalApprovedAt)}</span>`:''}
             </div>
             ${r.status==='rejected'?`<div style="font-size:var(--fs-sm);color:var(--red);margin-top:4px">退回原因：${r.rejectReason||'—'}</div>`:''}
         </div>
