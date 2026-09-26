@@ -503,6 +503,138 @@
             .ot-shift-btn{padding:8px 12px;font-size:var(--fs-cap);}
         }
     </style>
+    <style>
+        /* ─── 排班系統整合 ─── */
+        .nsched,.nsched-lbl{display:none!important}
+        body.sched-access .nsched{display:flex!important}
+        body.sched-access .nsched-lbl{display:block!important}
+        #page-schedule.page.active{min-width:0;}
+        body.on-sched .main{min-width:0;}
+        #sched-root{min-width:0;flex:1;display:flex;flex-direction:column;}
+        #sched-root > div{min-width:0;}
+        .sched-boot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:80px 20px;color:var(--text-muted);font-size:var(--fs-base);text-align:center;}
+
+        /* iOS 風格開關 */
+        .ios-switch{position:relative;display:inline-block;width:44px;height:26px;flex-shrink:0;}
+        .ios-switch input{position:absolute;opacity:0;width:0;height:0;}
+        .ios-switch .ios-slider{position:absolute;inset:0;background:#E9E9EB;border-radius:13px;cursor:pointer;transition:background .2s;}
+        .ios-switch .ios-slider::before{content:'';position:absolute;left:2px;top:2px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.18),0 0 1px rgba(0,0,0,.2);transition:transform .2s;}
+        .ios-switch input:checked + .ios-slider{background:#34C759;}
+        .ios-switch input:checked + .ios-slider::before{transform:translateX(18px);}
+        .ios-switch input:focus-visible + .ios-slider{box-shadow:0 0 0 2px var(--accent-border);}
+        .mgr-sched{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:var(--fs-sm);color:var(--text-muted);white-space:nowrap;}
+        /* ─── 排班系統（原樣式，限定於 #sched-root） ─── */
+
+#sched-root table{width:auto;font-size:inherit}
+#sched-root thead th{padding:0;text-align:center;font-size:inherit;font-weight:600;text-transform:none;letter-spacing:normal;color:inherit;border-bottom:none;background:transparent}
+#sched-root tbody tr{border-bottom:none;transition:none}
+#sched-root tbody tr:nth-child(even){background:transparent}
+#sched-root tbody tr:hover{background:transparent!important}
+#sched-root tbody td{padding:0;vertical-align:top}
+#sched-root button,#sched-root input,#sched-root select,#sched-root textarea{font-family:inherit}
+#sched-root .sched-table,#sched-root .stats-table,#sched-root .doc-pattern-table{width:100%}
+@media(max-width:700px){#sched-root .topbar{padding-left:56px;flex-wrap:wrap}}
+#sched-root *{box-sizing:border-box}
+#sched-root{font-family:-apple-system,'PingFang TC','Microsoft JhengHei',Arial,sans-serif;font-size:13px;background:#eef0f5;color:#2d3142;line-height:normal;letter-spacing:normal}
+#sched-root .topbar{background:linear-gradient(135deg,#1e3566 0%,#2d508a 100%);color:#fff;display:flex;align-items:center;gap:8px;padding:7px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+#sched-root .topbar-title{font-size:14px;font-weight:700;margin-right:10px;white-space:nowrap;letter-spacing:.5px}
+#sched-root .tab-btn{background:transparent;border:1px solid rgba(255,255,255,0.28);color:rgba(255,255,255,0.9);padding:4px 12px;border-radius:5px;cursor:pointer;font-size:12px;white-space:nowrap;transition:background .15s}
+#sched-root .tab-btn:hover{background:rgba(255,255,255,0.15)}
+#sched-root .tab-btn.active{background:rgba(255,255,255,0.22);border-color:rgba(255,255,255,0.75);font-weight:700}
+#sched-root .month-nav{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:13px}
+#sched-root .month-nav button{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.35);color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;transition:background .15s}
+#sched-root .month-nav button:hover{background:rgba(255,255,255,0.25)}
+#sched-root .content{padding:12px;overflow-x:auto;min-height:calc(100vh - 80px)}
+#sched-root .week-block{margin-bottom:12px;background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.07),0 3px 10px rgba(0,0,0,0.04);overflow:hidden}
+#sched-root .week-header-row{background:linear-gradient(90deg,#c8ceea 0%,#d8dcf0 100%);padding:5px 12px;display:flex;align-items:center;font-size:12px;font-weight:700;color:#2d3f8a}
+#sched-root .week-header-right{margin-left:auto;font-weight:400;color:#666;font-size:11px}
+#sched-root .sched-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+#sched-root .sched-table th{background:#eceef8;text-align:center;padding:3px 2px;font-weight:600;border:1px solid #d4d8ee;font-size:11px}
+#sched-root .sched-table td{border:1px solid #e8e8ec;padding:1px;vertical-align:top;overflow:hidden}
+#sched-root .name-cell{width:64px;text-align:center;font-weight:600;background:#f8f8fc;vertical-align:middle;padding:3px 5px;font-size:12px;white-space:nowrap}
+#sched-root .name-cell .color-bar{display:inline-block;width:4px;height:14px;border-radius:2px;vertical-align:middle;margin-right:3px}
+#sched-root .day-cell{padding:1px}
+#sched-root .day-cell.is-sun{background:#f5f5f5;min-width:46px}
+#sched-root .day-cell.is-sat{background:#fffcec}
+#sched-root .day-cell.is-holiday{background:#fff4e8}
+#sched-root .day-cell.is-no-doctor{background:#fdf0f2}
+#sched-root .day-cell.is-national-holiday{background:#fff8f8}
+#sched-root .stat-cell{background:#f2f4fc;text-align:center;font-size:11px;padding:2px 3px;min-width:36px;vertical-align:middle}
+#sched-root .remark-cell{font-size:10px;color:#999;padding:2px 4px;background:#fafafa;max-width:80px}
+#sched-root .shift-block{display:flex;align-items:center;padding:2px 3px;margin:0;border-radius:3px;cursor:pointer;min-height:20px;transition:filter .12s,opacity .12s;width:100%}
+#sched-root .shift-block:hover{filter:brightness(1.1)}
+#sched-root .sb-label{font-size:9px;font-weight:700;color:rgba(0,0,0,0.55);margin-right:3px;flex-shrink:0;width:10px}
+#sched-root .sb-value{color:#2d2020;font-size:11px;white-space:nowrap;flex:1;text-shadow:none}
+#sched-root .subnav{background:#f0f2fb;padding:6px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #d8dcea;flex-wrap:wrap}
+#sched-root .subnav-toggle{display:flex;gap:0}
+#sched-root .subnav-toggle button{background:#fff;border:1px solid #b0b8d8;color:#3a52a0;padding:4px 11px;cursor:pointer;font-size:12px;transition:background .12s}
+#sched-root .subnav-toggle button:first-child{border-radius:4px 0 0 4px}
+#sched-root .subnav-toggle button:last-child{border-radius:0 4px 4px 0}
+#sched-root .subnav-toggle button.active{background:#3a52a0;color:#fff;font-weight:700;border-color:#3a52a0}
+#sched-root .btn-action{background:linear-gradient(135deg,#2a4a88 0%,#3860a8 100%);color:#fff;border:none;padding:5px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.15);transition:filter .12s}
+#sched-root .btn-action:hover{filter:brightness(1.1)}
+#sched-root .btn-check{background:#fff;color:#3a52a0;border:1px solid #b0b8d8;padding:4px 12px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;transition:background .12s}
+#sched-root .btn-check.active{background:#3a52a0;color:#fff;border-color:#3a52a0}
+#sched-root .btn-clear{background:#fff;color:#8a4040;border:1px solid #d0a8a8;padding:4px 11px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap}
+#sched-root .btn-clear:hover{background:#fff0f0}
+#sched-root .modal-bg{position:fixed;inset:0;background:rgba(10,20,50,0.45);display:flex;align-items:center;justify-content:center;z-index:999}
+#sched-root .s-modal{background:#fff;border-radius:10px;padding:22px 24px;min-width:320px;max-width:94vw;box-shadow:0 8px 40px rgba(0,0,0,0.22)}
+#sched-root .s-modal h3{font-size:15px;color:#2d3f8a;margin-bottom:14px;border-bottom:2px solid #eceef8;padding-bottom:8px}
+#sched-root .s-modal label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:3px;margin-top:10px}
+#sched-root .s-modal select,#sched-root .s-modal input[type=number]{width:100%;padding:6px 8px;border:1px solid #ccc;border-radius:4px;font-size:13px}
+#sched-root .modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+#sched-root .s-btn{padding:6px 16px;border:none;border-radius:5px;cursor:pointer;font-size:13px;font-weight:600}
+#sched-root .s-btn-primary{background:#2d4f8a;color:#fff}
+#sched-root .s-btn-primary:hover{background:#244276}
+#sched-root .s-btn-danger{background:#b83030;color:#fff}
+#sched-root .s-btn-danger:hover{background:#a02828}
+#sched-root .s-btn-secondary{background:#e8e8ec;color:#444}
+#sched-root .s-btn-secondary:hover{background:#d8d8dc}
+#sched-root .check-row{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;cursor:pointer}
+#sched-root .s-asst-card{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.07),0 2px 8px rgba(0,0,0,0.04);padding:14px;margin-bottom:10px}
+#sched-root .s-asst-card h4{font-size:14px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+#sched-root .tag-group{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+#sched-root .tag{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;cursor:pointer;user-select:none;border:1px solid #ccc}
+#sched-root .tag.selected{border-color:transparent;color:#fff}
+#sched-root .section-card{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.07),0 2px 8px rgba(0,0,0,0.04);padding:14px;margin-bottom:14px}
+#sched-root .section-card h3{font-size:14px;font-weight:700;color:#2d3f8a;margin-bottom:12px;border-bottom:1px solid #eceef8;padding-bottom:6px}
+#sched-root .doc-pattern-table{border-collapse:collapse;width:100%}
+#sched-root .doc-pattern-table th,#sched-root .doc-pattern-table td{border:1px solid #e0e0e8;padding:5px 8px;text-align:center;font-size:12px}
+#sched-root .doc-pattern-table th{background:#eceef8;font-weight:600;color:#2d3f8a}
+#sched-root .doc-pattern-table tbody tr:nth-child(even):not(.special-row){background:#f5f6fc}
+#sched-root .doc-pattern-table tbody tr:nth-child(odd):not(.special-row){background:#fff}
+#sched-root .content-tab{background:#fff;border:1px solid #b0b8d8;color:#3a52a0;padding:4px 12px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;transition:background .12s}
+#sched-root .content-tab:hover{background:#edf0fc}
+#sched-root .content-tab.active{background:#3a52a0;color:#fff;border-color:#3a52a0}
+#sched-root .shift-check{display:flex;gap:6px;justify-content:center}
+#sched-root .shift-check label{display:flex;align-items:center;gap:2px;cursor:pointer;font-size:11px}
+#sched-root .stats-table{border-collapse:collapse;width:100%;font-size:12px}
+#sched-root .stats-table th,#sched-root .stats-table td{border:1px solid #e0e0e8;padding:5px 8px;text-align:center}
+#sched-root .stats-table th{background:#eceef8;font-weight:600;font-size:11px}
+#sched-root .stats-table tr:nth-child(even){background:#f8f8fc}
+#sched-root .stats-table .name-col{text-align:left;font-weight:600;min-width:60px}
+#sched-root .s-badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;color:#fff;font-weight:600}
+#sched-root .pos-table{border-collapse:collapse;font-size:11px;white-space:nowrap}
+#sched-root .pos-table th,#sched-root .pos-table td{border:1px solid #e0e0e8;padding:3px 5px;text-align:center;min-width:52px}
+#sched-root .pos-table th{background:#eceef8;font-weight:600}
+#sched-root .pos-table .pos-name{text-align:left;min-width:72px;font-weight:600;background:#f5f6fc;padding-left:8px}
+#sched-root .pos-cell{cursor:pointer;transition:background .1s;min-height:24px;position:relative}
+#sched-root .pos-cell:hover{background:#f0f4ff!important}
+#sched-root .pos-cell-names{color:#2d3142;font-size:11px}
+#sched-root .pos-cell-empty{color:#ddd;font-size:12px}
+#sched-root .pos-status-row{display:flex;flex-wrap:wrap;gap:1px 2px;justify-content:center;margin-top:1px}
+#sched-root .pos-chip{font-size:7.5px;font-weight:600;line-height:1.4;white-space:nowrap}
+#sched-root .pos-chip.filled{color:#c0c4d0;font-weight:400}
+#sched-root .flex{display:flex}
+#sched-root .gap{gap:8px}
+#sched-root .items-center{align-items:center}
+#sched-root .text-muted{color:#888;font-size:11px}
+#sched-root .alert{padding:8px 12px;border-radius:5px;font-size:12px;margin-bottom:8px}
+#sched-root .alert-warn{background:#fdf8ec;border:1px solid #e8d89a;color:#7a6020}
+#sched-root .legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;font-size:11px;align-items:center}
+#sched-root .legend-item{display:flex;align-items:center;gap:4px}
+#sched-root .legend-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0}
+    </style>
 </head>
 <body>
 
@@ -724,6 +856,10 @@ appId: "..."'></textarea>
                 <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm5 4a1 1 0 10-2 0v3H6a1 1 0 100 2h3v3a1 1 0 102 0v-3h3a1 1 0 100-2h-3V6z" clip-rule="evenodd"/></svg>假勤簽核
             </span>
             <span id="leave-pending-badge" class="hidden" style="background:var(--red);color:#fff;border-radius:999px;font-size:10px;font-weight:700;padding:1px 7px;min-width:18px;text-align:center"></span>
+        </button>
+        <div class="nav-sec-label nsched-lbl">排班系統</div>
+        <button class="nav-item nsched" onclick="navigate('schedule')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h4v4H5V5zm6 0h4v4h-4V5zm-6 6h4v4H5v-4zm6 0h4v4h-4v-4z" clip-rule="evenodd"/></svg>助理排班
         </button>
         <div class="nav-sec-label nfull-lbl">報備</div>
         <button class="nav-item nfull" onclick="navigate('support-report')">
@@ -1122,6 +1258,11 @@ appId: "..."'></textarea>
         </div>
     </div>
 
+    <!-- ── 助理排班（排班系統） ── -->
+    <div id="page-schedule" class="page">
+        <div id="sched-root"></div>
+    </div>
+
 </main>
 
 <!-- ══ 手機版底部功能列：每個角色僅保留 2–3 個最常用頁面，
@@ -1452,6 +1593,239 @@ appId: "..."'></textarea>
 
 <script>
 // ================================================================
+// 排班系統整合層（Firestore 儲存、權限、延遲載入）
+// 只在 workspaces/{wsId}/schedule 底下讀寫，不碰點數系統原有資料表
+// ================================================================
+const SCHED_COL = 'schedule';
+const SCHED_MONTH_KEYS = ['doctorSchedule', 'schedule', 'leaveRequests', 'sessionTargets', 'remarks', 'restDays'];
+const SCHED_BACKUP_URL = 'data/schedule-backup-20260926.json';
+const SCHED_LIBS_CORE = [
+    'https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js',
+    'https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js',
+];
+const SCHED_LIB_BABEL = 'https://cdn.jsdelivr.net/npm/@babel/standalone@7.23.5/babel.min.js';
+const SCHED_LIB_H2C   = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+const SCHED_CACHE_KEY = 'sched_compiled_v1';
+
+// 院長一律可用；管理者需院長在系統設定開啟
+function canUseSchedule() {
+    if (viewMode === 'principal') return true;
+    if (viewMode !== 'manager') return false;
+    const m = (settings.managers || []).find(x => x && x.name === currentOperator);
+    return !!(m && m.scheduleAccess);
+}
+// 設定變更（例如院長關閉權限）時即時套用
+function onSchedAccessChanged() {
+    document.body.classList.toggle('sched-access', canUseSchedule());
+    if (currentPage === 'schedule' && !canUseSchedule()) navigate('overview');
+}
+
+// 穩定序列化：物件鍵排序，避免 Firestore 回傳順序不同造成誤判
+function schedStableStr(v) {
+    if (Array.isArray(v)) return '[' + v.map(schedStableStr).join(',') + ']';
+    if (v && typeof v === 'object') {
+        return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + schedStableStr(v[k])).join(',') + '}';
+    }
+    return JSON.stringify(v === undefined ? null : v);
+}
+
+// 整份排班資料 ⇄ Firestore 文件（meta ＋ 每月一份 m_YYYY-MM）
+function schedSplit(data) {
+    const clean = JSON.parse(JSON.stringify(data || {}));
+    const out = { meta: {} };
+    Object.keys(clean).forEach(k => {
+        if (SCHED_MONTH_KEYS.includes(k)) {
+            Object.entries(clean[k] || {}).forEach(([mk, v]) => {
+                const id = 'm_' + mk;
+                (out[id] = out[id] || {})[k] = v;
+            });
+        } else {
+            out.meta[k] = clean[k];
+        }
+    });
+    return out;
+}
+function schedAssemble(docs) {
+    const data = { ...(docs.meta || {}) };
+    SCHED_MONTH_KEYS.forEach(k => { data[k] = {}; });
+    Object.entries(docs).forEach(([id, doc]) => {
+        if (!id.startsWith('m_')) return;
+        const mk = id.slice(2);
+        Object.entries(doc || {}).forEach(([k, v]) => {
+            if (SCHED_MONTH_KEYS.includes(k)) data[k][mk] = v;
+        });
+    });
+    return data;
+}
+
+const schedStore = {
+    docs: {},        // 目前（含本機未存）的文件內容
+    saved: {},       // 最後一次與雲端一致的序列化內容
+    dirty: new Set(),
+    listeners: new Set(),
+    _startP: null, _timer: null, _flushing: null, _unsub: null,
+
+    isEmpty() { return !this.docs.meta; },
+    get() { return schedAssemble(this.docs); },
+    subscribe(fn) { this.listeners.add(fn); return () => this.listeners.delete(fn); },
+    _notify() { const d = this.get(); this.listeners.forEach(fn => { try { fn(d); } catch (e) { console.error(e); } }); },
+    _ref(id) { return db.collection(col(SCHED_COL)).doc(id); },
+
+    start() {
+        if (this._startP) return this._startP;
+        this._startP = new Promise((resolve, reject) => {
+            let first = true;
+            this._unsub = db.collection(col(SCHED_COL)).onSnapshot(snap => {
+                if (!first && snap.metadata.hasPendingWrites) return; // 自己剛寫入的回音
+                const remote = {};
+                snap.docs.forEach(d => { remote[d.id] = d.data(); });
+                this._applyRemote(remote);
+                if (first) { first = false; resolve(); }
+            }, err => {
+                console.error('schedule', err);
+                if (first) { first = false; this._startP = null; reject(err); }
+                else toast('排班資料同步中斷：' + err.message);
+            });
+        });
+        return this._startP;
+    },
+
+    _applyRemote(remote) {
+        let changed = false;
+        new Set([...Object.keys(remote), ...Object.keys(this.docs)]).forEach(id => {
+            if (this.dirty.has(id)) return; // 本機尚未存檔的修改優先
+            const s = remote[id] ? schedStableStr(remote[id]) : null;
+            const cur = this.docs[id] ? schedStableStr(this.docs[id]) : null;
+            if (remote[id]) { this.saved[id] = s; this.docs[id] = remote[id]; }
+            else { delete this.saved[id]; delete this.docs[id]; }
+            if (s !== cur) changed = true;
+        });
+        if (changed) this._notify();
+    },
+
+    // React 每次資料變動都會呼叫；只寫入真的有變的文件
+    save(data) {
+        const split = schedSplit(data);
+        new Set([...Object.keys(split), ...Object.keys(this.docs)]).forEach(id => {
+            const s = split[id] ? schedStableStr(split[id]) : null;
+            if (s !== (this.saved[id] ?? null)) this.dirty.add(id);
+            else this.dirty.delete(id);
+        });
+        this.docs = split;
+        if (this.dirty.size) {
+            clearTimeout(this._timer);
+            this._timer = setTimeout(() => this.flush(), 600);
+        }
+    },
+
+    async flush() {
+        clearTimeout(this._timer);
+        if (this._flushing) { await this._flushing; }
+        if (!this.dirty.size) return;
+        const ids = [...this.dirty];
+        const snapshot = {};
+        const batch = db.batch();
+        ids.forEach(id => {
+            const doc = this.docs[id];
+            snapshot[id] = doc ? schedStableStr(doc) : null;
+            if (doc) batch.set(this._ref(id), doc); else batch.delete(this._ref(id));
+        });
+        this._flushing = batch.commit().then(() => {
+            ids.forEach(id => {
+                if (snapshot[id] === null) delete this.saved[id]; else this.saved[id] = snapshot[id];
+                const now = this.docs[id] ? schedStableStr(this.docs[id]) : null;
+                if (now === snapshot[id]) this.dirty.delete(id);
+            });
+        }).catch(e => {
+            console.error('schedule save', e);
+            toast(e.code === 'permission-denied'
+                ? '排班儲存被拒：請在 Firebase 安全性規則允許 schedule 資料表'
+                : '排班儲存失敗：' + e.message);
+        }).finally(() => { this._flushing = null; });
+        await this._flushing;
+    },
+
+    // 匯入備份：整份覆蓋（刪除備份中沒有的月份）
+    async replaceAll(data) {
+        clearTimeout(this._timer);
+        if (this._flushing) await this._flushing;
+        const split = schedSplit(data);
+        const batch = db.batch();
+        Object.entries(split).forEach(([id, doc]) => batch.set(this._ref(id), doc));
+        Object.keys(this.docs).forEach(id => { if (!split[id]) batch.delete(this._ref(id)); });
+        await batch.commit();
+        this.docs = split;
+        this.saved = {};
+        Object.entries(split).forEach(([id, doc]) => { this.saved[id] = schedStableStr(doc); });
+        this.dirty.clear();
+        this._notify();
+    },
+};
+
+// ── 延遲載入：只有打開排班頁才下載 React / 編譯器 ──
+function schedLoadScript(src) {
+    return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src; s.crossOrigin = 'anonymous';
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('無法載入 ' + src.split('/').slice(-1)[0]));
+        document.head.appendChild(s);
+    });
+}
+function schedHash(str) {
+    let h = 5381;
+    for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+    return String(h >>> 0) + '_' + str.length;
+}
+async function schedBoot() {
+    if (!window.React) { for (const src of SCHED_LIBS_CORE) await schedLoadScript(src); }
+    if (!window.html2canvas) schedLoadScript(SCHED_LIB_H2C).catch(() => {});
+    if (window.SchedModule) return;
+    const src = document.getElementById('sched-src').textContent;
+    const h = schedHash(src);
+    let code = null;
+    try { const c = JSON.parse(localStorage.getItem(SCHED_CACHE_KEY) || 'null'); if (c && c.h === h) code = c.code; } catch {}
+    if (!code) {
+        if (!window.Babel) await schedLoadScript(SCHED_LIB_BABEL);
+        code = Babel.transform(src, { presets: ['react'], sourceType: 'script' }).code;
+        try { localStorage.setItem(SCHED_CACHE_KEY, JSON.stringify({ h, code })); } catch {}
+    }
+    const s = document.createElement('script');
+    s.text = code;
+    document.head.appendChild(s);
+    if (!window.SchedModule) {
+        try { localStorage.removeItem(SCHED_CACHE_KEY); } catch {}
+        throw new Error('排班程式初始化失敗');
+    }
+}
+
+let _schedMounted = false, _schedBooting = null;
+function schedCtx() { return { role: viewMode, operator: currentOperator }; }
+function renderSchedulePage() {
+    if (!canUseSchedule()) { navigate('overview'); return; }
+    if (_schedMounted) { window.SchedModule.setCtx?.(schedCtx()); return; }
+    if (_schedBooting) return;
+    const el = document.getElementById('sched-root');
+    el.innerHTML = '<div class="sched-boot"><div class="spinner"></div><p>載入排班系統…</p></div>';
+    _schedBooting = Promise.all([schedBoot(), schedStore.start()])
+        .then(() => {
+            el.innerHTML = '';
+            window.SchedModule.mount(el, schedStore, schedCtx(), { backupUrl: SCHED_BACKUP_URL });
+            _schedMounted = true;
+        })
+        .catch(e => {
+            console.error(e);
+            const denied = e && e.code === 'permission-denied';
+            el.innerHTML = `<div class="sched-boot"><p>${denied
+                ? '排班資料讀取被拒：請在 Firebase 安全性規則允許 schedule 資料表'
+                : '排班系統載入失敗：' + (e && e.message || e)}</p>
+                <button class="btn btn-outline btn-sm" onclick="renderSchedulePage()">重試</button></div>`;
+        })
+        .finally(() => { _schedBooting = null; });
+}
+</script>
+<script>
+// ================================================================
 // CONSTANTS & CONFIG
 // ================================================================
 const CFG_KEY = 'asst_pts_cfg_v3';
@@ -1764,6 +2138,7 @@ function subscribeData() {
               }
           }
           loaded.s = true; tryReady();
+          if (appReady) onSchedAccessChanged();
       }, () => { loaded.s = true; tryReady(); });
 
     // Overtime records
@@ -2087,7 +2462,7 @@ const ASST_PAGES = ['myview','overtime-apply'];
 function navigate(p) {
     if (p === 'overview' && viewMode === 'principal') p = 'settlement';
     if (viewMode === 'viewer' && p !== 'overview') { showLoginScreen(); return; }
-    if (viewMode === 'manager'   && !['overview','record','leave-approve'].includes(p)) return;
+    if (viewMode === 'manager'   && !['overview','record','leave-approve'].concat(canUseSchedule()?['schedule']:[]).includes(p)) return;
     if (viewMode === 'doctor'    && !['overview','record','overtime-approve'].includes(p)) return;
     if (viewMode === 'assistant' && !['overview','myview','overtime-apply'].includes(p)) return;
     // principal can go anywhere
@@ -2099,6 +2474,7 @@ function navigate(p) {
     document.querySelectorAll('.nav-item').forEach(el=>{ if(el.getAttribute('onclick')?.includes("'"+p+"'")) el.classList.add('active'); });
     document.querySelectorAll('.mn-item').forEach(el=>{ el.classList.toggle('active', el.getAttribute('onclick')?.includes("'"+p+"'")); });
     closeDrawer();
+    document.body.classList.toggle('on-sched', p === 'schedule');
     currentPage=p; renderPage(p);
 }
 // ================================================================
@@ -2135,7 +2511,8 @@ function renderPage(p) {
       'overtime-approve':renderOvertimeApprove,
       attendance:renderAttendance,
       leave:renderLeave,'leave-approve':renderLeaveApprove,
-      'support-report':renderSupportReport})[p]?.();
+      'support-report':renderSupportReport,
+      schedule:renderSchedulePage})[p]?.();
 }
 function refreshPage() { renderPage(currentPage); }
 
@@ -4528,6 +4905,7 @@ function applyViewMode() {
 
     document.body.className = document.body.className.replace(/\b(principal|manager|doctor|assistant|viewer)-mode\b/g, '').trim();
     document.body.classList.add(viewMode + '-mode');
+    document.body.classList.toggle('sched-access', canUseSchedule());
 
     document.getElementById('btn-settings').classList.toggle('hidden', !isPrincipal);
     document.getElementById('btn-logout').classList.toggle('hidden', !loggedIn);
@@ -4544,8 +4922,8 @@ function applyViewMode() {
         chip.className = 'mode-chip' + (isPrincipal||isManager?' admin':isAsst||isDoctor?' assistant':'');
     }
 
-    if (isPrincipal) { if (!['record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report','leave','leave-approve','attendance'].includes(currentPage)) navigate('settlement'); else refreshPage(); return; }
-    if (isManager)   { if (!['overview','record','leave-approve'].includes(currentPage)) navigate('overview'); else refreshPage(); return; }
+    if (isPrincipal) { if (!['record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report','leave','leave-approve','attendance','schedule'].includes(currentPage)) navigate('settlement'); else refreshPage(); return; }
+    if (isManager)   { if (!['overview','record','leave-approve'].concat(canUseSchedule()?['schedule']:[]).includes(currentPage)) navigate('overview'); else refreshPage(); return; }
     if (isDoctor)    { if (!['record','overtime-approve'].includes(currentPage)) navigate('record'); else refreshPage(); return; }
     if (isAsst)      { if (!['myview','overtime-apply'].includes(currentPage)) navigate('myview'); else refreshPage(); return; }
     if (currentPage !== 'overview') navigate('overview'); else refreshPage();
@@ -4804,6 +5182,9 @@ function renderMgrListUI() {
     document.getElementById('mgr-list-ui').innerHTML = _mgrDraft.map((m,i)=>`
         <div class="mgr-row">
             <span class="mgr-name">${m.name} <span style="color:var(--text-muted);font-size:12.5px">(${m.password})</span></span>
+            <label class="mgr-sched" title="允許此管理者使用排班系統">排班
+                <span class="ios-switch"><input type="checkbox" ${m.scheduleAccess?'checked':''} onchange="_mgrDraft[${i}].scheduleAccess=this.checked"><span class="ios-slider"></span></span>
+            </label>
             <button class="btn btn-sm btn-danger" onclick="removeManagerName(${i})">移除</button>
         </div>`).join('') || '<div style="font-size:12.5px;color:var(--text-muted);padding:4px 0">尚無管理者帳號</div>';
 }
@@ -6202,6 +6583,3138 @@ document.getElementById('new-shift-segs')?.addEventListener('keydown',e=>{if(e.k
 // INIT
 // ================================================================
 init();
+</script>
+<script type="text/plain" id="sched-src">(function () {
+
+const { useState, useEffect, useCallback, useMemo, useRef } = React;
+
+// ═══════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════
+const SHIFTS = ['早','午','晚'];
+const SAT_SHIFTS = ['早','午'];
+const WDAY_LABELS = ['一','二','三','四','五','六','日'];
+const FIXED_POSITIONS = ['櫃檯','諮詢','流動','行政','打掃','教育訓練'];
+const LEAVE_TYPES = ['休','特休','指休','國定假日','—'];
+const REMARK_PRESETS = ['All on','月會','面談','備餐','手術','一樓','二樓','三樓','季醫師'];
+const STORAGE_KEY = 'clinic_sched_v1';
+
+const DOC_COLORS = {
+  '陳昶宇':'#6b8fab', '陳宥宇':'#7a9db8', '黃敏琪':'#8ba8c4',
+  '王泓仁':'#5c7a94', '沈煥喬':'#96b0c4', '張憶婷':'#4d7288',
+  '吳佳澤':'#7090a0', '陳啓榮':'#638496', '張詠竣':'#5a8a9f',
+  '黃韋婷':'#80a0b0',
+};
+const POSITION_COLORS = {
+  '流動':'#7aa8a0', '行政':'#8fa888', '櫃檯':'#6b9478', '諮詢':'#5f8a9a',
+  '打掃':'#c9956d', '教育訓練':'#c7885e',
+};
+const LEAVE_COLORS = {
+  '休':'#b8b8b4', '特休':'#b5716a', '指休':'#c49a93',
+  '國定假日':'#a4625b', '教育訓練':'#c7885e', '—':'#b0b0ae',
+};
+const MORANDI_REST_RED = '#b5716a';
+const MORANDI_PINK = '#d4a4a8';
+const SHIFT_COLORS = { '早':'#7a9db8','午':'#6b8fab','晚':'#5c7a94' };
+
+// Normalise remarks: stored as array (new) or string (legacy) → always returns array
+function getRemarks(data, mk, ds) {
+  const v = data.remarks?.[mk]?.[ds];
+  if (!v) return [];
+  return Array.isArray(v) ? v : [v];
+}
+
+function cellBg(value, isFullRestDay) {
+  if (!value || value === '休') return LEAVE_COLORS['休'];
+  if (value === '指休') return LEAVE_COLORS['休'];   // 指休 = 同休灰色，永不變紅
+  if (value === '國定假日') return '#ffffff';          // 國定假日 = 白底
+  if (value in LEAVE_COLORS) return LEAVE_COLORS[value];
+  // 醫師跟診、流動、櫃檯 → 白色底
+  if (value in DOC_COLORS || value === '流動' || value === '櫃檯') return '#ffffff';
+  if (value in POSITION_COLORS) return POSITION_COLORS[value];
+  return '#ffffff';
+}
+
+// 1-char abbreviation for compact cell display
+// For 3-char Chinese names (doctors) use the middle char; 2-char positions use last char
+function abbrev1(name) {
+  if (!name) return '';
+  const map = {'休':'休','特休':'特','指休':'指','國定假日':'國','教育訓練':'訓','—':'—'};
+  if (map[name] !== undefined) return map[name];
+  return name.length >= 3 ? name[1] : name.slice(-1);
+}
+
+// ═══════════════════════════════════════════
+// 排班規則設定區（可依人事異動調整）
+// ═══════════════════════════════════════════
+// 專科醫師
+const ORTHO_DOCTOR = '王泓仁';   // 矯正
+const ENDO_DOCTOR  = '吳佳澤';   // 根管
+
+// 矯正診：跟診由這幾位「輪流平均分配」
+const ORTHO_FOLLOW_ROTATION = ['吳佩宣','潘俞霏','鍾庭茵'];
+// 矯正診時做「諮詢」的人（獨立崗位，不佔最低人力名額）
+const CONSULT_ASSISTANT = '盧蓓歆';
+// 根管診：跟診由這幾位「輪流平均分配」
+const ENDO_FOLLOW_ROTATION = ['吳佩宣','金孟漪'];
+
+// 其他單一固定專跟（醫師 → 助理）
+const DEDICATED_FOLLOWS = {
+  '張憶婷': '吳佩宣',
+  '沈煥喬': '金孟漪',
+};
+
+// 櫃檯專職預設名單（僅當助理資料未勾選「櫃檯專職」時的 fallback）
+const RECEPTION_DEFAULT = ['黃莉婷','黃羿璇','楊季語'];
+
+// 預設每月目標診次（助理管理未設定 target 時的 fallback）
+const MONTHLY_TARGET = 45;
+// 特休 / 國定假日：每一天扣減的目標診次
+const LEAVE_SESSION_DEDUCT = 2;
+// 預設完整休息日天數（月設定未填時的 fallback）
+const DEFAULT_REST_DAYS = 5;
+
+function getRequiredStaff(doctorCount) {
+  if (!doctorCount) return { reception: 0, follow: 0, float: 0, total: 0 };
+  const reception = doctorCount >= 4 ? 2 : 1;
+  const float = doctorCount >= 2 ? (doctorCount >= 4 ? 2 : 1) : 0;
+  return { reception, follow: doctorCount, float, total: reception + doctorCount + float };
+}
+
+// ─── Data-driven rule helpers ────────────────
+// 該助理是否在職（activeFrom / activeTo 為 'YYYY-MM'，含端點；未設定＝一律在職）
+function isAsstActive(asst, mk) {
+  if (asst.activeFrom && mk < asst.activeFrom) return false;
+  if (asst.activeTo && mk > asst.activeTo) return false;
+  return true;
+}
+// 是否櫃檯專職（有勾選就用勾選；全診所都沒勾選才 fallback 到預設名單）
+function anyReceptionistFlagged(data) {
+  return (data.assistants || []).some(a => a.isReceptionist);
+}
+function isReceptionist(data, asst) {
+  return anyReceptionistFlagged(data) ? !!asst.isReceptionist : RECEPTION_DEFAULT.includes(asst.name);
+}
+// 當月完整休息日目標（月設定 → fallback 預設）
+function getRestDayTarget(data, mk) {
+  const v = data.restDays?.[mk];
+  return (v === undefined || v === null || v === '') ? DEFAULT_REST_DAYS : Number(v);
+}
+// 當月某助理有效目標診次 = 基準 − (特休+國定假日 天數 × 每日扣減)
+function getEffectiveTarget(data, mk, name) {
+  const base = data.sessionTargets?.[mk]?.[name] ?? MONTHLY_TARGET;
+  const lvs = data.leaveRequests?.[mk]?.[name] || {};
+  let deductDays = 0;
+  Object.values(lvs).forEach(lv => {
+    if (lv && (lv.type === '特休' || lv.type === '國定假日')) deductDays++;
+  });
+  return Math.max(0, base - deductDays * LEAVE_SESSION_DEDUCT);
+}
+// 行政診日期集合：依助理的 adminClinic 設定（enabled/days/frequency）回傳當月要排行政的日期
+// frequency: 'monthStart'（月初連續 days 個工作日）| 'monthEnd'（月底連續 days 個工作日）
+//            | 'weekly'（每週固定挑 days 天，取每週第一個工作日起）| 'monthly'（整月共 days 天，平均分散）
+function getAdminClinicDates(asst, y, m) {
+  const cfg = asst.adminClinic;
+  if (!cfg || !cfg.enabled || !cfg.days) return new Set();
+  const days = Math.max(0, Number(cfg.days) || 0);
+  if (!days) return new Set();
+  const total = daysInMonth(y, m);
+  // 收集當月所有工作日（週一~週六，排除週日）
+  const workdays = [];
+  for (let d = 1; d <= total; d++) {
+    const ds = fmtDate(y, m, d);
+    if (weekday(ds) !== 0) workdays.push(ds);
+  }
+  const pick = new Set();
+  if (cfg.frequency === 'monthStart') {
+    workdays.slice(0, days).forEach(ds => pick.add(ds));
+  } else if (cfg.frequency === 'monthEnd') {
+    workdays.slice(-days).forEach(ds => pick.add(ds));
+  } else if (cfg.frequency === 'weekly') {
+    // 依 ISO 週分組，每週取前 days 個工作日
+    const byWeek = {};
+    workdays.forEach(ds => {
+      const [yy,mm,dd] = ds.split('-').map(Number);
+      const jsDay = new Date(yy, mm-1, dd);
+      const onejan = new Date(yy, 0, 1);
+      const wk = Math.ceil((((jsDay - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+      (byWeek[wk] = byWeek[wk] || []).push(ds);
+    });
+    Object.values(byWeek).forEach(list => list.slice(0, days).forEach(ds => pick.add(ds)));
+  } else { // 'monthly' 平均分散
+    if (days >= workdays.length) { workdays.forEach(ds => pick.add(ds)); }
+    else {
+      const step = workdays.length / days;
+      for (let i = 0; i < days; i++) pick.add(workdays[Math.floor(i * step)]);
+    }
+  }
+  return pick;
+}
+
+// ═══════════════════════════════════════════
+// DATE UTILITIES
+// ═══════════════════════════════════════════
+function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+function weekday(dateStr) { // returns 0=Sun..6=Sat
+  const [y,m,d] = dateStr.split('-').map(Number);
+  return new Date(y,m-1,d).getDay();
+}
+function fmtDate(y, m, d) {
+  return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+}
+function monthKey(y, m) { return `${y}-${String(m).padStart(2,'0')}`; }
+
+// Returns array of weeks; each week = 7 dateStr slots (Mon-Sun), null = no date that month
+// The last week's trailing null slots are filled with next-month dates (cross-month display)
+function getMonthWeeks(y, m) {
+  const total = daysInMonth(y, m);
+  const weeks = [];
+  let week = Array(7).fill(null);
+  for (let d = 1; d <= total; d++) {
+    const ds = fmtDate(y, m, d);
+    const wd = weekday(ds); // 0=Sun
+    const col = wd === 0 ? 6 : wd - 1; // Mon=0..Sun=6
+    week[col] = ds;
+    if (wd === 0 || d === total) {
+      weeks.push([...week]);
+      week = Array(7).fill(null);
+    }
+  }
+  // Fill leading null slots in the first week with previous-month dates
+  const firstWeek = weeks[0];
+  if (firstWeek) {
+    const firstIdx = firstWeek.findIndex(x => x !== null);
+    if (firstIdx > 0) {
+      const pm = m === 1 ? 12 : m - 1;
+      const py = m === 1 ? y - 1 : y;
+      const pmDays = daysInMonth(py, pm);
+      for (let i = firstIdx - 1; i >= 0; i--) {
+        firstWeek[i] = fmtDate(py, pm, pmDays - (firstIdx - 1 - i));
+      }
+    }
+  }
+  // Fill trailing null slots in the last week with next-month dates
+  const lastWeek = weeks[weeks.length - 1];
+  if (lastWeek) {
+    const nm = m === 12 ? 1 : m + 1;
+    const ny = m === 12 ? y + 1 : y;
+    let nd = 1;
+    for (let i = 0; i < 7; i++) {
+      if (lastWeek[i] === null) lastWeek[i] = fmtDate(ny, nm, nd++);
+    }
+  }
+  return weeks;
+}
+
+// True if ds belongs to a different month than (y, m)
+function isCrossMonth(ds, y, m) {
+  if (!ds) return false;
+  return ds.slice(0, 7) !== monthKey(y, m);
+}
+
+function getShiftsForDate(ds) {
+  if (!ds) return [];
+  const wd = weekday(ds);
+  if (wd === 0) return []; // Sunday
+  if (wd === 6) return SAT_SHIFTS;
+  return SHIFTS;
+}
+
+// ═══════════════════════════════════════════
+// INITIAL DATA
+// ═══════════════════════════════════════════
+const INITIAL_DOCTORS = [
+  '陳昶宇','陳宥宇','黃敏琪','王泓仁','沈煥喬','張憶婷','吳佳澤','陳啓榮','張詠竣','黃韋婷'
+];
+
+// June 2026 doctor schedule (from Excel 6月醫師月班表.xlsx)
+const JUNE_DOCTOR_SCHED = {
+  '2026-06-01':{ 早:['張詠竣'],              午:['陳啓榮','陳宥宇'],                  晚:['陳啓榮','陳宥宇'] },
+  '2026-06-02':{ 早:['陳宥宇','陳昶宇'],     午:['陳啓榮','陳昶宇'],                  晚:['陳啓榮','陳昶宇'] },
+  '2026-06-03':{ 早:['陳宥宇','吳佳澤'],     午:['王泓仁','吳佳澤','陳宥宇'],         晚:['陳啓榮','吳佳澤','王泓仁'] },
+  '2026-06-04':{ 早:['張詠竣','陳昶宇','陳啓榮'], 午:['張詠竣','陳昶宇','陳宥宇','陳啓榮'], 晚:['張詠竣','陳昶宇','陳宥宇'] },
+  '2026-06-05':{ 早:[],                       午:['黃韋婷','陳宥宇'],                  晚:['黃韋婷','張憶婷'] },
+  '2026-06-06':{ 早:['吳佳澤','陳昶宇'],     午:['吳佳澤','陳昶宇'],                  晚:[] },
+  '2026-06-07':{ 早:[],午:[],晚:[] },
+  '2026-06-08':{ 早:['張詠竣'],              午:['陳啓榮','陳宥宇'],                  晚:['陳啓榮','陳宥宇'] },
+  '2026-06-09':{ 早:['沈煥喬','陳昶宇'],     午:['陳啓榮','陳昶宇','沈煥喬'],         晚:['陳啓榮','陳昶宇','沈煥喬'] },
+  '2026-06-10':{ 早:['陳宥宇','吳佳澤'],     午:['陳宥宇','吳佳澤'],                  晚:['陳啓榮','吳佳澤'] },
+  '2026-06-11':{ 早:['張詠竣','陳昶宇'],     午:['張詠竣','陳昶宇','陳宥宇'],         晚:['張詠竣','陳昶宇','陳宥宇'] },
+  '2026-06-12':{ 早:[],                       午:['黃韋婷','陳宥宇'],                  晚:['黃韋婷'] },
+  '2026-06-13':{ 早:['黃韋婷','陳昶宇','王泓仁','陳啓榮'], 午:['黃韋婷','陳昶宇','王泓仁'], 晚:[] },
+  '2026-06-14':{ 早:[],午:[],晚:[] },
+  '2026-06-15':{ 早:[],                       午:['陳啓榮','陳宥宇'],                  晚:['陳啓榮','陳宥宇'] },
+  '2026-06-16':{ 早:['陳宥宇','陳昶宇'],     午:['陳啓榮','陳昶宇'],                  晚:['陳啓榮','陳昶宇'] },
+  '2026-06-17':{ 早:['陳宥宇','吳佳澤'],     午:['陳宥宇','吳佳澤'],                  晚:['陳啓榮','吳佳澤'] },
+  '2026-06-18':{ 早:['陳啓榮','陳昶宇'],     午:['張詠竣','陳昶宇','陳宥宇','陳啓榮'], 晚:['張詠竣','陳昶宇','陳宥宇'] },
+  '2026-06-19':{ 早:[],午:[],晚:[], _note:'端午節' },
+  '2026-06-20':{ 早:[],午:[],晚:[], _note:'整日無診' },
+  '2026-06-21':{ 早:[],午:[],晚:[] },
+  '2026-06-22':{ 早:['張詠竣'],              午:['陳啓榮','陳宥宇'],                  晚:['陳啓榮','陳宥宇'] },
+  '2026-06-23':{ 早:['沈煥喬','陳昶宇'],     午:['陳啓榮','陳昶宇','沈煥喬'],         晚:['陳啓榮','陳昶宇','沈煥喬'] },
+  '2026-06-24':{ 早:['陳宥宇','吳佳澤'],     午:['陳宥宇','吳佳澤'],                  晚:['陳啓榮','吳佳澤'] },
+  '2026-06-25':{ 早:['張詠竣','陳昶宇'],     午:['張詠竣','陳昶宇','陳宥宇'],         晚:['張詠竣','陳昶宇','陳宥宇'] },
+  '2026-06-26':{ 早:[],                       午:['黃韋婷','陳宥宇'],                  晚:['黃韋婷'] },
+  '2026-06-27':{ 早:['陳啓榮','陳昶宇','王泓仁','吳佳澤'], 午:['吳佳澤','陳昶宇','王泓仁'], 晚:[] },
+  '2026-06-28':{ 早:[],午:[],晚:[] },
+  '2026-06-29':{ 早:['張詠竣'],              午:['陳宥宇'],                           晚:['陳宥宇'] },
+  '2026-06-30':{ 早:['陳宥宇','陳昶宇'],     午:['陳昶宇'],                           晚:['陳昶宇'] },
+};
+
+// Default doctor weekly pattern (for generating future months)
+const DEFAULT_DOCTOR_PATTERNS = {
+  '陳昶宇':{ '1':[],'2':['早','午','晚'],'3':[],'4':['早','午','晚'],'5':[],'6':['早','午'] },
+  '陳宥宇':{ '1':['午','晚'],'2':['早'],'3':['早','午'],'4':['午','晚'],'5':['午'],'6':[] },
+  '黃敏琪':{ '1':[],'2':[],'3':[],'4':[],'5':['午'],'6':['早','午'] },
+  '王泓仁':{ '1':[],'2':[],'3':['午','晚'],'4':[],'5':[],'6':['早','午'] },
+  '沈煥喬':{ '1':[],'2':['早','午','晚'],'3':[],'4':[],'5':[],'6':['早','午'] },
+  '張憶婷':{ '1':[],'2':[],'3':[],'4':[],'5':['晚'],'6':[] },
+  '吳佳澤':{ '1':[],'2':[],'3':['早','午'],'4':[],'5':[],'6':['早','午'] },
+  '陳啓榮':{ '1':['午','晚'],'2':['午','晚'],'3':['晚'],'4':['早','午','晚'],'5':[],'6':['早','午'] },
+  '張詠竣':{ '1':['早'],'2':[],'3':[],'4':['早','午','晚'],'5':[],'6':[] },
+  '黃韋婷':{ '1':[],'2':[],'3':[],'4':[],'5':['午','晚'],'6':['早','午'] },
+};
+
+const INITIAL_ASSISTANTS = [
+  { id:'a1', name:'金孟漪', eligiblePositions:['流動','陳昶宇','陳宥宇','吳佳澤','張詠竣'], color:'#43a047' },
+  { id:'a2', name:'吳佩宣', eligiblePositions:['流動','陳宥宇','陳昶宇','沈煥喬','張詠竣','黃韋婷','張憶婷','行政','櫃檯'], color:'#1e88e5' },
+  { id:'a3', name:'鍾庭茵', eligiblePositions:['流動','陳昶宇','陳宥宇','陳啓榮','王泓仁','黃韋婷'], color:'#8e24aa' },
+  { id:'a4', name:'黃莉婷', eligiblePositions:['櫃檯','流動'], color:'#e53935' },
+  { id:'a5', name:'盧蓓歆', eligiblePositions:['流動','陳昶宇','陳宥宇','陳啓榮','王泓仁','沈煥喬','吳佳澤','張詠竣','櫃檯'], color:'#00897b' },
+  { id:'a6', name:'林采霓', eligiblePositions:['流動','陳宥宇','陳啓榮','吳佳澤','張詠竣'], color:'#fb8c00' },
+  { id:'a7', name:'張瑜芳', eligiblePositions:['流動','陳昶宇','陳宥宇','陳啓榮','黃韋婷','張憶婷','張詠竣'], color:'#d81b60' },
+  { id:'a8', name:'黃羿璇', eligiblePositions:['櫃檯','流動','陳昶宇','黃韋婷'], color:'#5e35b1' },
+  { id:'a9', name:'王琳媛', eligiblePositions:['流動','陳昶宇','陳宥宇','吳佳澤'], color:'#039be5' },
+  { id:'a10',name:'李思彤', eligiblePositions:['櫃檯','流動'], color:'#7cb342' },
+  { id:'a11',name:'廖婉羽', eligiblePositions:['流動','張詠竣'], color:'#6d4c41' },
+  { id:'a12',name:'丁毓珉', eligiblePositions:['流動','王泓仁','陳啓榮','櫃檯'], color:'#546e7a' },
+];
+
+function makeInitialData() {
+  return {
+    doctors: INITIAL_DOCTORS,
+    doctorPatterns: DEFAULT_DOCTOR_PATTERNS,
+    doctorSchedule: { '2026-06': JUNE_DOCTOR_SCHED },
+    assistants: INITIAL_ASSISTANTS,
+    schedule: {},       // { monthKey: { dateStr: { shift: { asstName: position } } } }
+    leaveRequests: {},  // { monthKey: { asstName: { dateStr: { type, sessions } } } }
+    sessionTargets: {}, // { monthKey: { asstName: N } }
+    remarks: {},        // { monthKey: { dateStr: string } }
+  };
+}
+
+// ═══════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════
+let _store = null;   // 由點數系統整合層注入（Firestore）
+let _ctx = { role: 'principal', operator: '院長' };
+let _opts = {};
+
+function normalizeData(parsed) {
+  return { ...makeInitialData(), ...parsed,
+    doctors: parsed.doctors || INITIAL_DOCTORS,
+    doctorPatterns: parsed.doctorPatterns || DEFAULT_DOCTOR_PATTERNS,
+    doctorSchedule: { '2026-06': JUNE_DOCTOR_SCHED, ...(parsed.doctorSchedule||{}) },
+    assistants: parsed.assistants || INITIAL_ASSISTANTS,
+  };
+}
+
+function loadData() {
+  return normalizeData(_store.get());
+}
+
+function saveData(data) {
+  _store.save(data);
+}
+
+// ═══════════════════════════════════════════
+// CELL VALUE HELPERS
+// ═══════════════════════════════════════════
+function getCellValue(data, mk, dateStr, shift, asstName) {
+  // Leave takes priority
+  const leave = data.leaveRequests?.[mk]?.[asstName]?.[dateStr];
+  if (leave && (leave.sessions.includes(shift) || leave.sessions.includes('全'))) {
+    return leave.type || '休';
+  }
+  const assigned = data.schedule?.[mk]?.[dateStr]?.[shift]?.[asstName];
+  if (assigned) return assigned;
+  return '休';
+}
+
+function isWorkValue(v) {
+  return v && !LEAVE_TYPES.includes(v) && v !== '—';
+}
+
+// ═══════════════════════════════════════════
+// STATISTICS
+// ═══════════════════════════════════════════
+function calcMonthStats(data, mk, asstName) {
+  const stats = { 早:0,午:0,晚:0,全天:0,週六:0,完整休息:0,特休:0,指休:0,國定假日:0,教育訓練:0 };
+  const y = parseInt(mk.slice(0,4)), m = parseInt(mk.slice(5,7));
+  const total = daysInMonth(y, m);
+  for (let d = 1; d <= total; d++) {
+    const ds = fmtDate(y,m,d);
+    const wd = weekday(ds);
+    if (wd === 0) continue; // Sunday - skip
+    const isSat = wd === 6;
+    const shiftsForDay = isSat ? SAT_SHIFTS : SHIFTS;
+    let workCount = 0, allOff = true;
+    shiftsForDay.forEach(sh => {
+      const v = getCellValue(data, mk, ds, sh, asstName);
+      if (isWorkValue(v)) { stats[sh]++; workCount++; allOff = false; }
+      else if (v === '特休') { stats['特休']++; allOff = false; }   // 特休不計入完整休息日
+      else if (v === '指休') { stats['指休']++; }                   // 指休算完整休息日
+      else if (v === '國定假日') { stats['國定假日']++; allOff = false; } // 國定不計入
+      else if (v === '教育訓練') { stats['教育訓練']++; allOff = false; }
+    });
+    if (isSat && workCount > 0) stats['週六']++;
+    if (workCount === shiftsForDay.length) stats['全天']++;
+    if (allOff) stats['完整休息']++;
+  }
+  return stats;
+}
+
+function calcWeekStats(data, mk, weekDates, asstName) {
+  let 早=0,午=0,晚=0;
+  weekDates.forEach(ds => {
+    if (!ds) return;
+    const wd = weekday(ds);
+    if (wd === 0) return;
+    getShiftsForDate(ds).forEach(sh => {
+      const v = getCellValue(data, mk, ds, sh, asstName);
+      if (isWorkValue(v)) { if (sh==='早') 早++; else if(sh==='午') 午++; else 晚++; }
+    });
+  });
+  return { 早,午,晚, total: 早+午+晚 };
+}
+
+// Returns positions still needing assignment for a given session
+// excludeAsstName = the assistant currently being edited (their slot stays open)
+function getPendingPositions(data, mk, dateStr, shift, excludeAsstName) {
+  const doctorSched = data.doctorSchedule?.[mk] || {};
+  const dayInfo = doctorSched[dateStr] || {};
+  const doctors = dayInfo[shift] || [];
+  if (!doctors.length) return [];
+  const req = getRequiredStaff(doctors.length);
+  const shiftSched = data.schedule?.[mk]?.[dateStr]?.[shift] || {};
+  const otherPositions = Object.entries(shiftSched)
+    .filter(([n]) => n !== excludeAsstName)
+    .map(([, p]) => p).filter(p => isWorkValue(p));
+  const pending = [];
+  doctors.forEach(doc => { if (!otherPositions.includes(doc)) pending.push(doc); });
+  const recFilled = otherPositions.filter(p => p === '櫃檯').length;
+  if (recFilled < req.reception) pending.push('櫃檯');
+  const floatFilled = otherPositions.filter(p => p === '流動').length;
+  if (floatFilled < req.float) pending.push('流動');
+  return [...new Set(pending)];
+}
+
+// Returns per-position fill status for a shift's header display
+// { label, full, filled, extra }
+//   filled=true  → someone is assigned → show in blue (SHIFT_COLORS[shift])
+//   filled=false → not yet assigned    → show in gray
+//   extra        → count of staff BEYOND the required slot (shown as red +N)
+function getShiftPositionStatus(data, mk, dateStr, shift) {
+  const info = data.doctorSchedule?.[mk]?.[dateStr] || {};
+  const doctors = info[shift] || [];
+  if (!doctors.length) return null;
+  const req = getRequiredStaff(doctors.length);
+  const sched = data.schedule?.[mk]?.[dateStr]?.[shift] || {};
+  const assignedPos = Object.values(sched).filter(p => isWorkValue(p));
+  const result = [];
+
+  // Doctor follow slots
+  doctors.forEach(doc => {
+    const cnt = assignedPos.filter(p => p === doc).length;
+    result.push({ label: doc.length >= 3 ? doc[1] : doc.slice(-1), full: doc, filled: cnt >= 1, extra: cnt > 1 ? cnt : 0 });
+  });
+
+  // Reception slots
+  const recTotal = assignedPos.filter(p => p === '櫃檯').length;
+  const recReq = req.reception;
+  for (let i = 0; i < recReq; i++) {
+    const isLast = i === recReq - 1;
+    result.push({ label: '櫃', full: '櫃檯', filled: i < recTotal, extra: isLast && recTotal > 1 ? recTotal : 0 });
+  }
+
+  // Float slots
+  const floatTotal = assignedPos.filter(p => p === '流動').length;
+  const floatReq = req.float;
+  for (let i = 0; i < floatReq; i++) {
+    const isLast = i === floatReq - 1;
+    result.push({ label: '流', full: '流動', filled: i < floatTotal, extra: isLast && floatTotal > 1 ? floatTotal : 0 });
+  }
+
+  return result;
+}
+
+// ═══════════════════════════════════════════
+// RULE VALIDATION
+// ═══════════════════════════════════════════
+function checkScheduleRules(data, year, month) {
+  const mk = monthKey(year, month);
+  const violations = [];
+  const doctorSched = data.doctorSchedule?.[mk] || {};
+  const total = daysInMonth(year, month);
+
+  // Count total assignments to detect if schedule has been started
+  const totalAssigned = Object.values(data.schedule?.[mk] || {}).reduce((sum, day) =>
+    sum + Object.values(day).reduce((s, sh) => s + Object.keys(sh).length, 0), 0);
+  const scheduleStarted = totalAssigned >= 5;
+  const restTarget = getRestDayTarget(data, mk);
+
+  // ── Per-assistant checks ──
+  data.assistants.forEach(asst => {
+    // 全職＝非兼職且當月在職
+    const isFullTime = !asst.isPartTime && isAsstActive(asst, mk);
+    if (!isAsstActive(asst, mk)) return; // 未在職者不檢核
+    const stats = calcMonthStats(data, mk, asst.name);
+    const totalSessions = stats.早 + stats.午 + stats.晚;
+    const sessionTarget = getEffectiveTarget(data, mk, asst.name);
+
+    // Session count (full-time only, after schedule started) — exact match required
+    if (isFullTime && scheduleStarted) {
+      const diff = totalSessions - sessionTarget;
+      if (diff !== 0) {
+        violations.push({
+          type: 'session_count',
+          severity: 'warn',
+          assistant: asst.name,
+          message: `${asst.name}：診次 ${totalSessions}／目標 ${sessionTarget}${diff > 0 ? '（多 ' + diff + ' 診）' : '（少 ' + Math.abs(diff) + ' 診）'}`,
+        });
+      }
+    }
+
+    // Rest days (full-time only, after schedule started)
+    if (isFullTime && scheduleStarted) {
+      if (stats.完整休息 !== restTarget) {
+        violations.push({
+          type: 'rest_days',
+          severity: 'warn',
+          assistant: asst.name,
+          message: `${asst.name}：完整休息日 ${stats.完整休息} 天（需 ${restTarget} 天）`,
+        });
+      }
+    }
+
+    // 頭尾班 & Consecutive all-day (all assistants, all time)
+    for (let d = 1; d <= total; d++) {
+      const ds = fmtDate(year, month, d);
+      const wd = weekday(ds);
+      if (wd === 0 || wd === 6) continue; // Saturday has no 晚, skip
+      const v早 = getCellValue(data, mk, ds, '早', asst.name);
+      const v午 = getCellValue(data, mk, ds, '午', asst.name);
+      const v晚 = getCellValue(data, mk, ds, '晚', asst.name);
+      const w早 = isWorkValue(v早), w午 = isWorkValue(v午), w晚 = isWorkValue(v晚);
+
+      // 頭尾班: 早+晚 without 午
+      if (w早 && w晚 && !w午) {
+        const [,mm,dd] = ds.split('-');
+        violations.push({ type: 'head_tail', severity: 'error', assistant: asst.name, date: ds,
+          message: `${asst.name}：${parseInt(mm)}/${parseInt(dd)} 頭尾班（早+晚，無午診）` });
+      }
+
+      // Consecutive all-day: today is full-day and yesterday was too
+      if (w早 && w午 && w晚 && d > 1) {
+        const prev = fmtDate(year, month, d - 1);
+        const pWd = weekday(prev);
+        if (pWd !== 0) {
+          const pShifts = getShiftsForDate(prev);
+          if (pShifts.length > 0 && pShifts.every(s => isWorkValue(getCellValue(data, mk, prev, s, asst.name)))) {
+            const [,pm,pd] = prev.split('-'); const [,cm,cd] = ds.split('-');
+            violations.push({ type: 'consecutive_all_day', severity: 'warn', assistant: asst.name, date: ds,
+              message: `${asst.name}：連續全天班 ${parseInt(pm)}/${parseInt(pd)}～${parseInt(cm)}/${parseInt(cd)}` });
+          }
+        }
+      }
+    }
+  });
+
+  // ── Mandatory follows & staffing ──
+  let unstaffedCount = 0;
+  for (let d = 1; d <= total; d++) {
+    const ds = fmtDate(year, month, d);
+    const wd = weekday(ds);
+    if (wd === 0) continue;
+    const shifts = getShiftsForDate(ds);
+    const dayInfo = doctorSched[ds] || {};
+    if (dayInfo._note === '整日無診') continue;
+
+    shifts.forEach(sh => {
+      const doctors = dayInfo[sh] || [];
+      if (!doctors.length) return;
+      const shiftSched = data.schedule?.[mk]?.[ds]?.[sh] || {};
+      const workers = Object.entries(shiftSched).filter(([, p]) => isWorkValue(p)).map(([n]) => n);
+
+      // 矯正診(王泓仁)出診 → 諮詢(盧蓓歆)需在場警告
+      if (doctors.includes(ORTHO_DOCTOR)) {
+        const lv = data.leaveRequests?.[mk]?.[CONSULT_ASSISTANT]?.[ds];
+        const onLeave = lv && (lv.sessions.includes(sh) || lv.sessions.includes('全'));
+        const doingConsult = (shiftSched[CONSULT_ASSISTANT] === '諮詢');
+        if (!onLeave && !doingConsult) {
+          const [,mm,dd] = ds.split('-');
+          violations.push({ type: 'missing_mandatory_follow', severity: 'warn', date: ds, shift: sh,
+            message: `${parseInt(mm)}/${parseInt(dd)} ${sh}診：矯正(${ORTHO_DOCTOR})出診，${CONSULT_ASSISTANT}未排諮詢` });
+        }
+      }
+
+      // Understaffed (only after schedule started)
+      if (scheduleStarted) {
+        const req = getRequiredStaff(doctors.length);
+        if (workers.length === 0) {
+          unstaffedCount++;
+        } else if (workers.length < req.total) {
+          const [,mm,dd] = ds.split('-');
+          violations.push({ type: 'understaffed', severity: 'warn', date: ds, shift: sh,
+            message: `${parseInt(mm)}/${parseInt(dd)} ${sh}診：${workers.length}／${req.total} 人（${doctors.length} 位醫師）` });
+        }
+      }
+    });
+  }
+  if (unstaffedCount > 0 && scheduleStarted) {
+    violations.push({ type: 'understaffed', severity: 'error',
+      message: `共 ${unstaffedCount} 個有醫師出診的診次未安排任何助理` });
+  }
+
+  return violations;
+}
+
+// ═══════════════════════════════════════════
+// AUTO SCHEDULER
+// ═══════════════════════════════════════════
+function autoSchedule(data, year, month) {
+  const mk = monthKey(year, month);
+  const doctorSched = data.doctorSchedule?.[mk] || {};
+  const total = daysInMonth(year, month);
+  const existingLeave = data.leaveRequests?.[mk] || {};
+
+  // 只排「當月在職」的助理
+  const roster = data.assistants.filter(a => isAsstActive(a, mk));
+  const byName = Object.fromEntries(roster.map(a => [a.name, a]));
+  const sessionCount = {}, target = {}, adminDates = {};
+  roster.forEach(a => {
+    sessionCount[a.name] = 0;
+    // 兼職者目標=0（只在缺人時才補）；全職＝有效目標（已扣特休/國定）
+    target[a.name] = a.isPartTime ? 0 : getEffectiveTarget(data, mk, a.name);
+    adminDates[a.name] = getAdminClinicDates(a, year, month);
+  });
+
+  const newSched = {};
+  const orthoFollowCount = {}, endoFollowCount = {};
+  ORTHO_FOLLOW_ROTATION.forEach(n => orthoFollowCount[n] = 0);
+  ENDO_FOLLOW_ROTATION.forEach(n => endoFollowCount[n] = 0);
+
+  const isOnLeave = (name, ds, sh) => {
+    const lv = existingLeave[name]?.[ds];
+    return lv && (lv.sessions.includes(sh) || lv.sessions.includes('全'));
+  };
+  const isAdmin = (name, ds) => adminDates[name]?.has(ds);
+  const isAssigned = (name, ds, sh) => !!(newSched[ds]?.[sh]?.[name]);
+  const posOf = (name, ds, sh) => newSched[ds]?.[sh]?.[name];
+  const doAssign = (name, ds, sh, pos) => {
+    (newSched[ds] = newSched[ds] || {});
+    (newSched[ds][sh] = newSched[ds][sh] || {});
+    newSched[ds][sh][name] = pos; sessionCount[name]++;
+  };
+  const removeAssign = (name, ds, sh) => {
+    if (newSched[ds]?.[sh]?.[name]) { delete newSched[ds][sh][name]; sessionCount[name]--; }
+  };
+  const shiftEntries = (ds, sh) => Object.entries(newSched[ds]?.[sh] || {});
+  // 計入最低人力的崗位（跟診/櫃檯/流動）；諮詢、行政不算
+  const clinicWorkers = (ds, sh) => shiftEntries(ds, sh).filter(([,p]) => p !== '諮詢' && p !== '行政');
+  const followed = (ds, sh, doc) => shiftEntries(ds, sh).some(([,p]) => p === doc);
+  const need = (name) => target[name] - sessionCount[name]; // 越大越需要班
+  const canTake = (name, ds, sh) =>
+    !isOnLeave(name, ds, sh) && !isAdmin(name, ds) && !isAssigned(name, ds, sh);
+  // 可用助理，依「櫃檯專職優先(限櫃檯) → 最需要班」排序
+  const available = (pos, ds, sh) => roster
+    .filter(a => canTake(a.name, ds, sh) && a.eligiblePositions.includes(pos))
+    .sort((a, b) => {
+      if (pos === '櫃檯') {
+        const ar = isReceptionist(data, a) ? 0 : 1, br = isReceptionist(data, b) ? 0 : 1;
+        if (ar !== br) return ar - br;
+      }
+      return need(b.name) - need(a.name);
+    });
+
+  const activeDays = [];
+  for (let d = 1; d <= total; d++) {
+    const ds = fmtDate(year, month, d);
+    if (weekday(ds) === 0) continue;
+    if ((doctorSched[ds] || {})._note === '整日無診') continue;
+    activeDays.push(ds);
+  }
+
+  // ── 1. 行政診：指定日整日排行政（不佔看診人力，但算該人的診次）──
+  activeDays.forEach(ds => {
+    getShiftsForDate(ds).forEach(sh => {
+      roster.forEach(a => {
+        if (isAdmin(a.name, ds) && canTake(a.name, ds, sh)) doAssign(a.name, ds, sh, '行政');
+      });
+    });
+  });
+
+  // ── 2. 逐診次「理想填滿」到最低人力 ──
+  activeDays.forEach(ds => {
+    const dayInfo = doctorSched[ds] || {};
+    getShiftsForDate(ds).forEach(sh => {
+      const doctors = dayInfo[sh] || [];
+      if (!doctors.length) return;
+      const req = getRequiredStaff(doctors.length);
+
+      // 2a 矯正(王泓仁)：諮詢(獨立) + 輪流跟診
+      // 註：諮詢/輪跟/專跟為「規則指定角色」，由規則本身授權，不再受 eligiblePositions 限制
+      if (doctors.includes(ORTHO_DOCTOR)) {
+        if (byName[CONSULT_ASSISTANT] && canTake(CONSULT_ASSISTANT, ds, sh))
+          doAssign(CONSULT_ASSISTANT, ds, sh, '諮詢');
+        if (!followed(ds, sh, ORTHO_DOCTOR)) {
+          const cand = ORTHO_FOLLOW_ROTATION.map(n => byName[n])
+            .filter(a => a && canTake(a.name, ds, sh))
+            .sort((a, b) => orthoFollowCount[a.name] - orthoFollowCount[b.name] || need(b.name) - need(a.name));
+          if (cand.length) { doAssign(cand[0].name, ds, sh, ORTHO_DOCTOR); orthoFollowCount[cand[0].name]++; }
+        }
+      }
+      // 2b 根管(吳佳澤)：輪流跟診
+      if (doctors.includes(ENDO_DOCTOR) && !followed(ds, sh, ENDO_DOCTOR)) {
+        const cand = ENDO_FOLLOW_ROTATION.map(n => byName[n])
+          .filter(a => a && canTake(a.name, ds, sh))
+          .sort((a, b) => endoFollowCount[a.name] - endoFollowCount[b.name] || need(b.name) - need(a.name));
+        if (cand.length) { doAssign(cand[0].name, ds, sh, ENDO_DOCTOR); endoFollowCount[cand[0].name]++; }
+      }
+      // 2c 其他固定專跟
+      Object.entries(DEDICATED_FOLLOWS).forEach(([doc, name]) => {
+        if (!doctors.includes(doc) || followed(ds, sh, doc)) return;
+        const a = byName[name];
+        if (a && canTake(name, ds, sh)) doAssign(name, ds, sh, doc);
+      });
+      // 2d 其餘醫師跟診（依 need 貪婪）
+      doctors.forEach(doc => {
+        if (followed(ds, sh, doc)) return;
+        const el = available(doc, ds, sh);
+        if (el.length) doAssign(el[0].name, ds, sh, doc);
+      });
+      // 2e 櫃檯補到 req.reception
+      let rec = clinicWorkers(ds, sh).filter(([,p]) => p === '櫃檯').length;
+      while (rec < req.reception) {
+        const el = available('櫃檯', ds, sh);
+        if (!el.length) break;
+        doAssign(el[0].name, ds, sh, '櫃檯'); rec++;
+      }
+      // 2f 流動補到 req.float
+      let flo = clinicWorkers(ds, sh).filter(([,p]) => p === '流動').length;
+      while (flo < req.float) {
+        const el = available('流動', ds, sh);
+        if (!el.length) break;
+        doAssign(el[0].name, ds, sh, '流動'); flo++;
+      }
+    });
+  });
+
+  // ── 3. 補足目標：未達標全職往各自 target 靠（新增流動，單診次至多 +2，不因補班湊成全天）──
+  let progress = true, guard = 0;
+  while (progress && guard++ < 500) {
+    progress = false;
+    const needy = roster.filter(a => !a.isPartTime && need(a.name) > 0)
+      .sort((a, b) => need(b.name) - need(a.name));
+    for (const a of needy) {
+      let placed = false;
+      for (const ds of activeDays) {
+        if (placed) break;
+        const dayInfo = doctorSched[ds] || {};
+        const shifts = getShiftsForDate(ds);
+        const dayCount = shifts.filter(s => isAssigned(a.name, ds, s)).length;
+        if (dayCount >= 2) continue; // 不因補班湊成全天
+        for (const sh of shifts) {
+          const doctors = dayInfo[sh] || [];
+          if (!doctors.length) continue;
+          const req = getRequiredStaff(doctors.length);
+          if (!canTake(a.name, ds, sh) || !a.eligiblePositions.includes('流動')) continue;
+          if (clinicWorkers(ds, sh).length >= req.total + 2) continue; // 單診次上限
+          doAssign(a.name, ds, sh, '流動'); placed = true; progress = true; break;
+        }
+      }
+    }
+  }
+
+  // ── 4. 頭尾班修正（平日 早+晚 無午）──
+  activeDays.forEach(ds => {
+    const wd = weekday(ds);
+    if (wd === 6) return;
+    const dayInfo = doctorSched[ds] || {};
+    roster.forEach(a => {
+      const name = a.name;
+      if (!(isAssigned(name, ds, '早') && isAssigned(name, ds, '晚') && !isAssigned(name, ds, '午'))) return;
+      let fixed = false;
+      const docs午 = dayInfo['午'] || [];
+      if (docs午.length && canTake(name, ds, '午')) {
+        for (const doc of docs午) {
+          if (a.eligiblePositions.includes(doc) && !followed(ds, '午', doc)) { doAssign(name, ds, '午', doc); fixed = true; break; }
+        }
+        if (!fixed) for (const pos of ['流動', '櫃檯']) {
+          if (a.eligiblePositions.includes(pos)) { doAssign(name, ds, '午', pos); fixed = true; break; }
+        }
+      }
+      if (!fixed) removeAssign(name, ds, '晚'); // 補不到 → 移除晚診消除頭尾班
+    });
+  });
+
+  // ── 5. 連續全天班避免（昨日全天 + 今日全天 → 今日移除一班，且該診次仍 ≥ 最低人力）──
+  for (let i = 1; i < activeDays.length; i++) {
+    const ds = activeDays[i], prev = activeDays[i - 1];
+    // 僅比較日曆上相鄰的兩天（排除中間隔了週日/無診日的情況）
+    const [y1,m1,d1] = ds.split('-').map(Number), [y0,m0,d0] = prev.split('-').map(Number);
+    const dayDiff = (Date.UTC(y1,m1-1,d1) - Date.UTC(y0,m0-1,d0)) / 86400000;
+    if (dayDiff !== 1) continue;
+    const shifts = getShiftsForDate(ds), pShifts = getShiftsForDate(prev);
+    const dayInfo = doctorSched[ds] || {};
+    roster.forEach(a => {
+      const name = a.name;
+      const fullToday = shifts.length > 0 && shifts.every(sh => isAssigned(name, ds, sh));
+      const fullPrev = pShifts.length > 0 && pShifts.every(sh => isAssigned(name, prev, sh));
+      if (!(fullToday && fullPrev)) return;
+      // 優先移除 晚 → 早 → 午（午最後），且移除午診不得造成「早+晚」頭尾班
+      for (const sh of ['晚', '早', '午']) {
+        if (!shifts.includes(sh)) continue;
+        const pos = posOf(name, ds, sh);
+        if (!pos || pos === '諮詢' || pos === '行政') continue;
+        if (sh === '午' && isAssigned(name, ds, '早') && isAssigned(name, ds, '晚')) continue; // 避免製造頭尾班
+        const req = getRequiredStaff((dayInfo[sh] || []).length);
+        if (pos === '流動' || clinicWorkers(ds, sh).length - 1 >= req.total) { removeAssign(name, ds, sh); break; }
+      }
+    });
+  }
+
+  return { mk, schedule: newSched };
+}
+
+// ═══════════════════════════════════════════
+// SCREENSHOT UTILITY
+// ═══════════════════════════════════════════
+async function captureWeekBlock(weekBlockEl, filename) {
+  if (!window.html2canvas) { alert('截圖套件尚未載入，請稍後再試。'); return; }
+
+  // Clone the week block off-screen
+  const clone = weekBlockEl.cloneNode(true);
+  clone.style.cssText = [
+    'position:fixed', 'top:-9999px', 'left:-9999px',
+    'width:' + weekBlockEl.offsetWidth + 'px',
+    'background:#fff', 'z-index:-1'
+  ].join(';');
+
+  // Remove screenshot-hidden elements from clone
+  clone.querySelectorAll('.ss-hide').forEach(el => el.remove());
+
+  // Force all text inside the table to black for legibility
+  clone.querySelectorAll('.sched-table *').forEach(el => { el.style.color = '#1a1a1a'; });
+
+  // Remove last 3 <col> from colgroup (stat columns)
+  clone.querySelectorAll('.sched-table colgroup').forEach(cg => {
+    const cols = cg.querySelectorAll('col');
+    const n = cols.length;
+    if (n >= 3) [cols[n-3], cols[n-2], cols[n-1]].forEach(c => c.remove());
+  });
+
+  const ssHost = document.getElementById('sched-root') || document.body;
+  ssHost.appendChild(clone);
+  try {
+    const canvas = await html2canvas(clone, {
+      scale: 2,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      logging: false,
+    });
+    const url = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.download = filename;
+    a.href = url;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } finally {
+    ssHost.removeChild(clone);
+  }
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: ShiftBlock
+// ═══════════════════════════════════════════
+function ShiftBlock({ shift, value, onClick, noLabel, locked, fullRestDay, isPartTime }) {
+  const isEmpty = isPartTime && (!value || value === '休');
+  const bg = isEmpty ? '#f5f5f7' : cellBg(value, fullRestDay);
+  const isWhite = bg === '#ffffff';
+  const isNationalHoliday = value === '國定假日';
+  const isZhixiu = value === '指休';
+  const display = isEmpty ? '' : (noLabel ? abbrev1(value) : (value || '休'));
+  const border = isZhixiu ? '1.5px solid #c0504d'
+    : isWhite ? '1px solid #d0d4e0'
+    : undefined;
+  return (
+    <div className="shift-block"
+      style={{background:bg, justifyContent:noLabel?'center':undefined,
+        cursor: isEmpty || locked ? 'default' : 'pointer',
+        border, boxSizing:'border-box'}}
+      onClick={isEmpty || locked ? undefined : onClick}
+      title={isEmpty ? '' : `${shift}: ${value||'休'}`}>
+      {!noLabel && <span className="sb-label">{shift}</span>}
+      <span className="sb-value" style={{
+        textAlign: noLabel ? 'center' : undefined,
+        color: isNationalHoliday ? '#c62828' : isZhixiu ? '#b0322e' : undefined,
+        fontWeight: (isNationalHoliday || isZhixiu) ? 700 : undefined,
+      }}>{display}</span>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: EditCellModal
+// ═══════════════════════════════════════════
+function EditCellModal({ asst, dateStr, shift, currentValue, data, mk, onSave, onClose }) {
+  const shiftsForDay = getShiftsForDate(dateStr);
+  const initVals = Object.fromEntries(
+    shiftsForDay.map(sh => [sh, getCellValue(data, mk, dateStr, sh, asst.name)])
+  );
+  const [values, setValues] = useState(initVals);
+  const [activeShift, setActiveShift] = useState(shift);
+  const [showMoreLeave, setShowMoreLeave] = useState(false);
+  const [showOther, setShowOther] = useState(false);
+  const [showEmergency, setShowEmergency] = useState(false);
+
+  const wd = weekday(dateStr);
+  const [,mm,dd] = dateStr.split('-');
+  const dateLabel = asst.name + ' — ' + parseInt(mm) + '/' + parseInt(dd) + '（' + WDAY_LABELS[wd===0?6:wd-1] + '）';
+
+  const value = values[activeShift] || '休';
+  function pick(v) { setValues(prev => ({...prev, [activeShift]: prev[activeShift]===v ? '休' : v})); }
+
+  const pending = getPendingPositions(data, mk, dateStr, activeShift, asst.name);
+  const shiftSched = data.schedule?.[mk]?.[dateStr]?.[activeShift] || {};
+  const filledPositions = Object.values(shiftSched).filter(p => isWorkValue(p));
+  const myRelevant = asst.eligiblePositions.filter(p => pending.includes(p) || filledPositions.includes(p));
+  const myOther = asst.eligiblePositions.filter(p => !myRelevant.includes(p));
+  const allKnown = [...new Set([...FIXED_POSITIONS, ...(data.doctors||[])])];
+  const nonEligible = allKnown.filter(p => !asst.eligiblePositions.includes(p));
+
+  function Chip({ label: lbl, active, color, dim, onClick: oc }) {
+    return (
+      <button onClick={oc} style={{
+        padding:'5px 10px', borderRadius:5, cursor:'pointer', fontSize:12,
+        fontWeight: active ? 700 : 500,
+        background: active ? (color||'#6b8fab') : (dim ? '#f0f0f0' : '#f2f4fc'),
+        color: active ? '#fff' : (dim ? '#909090' : '#333'),
+        border: '2px solid ' + (active ? (color||'#6b8fab') : (dim ? '#e0e0e0' : '#d8dcf0')),
+        transition:'all .1s', whiteSpace:'nowrap',
+      }}>{lbl}{dim && !active && <span style={{fontSize:8,color:'#ccc',marginLeft:3}}>✓</span>}</button>
+    );
+  }
+
+  return (
+    <div className="modal-bg" onClick={onClose}>
+      <div className="s-modal" style={{minWidth:360,maxWidth:'96vw'}} onClick={e => e.stopPropagation()}>
+        <h3 style={{fontSize:14,marginBottom:10}}>{dateLabel}</h3>
+
+        {shiftsForDay.length > 1 && (
+          <div style={{display:'flex',gap:4,marginBottom:12,borderBottom:'2px solid #eceef8',paddingBottom:8}}>
+            {shiftsForDay.map(sh => (
+              <button key={sh} onClick={() => setActiveShift(sh)} style={{
+                padding:'4px 14px', borderRadius:'5px 5px 0 0', cursor:'pointer',
+                fontSize:12, fontWeight: activeShift===sh ? 700 : 500,
+                background: activeShift===sh ? '#6b8fab' : '#f0f2f8',
+                color: activeShift===sh ? '#fff' : '#555',
+                border: '2px solid ' + (activeShift===sh ? '#6b8fab' : '#e0e4f0'),
+                borderBottom: activeShift===sh ? '2px solid transparent' : undefined,
+                marginBottom: activeShift===sh ? -2 : 0,
+              }}>{sh}診 <span style={{fontSize:10,opacity:0.75}}>{abbrev1(values[sh]||'休')}</span></button>
+            ))}
+          </div>
+        )}
+
+        <div style={{marginBottom:12}}>
+          <div style={{display:'flex',gap:5,alignItems:'center',flexWrap:'wrap'}}>
+            <Chip label="休" active={value==='休'} color={LEAVE_COLORS['休']} onClick={() => pick('休')} />
+            {!showMoreLeave ? (
+              <button onClick={() => setShowMoreLeave(true)} style={{
+                padding:'5px 8px', borderRadius:5, cursor:'pointer', fontSize:12,
+                background:'#f2f4fc', border:'2px solid #d8dcf0', color:'#666'
+              }}>⋯</button>
+            ) : (
+              LEAVE_TYPES.filter(t => t !== '休').map(t => (
+                <Chip key={t} label={t} active={value===t} color={LEAVE_COLORS[t]} onClick={() => pick(t)} />
+              ))
+            )}
+          </div>
+        </div>
+
+        {myRelevant.length > 0 && (
+          <div style={{marginBottom:10}}>
+            <div style={{fontSize:11,color:'#4d7288',fontWeight:700,marginBottom:6}}>可排崗位</div>
+            <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
+              {myRelevant.map(p => {
+                const isPending = pending.includes(p);
+                const isDoc = (data.doctors||[]).includes(p);
+                const color = isDoc ? (DOC_COLORS[p]||'#6b8fab') : (POSITION_COLORS[p]||'#7090a0');
+                return <Chip key={p} label={p} active={value===p} color={color} dim={!isPending} onClick={() => pick(p)} />;
+              })}
+            </div>
+          </div>
+        )}
+
+        {myOther.length > 0 && (
+          <div style={{marginBottom:8}}>
+            <button onClick={() => setShowOther(v=>!v)} style={{background:'none',border:'none',cursor:'pointer',fontSize:11,color:'#909090',padding:'2px 0',display:'flex',alignItems:'center',gap:4}}>
+              {showOther?'▲':'▼'} 其他可擔任崗位
+            </button>
+            {showOther && (
+              <div style={{display:'flex',flexWrap:'wrap',gap:5,marginTop:5}}>
+                {myOther.map(p => {
+                  const isDoc = (data.doctors||[]).includes(p);
+                  const color = isDoc ? (DOC_COLORS[p]||'#6b8fab') : (POSITION_COLORS[p]||'#7090a0');
+                  return <Chip key={p} label={p} active={value===p} color={color} onClick={() => pick(p)} />;
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {nonEligible.length > 0 && (
+          <div style={{marginBottom:10}}>
+            <button onClick={() => setShowEmergency(v=>!v)} style={{background:'none',border:'none',cursor:'pointer',fontSize:11,color:'#aaa',padding:'2px 0',display:'flex',alignItems:'center',gap:4}}>
+              {showEmergency?'▲':'▼'} 緊急調度（資格外）
+            </button>
+            {showEmergency && (
+              <div style={{display:'flex',flexWrap:'wrap',gap:4,marginTop:5}}>
+                {nonEligible.map(p => <Chip key={p} label={p} active={value===p} color='#8090a0' onClick={() => pick(p)} />)}
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{display:'flex',gap:6,marginBottom:14,flexWrap:'wrap'}}>
+          {shiftsForDay.map(sh => (
+            <span key={sh} style={{
+              padding:'3px 10px', borderRadius:5, fontSize:11,
+              background: cellBg(values[sh]||'休', false),
+              color:'#2d2020', fontWeight:600,
+              outline: sh===activeShift ? '2px solid #6b8fab' : 'none',
+            }}>{sh}：{values[sh]||'休'}</span>
+          ))}
+        </div>
+
+        <div className="modal-btns">
+          <button className="s-btn s-btn-secondary" onClick={onClose}>取消</button>
+          <button className="s-btn s-btn-primary" onClick={() => onSave(values)}>儲存</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: AssistantView (週表格式)
+// ═══════════════════════════════════════════
+function AssistantView({ data, year, month, onUpdate, isLocked }) {
+  const [editTarget, setEditTarget] = useState(null);
+  const mk = monthKey(year, month);
+  const weeks = useMemo(() => getMonthWeeks(year, month), [year, month]);
+  const numWeeks = weeks.length;
+  const doctorSched = data.doctorSchedule?.[mk] || {};
+
+  function handleCellClick(asst, ds, shift) {
+    if (isLocked) return;
+    const current = getCellValue(data, mk, ds, shift, asst.name);
+    setEditTarget({ asst, dateStr: ds, shift, currentValue: current });
+  }
+
+  function handleSave(valueOrMap, applyAllDay) {
+    const { asst, dateStr, shift } = editTarget;
+    onUpdate(draft => {
+      if (!draft.schedule[mk]) draft.schedule[mk] = {};
+      if (!draft.schedule[mk][dateStr]) draft.schedule[mk][dateStr] = {};
+      const pairs = (valueOrMap && typeof valueOrMap === 'object' && !LEAVE_TYPES.includes(valueOrMap) && typeof valueOrMap !== 'string')
+        ? Object.entries(valueOrMap)
+        : (applyAllDay ? getShiftsForDate(dateStr) : [shift]).map(sh => [sh, valueOrMap]);
+      pairs.forEach(([sh, value]) => {
+        const isLeave = LEAVE_TYPES.includes(value) || value === '—';
+        if (isLeave) {
+          if (!draft.leaveRequests[mk]) draft.leaveRequests[mk] = {};
+          if (!draft.leaveRequests[mk][asst.name]) draft.leaveRequests[mk][asst.name] = {};
+          const existing = draft.leaveRequests[mk][asst.name][dateStr];
+          if (existing) { if (!existing.sessions.includes(sh)) existing.sessions.push(sh); existing.type = value; }
+          else { draft.leaveRequests[mk][asst.name][dateStr] = { type: value, sessions: [sh] }; }
+          if (draft.schedule[mk][dateStr][sh]) delete draft.schedule[mk][dateStr][sh][asst.name];
+        } else {
+          if (!draft.schedule[mk][dateStr][sh]) draft.schedule[mk][dateStr][sh] = {};
+          draft.schedule[mk][dateStr][sh][asst.name] = value;
+          const lv = draft.leaveRequests?.[mk]?.[asst.name]?.[dateStr];
+          if (lv) { lv.sessions = lv.sessions.filter(s => s !== sh); if (lv.sessions.length === 0) delete draft.leaveRequests[mk][asst.name][dateStr]; }
+        }
+      });
+    });
+    setEditTarget(null);
+  }
+
+  function getDayHeaderStyle(ds) {
+    const wd = weekday(ds);
+    const info = doctorSched[ds] || {};
+    if (wd === 0) return { background:'#eeeeee' };
+    if (wd === 6) return { background:'#fff9c4' };
+    if (info._note === '國定假日') return { background:'#fef2f2' };
+    if (info._note === '端午節') return { background:'#ffe0b2' };
+    if (info._note === '整日無診') return { background:'#fce4ec' };
+    return {};
+  }
+
+  const monthStats = useMemo(() =>
+    data.assistants.reduce((acc, a) => ({ ...acc, [a.name]: calcMonthStats(data, mk, a.name) }), {}),
+    [data, mk]);
+
+  return (
+    <div>
+      {/* Legend */}
+      <div className="legend">
+        <span style={{fontWeight:600,fontSize:12,marginRight:4}}>崗位：</span>
+        {Object.entries(POSITION_COLORS)
+          .filter(([pos]) => pos !== '流動' && pos !== '櫃檯')
+          .map(([pos,c]) => (
+            <div key={pos} className="legend-item">
+              <div className="legend-dot" style={{background:c}}/>
+              <span>{pos}</span>
+            </div>
+          ))}
+        <span style={{fontWeight:600,fontSize:12,marginLeft:8,marginRight:4}}>休假：</span>
+        {Object.entries(LEAVE_COLORS)
+          .filter(([k]) => k !== '—' && k !== '教育訓練')
+          .map(([t]) => {
+            const bg = cellBg(t, false);
+            const isWhite = bg === '#ffffff';
+            const isZhixiu = t === '指休';
+            return (
+              <div key={t} className="legend-item">
+                <div className="legend-dot" style={{
+                  background: bg,
+                  border: isZhixiu ? '1.5px solid #c0504d' : isWhite ? '1px solid #e57373' : undefined,
+                  boxSizing: 'border-box',
+                }}/>
+                <span style={{
+                  color: isWhite ? '#c62828' : isZhixiu ? '#b0322e' : undefined,
+                  fontWeight: (isWhite || isZhixiu) ? 700 : undefined,
+                }}>{t}</span>
+              </div>
+            );
+          })}
+      </div>
+
+      {weeks.map((wdates, wi) => {
+        const validDates = wdates.filter(Boolean);
+        if (validDates.length === 0) return null;
+        const firstD = validDates[0], lastD = validDates[validDates.length-1];
+        const [,fm,fd] = firstD.split('-'); const [,lm,ld] = lastD.split('-');
+
+        return (
+          <div className="week-block" key={wi}>
+            {/* Week header */}
+            <div className="week-header-row">
+              <span>W{wi+1}&nbsp;&nbsp;{parseInt(fm)}/{parseInt(fd)} ~ {parseInt(lm)}/{parseInt(ld)}</span>
+              <button className="ss-hide" onClick={async e => {
+                const block = e.currentTarget.closest('.week-block');
+                const label = `${String(year).slice(-2)}${String(month).padStart(2,'0')}_W${wi+1}`;
+                await captureWeekBlock(block, `排班_${label}.png`);
+              }} style={{
+                marginLeft:8, padding:'2px 9px', fontSize:11, fontWeight:600,
+                background:'rgba(255,255,255,0.22)', border:'1px solid rgba(255,255,255,0.5)',
+                borderRadius:4, color:'#fff', cursor:'pointer'
+              }}>截圖</button>
+              <span className="ss-hide week-header-right">點擊格子可編輯</span>
+            </div>
+
+            <div style={{overflowX:'auto'}}>
+              <table className="sched-table">
+                <colgroup>
+                  <col style={{width:64}}/>
+                  {wdates.flatMap((ds, i) => {
+                    const k = ds || `p${i}`;
+                    if (!ds) return [<col key={`${k}a`} style={{width:4}}/>,<col key={`${k}b`} style={{width:4}}/>,<col key={`${k}c`} style={{width:4}}/>];
+                    const wd = weekday(ds);
+                    if (wd === 0) return [<col key={`${k}a`} style={{width:18}}/>,<col key={`${k}b`} style={{width:18}}/>,<col key={`${k}c`} style={{width:18}}/>];
+                    if (wd === 6) return [<col key={`${k}a`}/>,<col key={`${k}b`}/>,<col key={`${k}c`} style={{width:18}}/>];
+                    return [<col key={`${k}a`}/>,<col key={`${k}b`}/>,<col key={`${k}c`}/>];
+                  })}
+                  <col style={{width:22}}/><col style={{width:22}}/><col style={{width:22}}/>
+                </colgroup>
+                <thead>
+                  {/* Row 1: date headers (colSpan=3 each) */}
+                  <tr>
+                    <th rowSpan={2} style={{background:'#e8eaf6',verticalAlign:'middle'}}>人員</th>
+                    {wdates.map((ds, i) => {
+                      if (!ds) return <th key={`p${i}`} colSpan={3} style={{background:'#f0f0f0'}}></th>;
+                      const wd = weekday(ds);
+                      const [,mm,dd] = ds.split('-');
+                      const info = doctorSched[ds] || {};
+                      const cross = isCrossMonth(ds, year, month);
+                      if (wd === 0) {
+                        return (
+                          <th key={ds} colSpan={3} rowSpan={2}
+                              style={{background:'#f5f5f5',color: cross ? '#ddd' : '#bbb',fontSize:11,textAlign:'center',verticalAlign:'middle',border:'1px solid #e0e4ef',borderLeft:'2px solid #9098b8', opacity: cross ? 0.38 : 1}}>
+                            <div style={{fontWeight:700}}>{parseInt(mm)}/{parseInt(dd)}</div>
+                            <div style={{fontSize:9}}>日</div>
+                          </th>
+                        );
+                      }
+                      if (cross) {
+                        return (
+                          <th key={ds} colSpan={3}
+                              style={{background:'#f2f2f4',padding:'3px 4px',verticalAlign:'middle',textAlign:'center',border:'1px solid #e0e0e6',borderLeft:'2px solid #9098b8', opacity:0.38}}>
+                            <div style={{fontSize:12,fontWeight:600,color:'#bbb'}}>{parseInt(mm)}/{parseInt(dd)}</div>
+                            <div style={{fontSize:10,color:'#ccc'}}>{WDAY_LABELS[wd===0?6:wd-1]}</div>
+                          </th>
+                        );
+                      }
+                      return (
+                        <th key={ds} colSpan={3}
+                            style={{...getDayHeaderStyle(ds),padding:'3px 4px',verticalAlign:'middle',textAlign:'center',border:'1px solid #d4d8ee',borderLeft:'2px solid #9098b8'}}>
+                          <div style={{fontSize:12,fontWeight:700}}>{parseInt(mm)}/{parseInt(dd)}</div>
+                          <div style={{fontSize:10,color:'#666'}}>{WDAY_LABELS[wd===0?6:wd-1]}</div>
+                          {info._note && <div style={{fontSize:9,color:'#b04040',fontWeight:600}}>{info._note}</div>}
+                        </th>
+                      );
+                    })}
+                    <th rowSpan={2} className="ss-hide" style={{background:'#d8eece',fontSize:10,verticalAlign:'middle'}}>早</th>
+                    <th rowSpan={2} className="ss-hide" style={{background:'#ccdaee',fontSize:10,verticalAlign:'middle'}}>午</th>
+                    <th rowSpan={2} className="ss-hide" style={{background:'#d8ccee',fontSize:10,verticalAlign:'middle'}}>晚</th>
+                  </tr>
+                  {/* Row 2: shift sub-headers with position status chips */}
+                  <tr>
+                    {wdates.flatMap((ds, i) => {
+                      if (!ds) return [<th key={`p${i}a`}/>,<th key={`p${i}b`}/>,<th key={`p${i}c`}/>];
+                      const wd = weekday(ds);
+                      if (wd === 0) return [];
+                      if (isCrossMonth(ds, year, month)) {
+                        return SHIFTS.map(sh => <th key={`${ds}${sh}`} style={{background:'#f2f2f4',border:'1px solid #e0e0e6',borderLeft:sh==='早'?'2px solid #9098b8':undefined, opacity:0.38}}/>);
+                      }
+                      const shiftsOk = wd === 6 ? SAT_SHIFTS : SHIFTS;
+                      return SHIFTS.map(sh => {
+                        if (!shiftsOk.includes(sh)) {
+                          return <th key={`${ds}${sh}`} style={{background:'#f0f2f8',border:'1px solid #e8eaf2'}}></th>;
+                        }
+                        const status = getShiftPositionStatus(data, mk, ds, sh);
+                        return (
+                          <th key={`${ds}${sh}`} style={{background:'#eceef8',padding:'1px 2px',verticalAlign:'top',border:'1px solid #d4d8ee',borderLeft:sh==='早'?'2px solid #9098b8':undefined}}>
+                            <div style={{fontSize:9,fontWeight:700,color:'#5568a8',textAlign:'center'}}>{sh}</div>
+                            {status && status.length > 0 && (
+                              <div className="pos-status-row" style={{justifyContent:'center',marginTop:1,flexWrap:'wrap',gap:'1px 3px',maxHeight:'20px',overflow:'hidden'}}>
+                                {status.map(({label,full,filled,extra},idx) => (
+                                  <span key={idx}
+                                    title={full}
+                                    style={{
+                                      fontSize:7,
+                                      fontWeight: filled ? 700 : 400,
+                                      color: filled ? SHIFT_COLORS[sh] : '#c4c6d0',
+                                      display:'inline-flex',
+                                      alignItems:'flex-end',
+                                      lineHeight:1.3,
+                                    }}>
+                                    {label}
+                                    <span style={{
+                                      fontSize:5.5,
+                                      minWidth:'5px',
+                                      display:'inline-block',
+                                      textAlign:'left',
+                                      color:'#c04040',
+                                      fontWeight:700,
+                                      lineHeight:1,
+                                      paddingBottom:1,
+                                    }}>{extra > 0 ? String(extra) : ''}</span>
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </th>
+                        );
+                      });
+                    })}
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.assistants.map(asst => {
+                    const ws = calcWeekStats(data, mk, wdates, asst.name);
+                    const target = data.sessionTargets?.[mk]?.[asst.name];
+                    const weeklyTarget = target ? Math.round(target / numWeeks) : null;
+                    return (
+                      <tr key={asst.id}>
+                        <td className="name-cell">
+                          <span className="color-bar" style={{background:asst.color}}/>
+                          {asst.name}
+                          {weeklyTarget !== null && (
+                            <div className="ss-hide" style={{fontSize:9,color: ws.total > weeklyTarget+1 ? '#c62828' : ws.total < weeklyTarget-1 ? '#e65100' : '#2e7d32',marginTop:1}}>
+                              {ws.total}/{weeklyTarget}診
+                            </div>
+                          )}
+                        </td>
+                        {wdates.flatMap((ds, i) => {
+                          if (!ds) return [<td key={`p${i}a`} style={{background:'#f5f5f5'}}/>,<td key={`p${i}b`} style={{background:'#f5f5f5'}}/>,<td key={`p${i}c`} style={{background:'#f5f5f5'}}/>];
+                          const wd = weekday(ds);
+                          if (isCrossMonth(ds, year, month)) {
+                            if (wd === 0) return [<td key={ds} colSpan={3} style={{background:'#f2f2f4',border:'1px solid #e8e8ec',borderLeft:'2px solid #9098b8', opacity:0.38}}/>];
+                            return SHIFTS.map(sh => (
+                              <td key={`${ds}${sh}`} style={{background: wd===6&&sh==='晚' ? '#eeeef0' : '#f2f2f4', border:'1px solid #e8e8ec', borderLeft:sh==='早'?'2px solid #9098b8':undefined, opacity:0.38}}/>
+                            ));
+                          }
+                          if (wd === 0) {
+                            return [<td key={ds} colSpan={3} className="day-cell is-sun" style={{borderLeft:'2px solid #9098b8'}}><div style={{color:'#ccc',textAlign:'center',padding:'4px 0',fontSize:10}}>休</div></td>];
+                          }
+                          const info = doctorSched[ds] || {};
+                          const isNatHoliday = info._note === '國定假日';
+                          const baseCls = wd===6?'day-cell is-sat'
+                            : isNatHoliday?'day-cell is-national-holiday'
+                            : info._note==='端午節'?'day-cell is-holiday'
+                            : info._note==='整日無診'?'day-cell is-no-doctor'
+                            : 'day-cell';
+                          const validShifts = wd === 6 ? SAT_SHIFTS : SHIFTS;
+                          const isFullRestDay = validShifts.every(sh => {
+                            let v = getCellValue(data, mk, ds, sh, asst.name);
+                            if (isNatHoliday && v === '休') v = '國定假日';
+                            return !v || v === '休' || v === '指休';
+                          });
+                          return SHIFTS.map(sh => {
+                            if (wd === 6 && sh === '晚') {
+                              return <td key={`${ds}${sh}`} style={{background:'#f0f2f8',border:'1px solid #e8eaf2'}}></td>;
+                            }
+                            let v = getCellValue(data, mk, ds, sh, asst.name);
+                            if (isNatHoliday && v === '休') v = '國定假日';
+                            return (
+                              <td key={`${ds}${sh}`} className={baseCls} style={{padding:2, borderLeft:sh==='早'?'2px solid #9098b8':undefined}}>
+                                <ShiftBlock shift={sh} value={v} onClick={() => handleCellClick(asst, ds, sh)} noLabel locked={isLocked} fullRestDay={isFullRestDay} isPartTime={asst.isPartTime}/>
+                              </td>
+                            );
+                          });
+                        })}
+                        <td className="stat-cell ss-hide" style={{color:'#4a7c33',fontWeight:700}}>{ws.早}</td>
+                        <td className="stat-cell ss-hide" style={{color:'#1e5799',fontWeight:700}}>{ws.午}</td>
+                        <td className="stat-cell ss-hide" style={{color:'#6d4c41',fontWeight:700}}>{ws.晚}</td>
+                      </tr>
+                    );
+                  })}
+                  {/* Remarks row */}
+                  <tr className="ss-hide">
+                    <td style={{padding:'2px 5px',fontSize:10,color:'#888',background:'#fafafa'}}>備註</td>
+                    {wdates.flatMap((ds, i) => {
+                      if (!ds) return [<td key={`p${i}r`} colSpan={3} style={{background:'#fafafa'}}/>];
+                      if (isCrossMonth(ds, year, month)) return [<td key={`${ds}r`} colSpan={3} style={{background:'#f2f2f4',border:'1px solid #e8e8ec', opacity:0.38}}/>];
+                      const remarks = getRemarks(data, mk, ds);
+                      const info = doctorSched[ds] || {};
+                      const note = info._note || '';
+                      return [
+                        <td key={`${ds}r`} colSpan={3} className="remark-cell">
+                          {note && <span style={{display:'inline-block',padding:'1px 6px',borderRadius:10,background:'#f5c8a8',color:'#2d2020',fontWeight:700,fontSize:11,marginRight:3}}>{note}</span>}
+                          {remarks.map((r,ri) => <span key={ri} style={{display:'inline-block',padding:'1px 6px',borderRadius:10,background:MORANDI_PINK,color:'#2d2020',fontWeight:700,fontSize:11,marginRight:2}}>{r}</span>)}
+                        </td>
+                      ];
+                    })}
+                    <td colSpan={3} className="ss-hide" style={{background:'#fafafa'}}></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Monthly totals */}
+      <div className="week-block">
+        <div className="week-header-row"><span>月統計合計</span></div>
+        <div style={{overflowX:'auto'}}>
+          <table className="stats-table" style={{minWidth:600}}>
+            <thead>
+              <tr>
+                <th className="name-col">人員</th>
+                <th>早診</th><th>午診</th><th>晚診</th>
+                <th>全天班</th><th>週六出勤</th><th>完整休息日</th>
+                <th>特休</th><th>指休</th><th>國定</th><th>教育訓練</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.assistants.filter(a => !a.isPartTime).map(a => {
+                const s = monthStats[a.name];
+                return (
+                  <tr key={a.id}>
+                    <td className="name-col"><span className="color-bar" style={{background:a.color,display:'inline-block',width:4,height:12,borderRadius:2,marginRight:4,verticalAlign:'middle'}}/>{a.name}</td>
+                    <td><span className="s-badge" style={{background:SHIFT_COLORS['早']}}>{s.早}</span></td>
+                    <td><span className="s-badge" style={{background:SHIFT_COLORS['午']}}>{s.午}</span></td>
+                    <td><span className="s-badge" style={{background:SHIFT_COLORS['晚']}}>{s.晚}</span></td>
+                    <td style={{fontWeight:s.全天>0?700:'normal',color:s.全天>0?'#e65100':'#999'}}>{s.全天}</td>
+                    <td>{s.週六}</td>
+                    <td style={{fontWeight:700,color:'#1a3a6e'}}>{s.完整休息}</td>
+                    <td style={{color:s.特休>0?LEAVE_COLORS['特休']:'#ccc'}}>{s.特休||'-'}</td>
+                    <td style={{color:s.指休>0?LEAVE_COLORS['指休']:'#ccc'}}>{s.指休||'-'}</td>
+                    <td style={{color:s.國定假日>0?LEAVE_COLORS['國定假日']:'#ccc'}}>{s.國定假日||'-'}</td>
+                    <td style={{color:s.教育訓練>0?LEAVE_COLORS['教育訓練']:'#ccc'}}>{s.教育訓練||'-'}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {editTarget && (
+        <EditCellModal
+          asst={editTarget.asst}
+          dateStr={editTarget.dateStr}
+          shift={editTarget.shift}
+          currentValue={editTarget.currentValue}
+          data={data}
+          mk={mk}
+          onSave={handleSave}
+          onClose={() => setEditTarget(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: EditPositionModal (崗位視角點選排班・多人可選)
+// ═══════════════════════════════════════════
+function EditPositionModal({ position, dateStr, shift, data, mk, onSave, onClose }) {
+  const info = data.doctorSchedule?.[mk]?.[dateStr] || {};
+  const isDoctorPos = (data.doctors||[]).includes(position);
+  const doctorHasSession = isDoctorPos && (info[shift]||[]).includes(position);
+  const sched = data.schedule?.[mk]?.[dateStr]?.[shift] || {};
+  const currentAssignees = Object.entries(sched).filter(([,p]) => p === position).map(([n]) => n);
+  const [selectedSet, setSelectedSet] = useState(() => new Set(currentAssignees));
+  function toggle(name) {
+    setSelectedSet(prev => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name); else next.add(name);
+      return next;
+    });
+  }
+
+  const eligible = data.assistants.filter(a => a.eligiblePositions.includes(position));
+  const notEligible = data.assistants.filter(a => !a.eligiblePositions.includes(position));
+  const [showNotEligible, setShowNotEligible] = useState(false);
+  const shiftColor = SHIFT_COLORS[shift] || '#2d4f8a';
+
+  function isOnLeave(name) {
+    const lv = data.leaveRequests?.[mk]?.[name]?.[dateStr];
+    return lv && (lv.sessions.includes(shift) || lv.sessions.includes('全'));
+  }
+  function otherPosForAsst(name) {
+    const pos = sched[name];
+    return (pos && isWorkValue(pos) && pos !== position) ? pos : null;
+  }
+
+  const wd = weekday(dateStr);
+  const [,mm,dd] = dateStr.split('-');
+  const dayLabel = `${parseInt(mm)}/${parseInt(dd)}（${WDAY_LABELS[wd===0?6:wd-1]}）${shift}診`;
+
+  function AsstBtn({ asst }) {
+    const onLeave = isOnLeave(asst.name);
+    const otherPos = otherPosForAsst(asst.name);
+    const isSelected = selectedSet.has(asst.name);
+    return (
+      <button onClick={() => { if (!onLeave) toggle(asst.name); }}
+        title={onLeave ? '休假中' : otherPos ? `已排：${otherPos}` : ''}
+        style={{
+          padding:'5px 10px', borderRadius:5, cursor:onLeave?'not-allowed':'pointer',
+          fontSize:12, fontWeight:isSelected?700:500,
+          background: isSelected ? asst.color : onLeave ? '#f0f0f0' : '#f2f4fc',
+          color: onLeave ? '#bbb' : isSelected ? '#fff' : '#333',
+          border: isSelected ? `2px solid ${asst.color}` : '2px solid #d8dcf0',
+          opacity: onLeave ? 0.55 : 1, transition:'all .1s',
+          display:'flex', alignItems:'center', gap:4,
+        }}>
+        {asst.name}
+        {onLeave && <span style={{fontSize:8,background:'#d88080',color:'#fff',padding:'1px 3px',borderRadius:2}}>休</span>}
+        {!onLeave && otherPos && <span style={{fontSize:8,color:'#888',background:'#e8e8e8',padding:'1px 3px',borderRadius:2}}>{otherPos}</span>}
+        {isSelected && <span style={{fontSize:9}}>✓</span>}
+      </button>
+    );
+  }
+
+  function handleSave() {
+    const added   = [...selectedSet].filter(n => !currentAssignees.includes(n));
+    const removed = currentAssignees.filter(n => !selectedSet.has(n));
+    onSave(position, dateStr, shift, added, removed);
+  }
+
+  return (
+    <div className="modal-bg" onClick={onClose}>
+      <div className="s-modal" style={{minWidth:340,maxWidth:'96vw'}} onClick={e => e.stopPropagation()}>
+        <h3 style={{fontSize:14}}>
+          <span style={{background:shiftColor,color:'#fff',padding:'2px 8px',borderRadius:4,marginRight:8,fontSize:12}}>
+            {position}
+          </span>
+          {dayLabel}
+        </h3>
+
+        {isDoctorPos && !doctorHasSession && (
+          <div style={{padding:'8px 10px',background:'#fdf4f4',borderRadius:5,fontSize:12,color:'#b04040',border:'1px solid #f0c8c8',marginBottom:12}}>
+            此醫師本診次未出診，仍可排班（緊急調度）。
+          </div>
+        )}
+
+        {/* Current assignees */}
+        <div style={{fontSize:12,marginBottom:10,display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
+          <span style={{color:'#888'}}>目前：</span>
+          {currentAssignees.length === 0
+            ? <span style={{color:'#bbb'}}>尚無人分配</span>
+            : currentAssignees.map(n => (
+                <span key={n} style={{background:'#e8f0fc',color:'#2d4f8a',padding:'2px 7px',borderRadius:10,fontSize:11,fontWeight:600}}>{n}</span>
+              ))
+          }
+          {JSON.stringify([...selectedSet].sort()) !== JSON.stringify(currentAssignees.slice().sort()) && (
+            <span style={{fontSize:11,color:'#5a7090',marginLeft:4}}>
+              → {[...selectedSet].length===0?'（清空）':[...selectedSet].join('、')}
+            </span>
+          )}
+        </div>
+
+        {/* Eligible */}
+        {eligible.length > 0 && (
+          <div style={{marginBottom:12}}>
+            <div style={{fontSize:11,color:'#2d4f8a',fontWeight:700,marginBottom:7}}>
+              可擔任此崗位
+              <span style={{fontWeight:400,color:'#aaa',marginLeft:6,fontSize:10}}>可多選・再點取消</span>
+            </div>
+            <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+              {eligible.map(a => <AsstBtn key={a.id} asst={a} />)}
+            </div>
+          </div>
+        )}
+
+        {/* Not-eligible expandable */}
+        {notEligible.length > 0 && (
+          <div style={{marginBottom:10}}>
+            <button onClick={() => setShowNotEligible(v=>!v)}
+              style={{background:'none',border:'none',cursor:'pointer',fontSize:11,color:'#aaa',padding:'2px 0',display:'flex',alignItems:'center',gap:4}}>
+              {showNotEligible?'▲':'▼'} 其他人員（資格外緊急調度）
+            </button>
+            {showNotEligible && (
+              <div style={{display:'flex',flexWrap:'wrap',gap:5,marginTop:6}}>
+                {notEligible.map(a => <AsstBtn key={a.id} asst={a} />)}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Clear all */}
+        <div style={{marginBottom:14}}>
+          <button onClick={() => setSelectedSet(new Set())}
+            style={{padding:'4px 10px',borderRadius:4,cursor:'pointer',fontSize:11,
+              background: selectedSet.size===0 ? '#e8e8ec' : '#fafafa',
+              border:'1px solid #ddd',color:'#888',fontWeight:selectedSet.size===0?700:400}}>
+            ✕ 清除所有指派
+          </button>
+        </div>
+
+        <div className="modal-btns">
+          <button className="s-btn s-btn-secondary" onClick={onClose}>取消</button>
+          <button className="s-btn s-btn-primary" onClick={handleSave}>儲存</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: PositionView (崗位視角)
+// ═══════════════════════════════════════════
+function PositionView({ data, year, month, onUpdate, isLocked }) {
+  const mk = monthKey(year, month);
+  const [weekIdx, setWeekIdx] = useState(0);
+  const [editTarget, setEditTarget] = useState(null); // { position, dateStr, shift }
+  const weeks = useMemo(() => getMonthWeeks(year, month), [year, month]);
+  const wdates = weeks[weekIdx] || [];
+  const doctorSched = data.doctorSchedule?.[mk] || {};
+
+  // All positions: doctors that appear in the month + fixed positions
+  const usedDoctors = useMemo(() => {
+    const set = new Set();
+    Object.values(doctorSched).forEach(day => {
+      ['早','午','晚'].forEach(sh => (day[sh]||[]).forEach(d => set.add(d)));
+    });
+    return Array.from(set);
+  }, [doctorSched]);
+
+  const allPositions = [...usedDoctors, ...FIXED_POSITIONS];
+
+  function getAssigned(position, ds, shift) {
+    const daySched = data.schedule?.[mk]?.[ds]?.[shift] || {};
+    return Object.entries(daySched)
+      .filter(([,pos]) => pos === position)
+      .map(([name]) => name);
+  }
+
+  function handlePositionSave(position, dateStr, shift, added, removed) {
+    onUpdate(draft => {
+      if (!draft.schedule[mk]) draft.schedule[mk] = {};
+      if (!draft.schedule[mk][dateStr]) draft.schedule[mk][dateStr] = {};
+      if (!draft.schedule[mk][dateStr][shift]) draft.schedule[mk][dateStr][shift] = {};
+      // Remove deselected
+      removed.forEach(name => {
+        if (draft.schedule[mk][dateStr][shift][name] === position) {
+          delete draft.schedule[mk][dateStr][shift][name];
+        }
+      });
+      // Add newly selected
+      added.forEach(name => {
+        draft.schedule[mk][dateStr][shift][name] = position;
+        const lv = draft.leaveRequests?.[mk]?.[name]?.[dateStr];
+        if (lv) {
+          lv.sessions = lv.sessions.filter(s => s !== shift);
+          if (lv.sessions.length === 0) delete draft.leaveRequests[mk][name][dateStr];
+        }
+      });
+    });
+    setEditTarget(null);
+  }
+
+  const validDates = wdates.filter(Boolean);
+  const firstD = validDates[0], lastD = validDates[validDates.length-1];
+  if (!firstD) return null;
+  const [,fm,fd] = firstD.split('-'); const [,lm,ld] = lastD.split('-');
+
+  const SH_BG = { '早':'#e8f0fa','午':'#dce8f5','晚':'#d0dcf0' };
+  const SH_HDR = { '早':'#c4d8f0','午':'#b4cce8','晚':'#a4bce0' };
+
+  return (
+    <div>
+      {/* Week navigation */}
+      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10,flexWrap:'wrap'}}>
+        {weeks.map((wd2,i) => {
+          const vd = wd2.filter(Boolean);
+          if (vd.length === 0) return null;
+          const [,m1,d1] = vd[0].split('-');
+          return (
+            <button key={i} onClick={() => setWeekIdx(i)}
+              style={{padding:'4px 12px',border:'1px solid',borderRadius:5,cursor:'pointer',fontSize:12,
+                background:weekIdx===i?'#2d4f8a':'white',
+                color:weekIdx===i?'#fff':'#444',
+                borderColor:weekIdx===i?'#2d4f8a':'#c8cce0',
+                fontWeight:weekIdx===i?700:'normal',
+              }}>
+              W{i+1} ({parseInt(m1)}/{parseInt(d1)})
+            </button>
+          );
+        })}
+        <span style={{fontSize:11,color:'#888',marginLeft:4}}>點選格子可指派助理</span>
+      </div>
+
+      <div className="week-block">
+        <div className="week-header-row">
+          <span>崗位視角 — W{weekIdx+1}&nbsp;&nbsp;{parseInt(fm)}/{parseInt(fd)} ~ {parseInt(lm)}/{parseInt(ld)}</span>
+        </div>
+        <div style={{overflowX:'auto'}}>
+          <table className="pos-table">
+            <thead>
+              <tr>
+                <th className="pos-name">崗位</th>
+                {wdates.map((ds,i) => {
+                  if (!ds) return null;
+                  const wd = weekday(ds);
+                  if (wd === 0) return null;
+                  const shiftsForDay = wd === 6 ? SAT_SHIFTS : SHIFTS;
+                  const [,mm,dd] = ds.split('-');
+                  return shiftsForDay.map(sh => (
+                    <th key={ds+sh} style={{
+                      background: SH_HDR[sh],
+                      fontSize:10, whiteSpace:'nowrap', padding:'4px 3px',
+                    }}>
+                      {parseInt(mm)}/{parseInt(dd)}<br/>
+                      <span style={{color:SHIFT_COLORS[sh],fontWeight:700}}>{sh}</span>
+                    </th>
+                  ));
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {allPositions.map(pos => (
+                <tr key={pos}>
+                  <td className="pos-name">{pos}</td>
+                  {wdates.map((ds,i) => {
+                    if (!ds) return null;
+                    const wd = weekday(ds);
+                    if (wd === 0) return null;
+                    const shiftsForDay = wd === 6 ? SAT_SHIFTS : SHIFTS;
+                    return shiftsForDay.map(sh => {
+                      const info = doctorSched[ds] || {};
+                      const isDoctorPos = data.doctors.includes(pos);
+                      const doctorHasSession = isDoctorPos && (info[sh]||[]).includes(pos);
+                      const assignedNames = getAssigned(pos, ds, sh);
+                      const inactive = isDoctorPos && !doctorHasSession;
+                      return (
+                        <td key={ds+sh} className="pos-cell"
+                          onClick={() => !inactive && !isLocked && setEditTarget({ position: pos, dateStr: ds, shift: sh })}
+                          style={{
+                            background: inactive ? '#f6f6f8' : SH_BG[sh],
+                            cursor: inactive || isLocked ? 'default' : 'pointer',
+                            padding:'3px 5px', textAlign:'center',
+                          }}>
+                          {inactive
+                            ? <span className="pos-cell-empty">—</span>
+                            : assignedNames.length > 0
+                              ? <span className="pos-cell-names" style={{
+                                  color: SHIFT_COLORS[sh],
+                                  fontWeight:700,
+                                  fontSize:11,
+                                }}>{assignedNames.join('、')}</span>
+                              : <span className="pos-cell-empty" style={{color:'#ccc',fontSize:16,lineHeight:'1'}}>+</span>
+                          }
+                        </td>
+                      );
+                    });
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {editTarget && (
+        <EditPositionModal
+          position={editTarget.position}
+          dateStr={editTarget.dateStr}
+          shift={editTarget.shift}
+          data={data}
+          mk={mk}
+          onSave={handlePositionSave}
+          onClose={() => setEditTarget(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: DoctorScheduleView
+// ═══════════════════════════════════════════
+function DoctorScheduleView({ data, year, month, onUpdate }) {
+  const mk = monthKey(year, month);
+  const [tab, setTab] = useState('calendar'); // 'pattern' | 'calendar'
+  const doctorSched = data.doctorSchedule?.[mk] || {};
+  const [newDocName, setNewDocName] = useState('');
+  const [showAddDoc, setShowAddDoc] = useState(false);
+
+  function addDoctor() {
+    const name = newDocName.trim();
+    if (!name || data.doctors.includes(name)) return;
+    onUpdate(draft => {
+      draft.doctors.push(name);
+      if (!draft.doctorPatterns[name]) draft.doctorPatterns[name] = {};
+    });
+    setNewDocName(''); setShowAddDoc(false);
+  }
+
+  function removeDoctor(docName) {
+    if (!confirm(`確定刪除醫師「${docName}」？\n注意：不影響已排的班表記錄，但規律設定會保留以供恢復。`)) return;
+    onUpdate(draft => {
+      draft.doctors = draft.doctors.filter(d => d !== docName);
+    });
+  }
+
+  function togglePattern(doctor, wd, shift) {
+    onUpdate(draft => {
+      if (!draft.doctorPatterns[doctor]) draft.doctorPatterns[doctor] = {};
+      const arr = draft.doctorPatterns[doctor][wd] || [];
+      if (arr.includes(shift)) {
+        draft.doctorPatterns[doctor][wd] = arr.filter(s => s !== shift);
+      } else {
+        draft.doctorPatterns[doctor][wd] = [...arr, shift].sort((a,b) => SHIFTS.indexOf(a)-SHIFTS.indexOf(b));
+      }
+    });
+  }
+
+  function generateFromPattern() {
+    onUpdate(draft => {
+      if (!draft.doctorSchedule) draft.doctorSchedule = {};
+      const gen = {};
+      const total = daysInMonth(year, month);
+      for (let d = 1; d <= total; d++) {
+        const ds = fmtDate(year, month, d);
+        const wd = weekday(ds); // 0=Sun
+        if (wd === 0) { gen[ds] = {早:[],午:[],晚:[]}; continue; }
+        const wdKey = String(wd); // 1=Mon..6=Sat
+        const dayEntry = {早:[],午:[],晚:[]};
+        data.doctors.forEach(doc => {
+          const pattern = draft.doctorPatterns[doc] || {};
+          (pattern[wdKey] || []).forEach(sh => { dayEntry[sh] = [...(dayEntry[sh]||[]), doc]; });
+        });
+        gen[ds] = dayEntry;
+      }
+      draft.doctorSchedule[mk] = gen;
+    });
+  }
+
+  function setDayNote(ds, note) {
+    onUpdate(draft => {
+      if (!draft.doctorSchedule[mk]) draft.doctorSchedule[mk] = {};
+      if (!draft.doctorSchedule[mk][ds]) draft.doctorSchedule[mk][ds] = {早:[],午:[],晚:[]};
+      if (note) draft.doctorSchedule[mk][ds]._note = note;
+      else delete draft.doctorSchedule[mk][ds]._note;
+    });
+  }
+
+  function toggleDateShift(doc, ds, shift) {
+    onUpdate(draft => {
+      if (!draft.doctorSchedule[mk]) draft.doctorSchedule[mk] = {};
+      if (!draft.doctorSchedule[mk][ds]) draft.doctorSchedule[mk][ds] = {早:[],午:[],晚:[]};
+      const arr = draft.doctorSchedule[mk][ds][shift] || [];
+      if (arr.includes(doc)) {
+        draft.doctorSchedule[mk][ds][shift] = arr.filter(d => d !== doc);
+      } else {
+        draft.doctorSchedule[mk][ds][shift] = [...arr, doc];
+      }
+    });
+  }
+
+  const weeks = useMemo(() => getMonthWeeks(year, month), [year, month]);
+
+  return (
+    <div>
+      <div style={{display:'flex',gap:8,marginBottom:12,alignItems:'center'}}>
+        <button onClick={() => setTab('pattern')} className={`content-tab${tab==='pattern'?' active':''}`}>週期規律設定</button>
+        <button onClick={() => setTab('calendar')} className={`content-tab${tab==='calendar'?' active':''}`}>月曆覆蓋</button>
+        {tab==='calendar' && (
+          <button onClick={generateFromPattern} style={{marginLeft:8,padding:'4px 14px',border:'1px solid #1a3a6e',background:'#e8eaf6',borderRadius:4,cursor:'pointer',fontSize:12,fontWeight:600,color:'#1a3a6e'}}>
+            從規律產生本月班表
+          </button>
+        )}
+      </div>
+
+      {tab === 'pattern' && (
+        <div className="section-card">
+          <h3 style={{display:'flex',alignItems:'center',gap:10}}>
+            醫師每週固定規律
+            <button onClick={() => setShowAddDoc(v=>!v)}
+              style={{padding:'3px 10px',fontSize:11,fontWeight:600,background:'#e8f0fc',border:'1px solid #b0c4e0',
+                borderRadius:4,cursor:'pointer',color:'#2d4f8a',marginLeft:'auto'}}>
+              ＋ 新增醫師
+            </button>
+          </h3>
+
+          {/* Add doctor form */}
+          {showAddDoc && (
+            <div style={{background:'#f4f6fc',borderRadius:6,padding:'10px 12px',marginBottom:12,display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
+              <input value={newDocName} onChange={e => setNewDocName(e.target.value)}
+                onKeyDown={e => e.key==='Enter' && addDoctor()}
+                placeholder="醫師姓名…"
+                style={{padding:'5px 8px',border:'1px solid #c8d0e8',borderRadius:4,fontSize:13,width:130}}/>
+              <button onClick={addDoctor} className="s-btn s-btn-primary" style={{padding:'4px 14px',fontSize:12}}>新增</button>
+              <button onClick={() => { setShowAddDoc(false); setNewDocName(''); }}
+                className="s-btn s-btn-secondary" style={{padding:'4px 12px',fontSize:12}}>取消</button>
+              {data.doctors.includes(newDocName.trim()) && newDocName.trim() && (
+                <span style={{fontSize:11,color:'#b04040'}}>已存在此名稱</span>
+              )}
+            </div>
+          )}
+
+          {/* Doctor list management */}
+          <div style={{display:'flex',flexWrap:'wrap',gap:5,marginBottom:12}}>
+            {data.doctors.map(doc => (
+              <span key={doc} style={{display:'inline-flex',alignItems:'center',gap:4,
+                background:'#eceef8',borderRadius:12,padding:'3px 10px',fontSize:12,fontWeight:500}}>
+                {doc}
+                <span onClick={() => removeDoctor(doc)}
+                  style={{cursor:'pointer',color:'#b04040',fontWeight:700,fontSize:12,lineHeight:1,padding:'0 2px'}}>×</span>
+              </span>
+            ))}
+          </div>
+          <div style={{overflowX:'auto'}}>
+            <table className="doc-pattern-table">
+              <thead>
+                <tr>
+                  <th style={{minWidth:70}}>醫師</th>
+                  {['週一','週二','週三','週四','週五','週六'].map((d,i) => (
+                    <th key={i}>{d}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {data.doctors.map(doc => (
+                  <tr key={doc}>
+                    <td style={{fontWeight:600,textAlign:'left',paddingLeft:8}}>{doc}</td>
+                    {['1','2','3','4','5','6'].map(wd => {
+                      const arr = data.doctorPatterns?.[doc]?.[wd] || [];
+                      return (
+                        <td key={wd}>
+                          <div className="shift-check">
+                            {SHIFTS.map(sh => (
+                              <label key={sh} style={{color: arr.includes(sh) ? SHIFT_COLORS[sh] : '#7080a0', fontWeight: arr.includes(sh) ? 700 : 400}}>
+                                <input type="checkbox" checked={arr.includes(sh)}
+                                  onChange={() => togglePattern(doc, wd, sh)}
+                                  style={{marginRight:2,accentColor: SHIFT_COLORS[sh]}}/>
+                                {sh}
+                              </label>
+                            ))}
+                          </div>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {tab === 'calendar' && (
+        <div>
+          <div className="alert alert-warn" style={{marginBottom:10}}>
+            點擊醫師名稱可切換出診/不出診。修改後不影響規律，只影響本月。
+          </div>
+          {weeks.map((wdates, wi) => {
+            const validDates = wdates.filter(Boolean);
+            if (!validDates.length) return null;
+            const [,fm,fd] = validDates[0].split('-');
+            return (
+              <div className="week-block" key={wi} style={{marginBottom:10}}>
+                <div className="week-header-row"><span>W{wi+1} ({parseInt(fm)}/{parseInt(fd)}~)</span></div>
+                <div style={{overflowX:'auto'}}>
+                  <table className="doc-pattern-table" style={{minWidth:300}}>
+                    <thead>
+                      <tr>
+                        <th>醫師</th>
+                        {wdates.map((ds,i) => {
+                          if (!ds) return <th key={i} style={{background:'#f5f5f5'}}>—</th>;
+                          const wd = weekday(ds);
+                          const [,mm,dd] = ds.split('-');
+                          return (
+                            <th key={ds} style={{background:wd===0?'#eee':wd===6?'#fffde7':'#e8eaf6'}}>
+                              {parseInt(mm)}/{parseInt(dd)}<br/>
+                              <span style={{fontWeight:400,fontSize:10}}>{WDAY_LABELS[wd===0?6:wd-1]}</span>
+                            </th>
+                          );
+                        })}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.doctors.map(doc => (
+                        <tr key={doc}>
+                          <td style={{fontWeight:600,textAlign:'left',paddingLeft:6,fontSize:12}}>{doc}</td>
+                          {wdates.map((ds,i) => {
+                            if (!ds) return <td key={i} style={{background:'#f5f5f5'}}></td>;
+                            const wd = weekday(ds);
+                            if (wd === 0) return <td key={ds} style={{background:'#eee'}}></td>;
+                            const info = doctorSched[ds] || {};
+                            const shiftsForDay = wd === 6 ? SAT_SHIFTS : SHIFTS;
+                            return (
+                              <td key={ds} style={{padding:'3px'}}>
+                                <div style={{display:'flex',gap:3,justifyContent:'center'}}>
+                                  {shiftsForDay.map(sh => {
+                                    const has = (info[sh]||[]).includes(doc);
+                                    return (
+                                      <div key={sh} onClick={() => toggleDateShift(doc, ds, sh)}
+                                        style={{padding:'2px 6px',borderRadius:3,cursor:'pointer',fontSize:11,
+                                          background: has ? SHIFT_COLORS[sh] : '#edf0f8',
+                                          color: has ? '#fff' : '#8898c0',
+                                          fontWeight: has ? 700 : 500,
+                                          border: has ? 'none' : '1px solid #d0d8ea'}}>
+                                        {sh}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                      {/* 特殊日標注列 */}
+                      <tr className="special-row" style={{borderTop:'2px solid #e0e4f0'}}>
+                        <td style={{fontSize:11,color:'#888',fontWeight:600,paddingLeft:6,paddingTop:3}}>特殊日</td>
+                        {wdates.map((ds,i) => {
+                          if (!ds) return <td key={i} style={{background:'#f5f5f5'}}></td>;
+                          const wd = weekday(ds);
+                          if (wd === 0) return <td key={ds} style={{background:'#eee'}}></td>;
+                          const note = (doctorSched[ds] || {})._note || '';
+                          const btn = (label, val, activeStyle) => (
+                            <button key={val} onClick={() => setDayNote(ds, note===val ? '' : val)} style={{
+                              padding:'1px 5px', borderRadius:3, cursor:'pointer', fontSize:10, fontWeight:600,
+                              border:'1px solid', marginRight:2,
+                              ...(note===val ? activeStyle : {background:'#f5f5f5',borderColor:'#ddd',color:'#aaa'}),
+                            }}>{label}</button>
+                          );
+                          return (
+                            <td key={ds} style={{padding:'2px 3px',textAlign:'center',verticalAlign:'middle'}}>
+                              {btn('國定','國定假日',{background:'#fef2f2',borderColor:'#e57373',color:'#c62828'})}
+                              {btn('無診','整日無診',{background:'#fce4ec',borderColor:'#e091a0',color:'#880e4f'})}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: AssistantManager
+// ═══════════════════════════════════════════
+function AssistantManager({ data, year, month, onUpdate }) {
+  const mk = monthKey(year, month);
+  const [editingId, setEditingId] = useState(null);
+  const [addMode, setAddMode] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newColor, setNewColor] = useState('#43a047');
+  const [showLeave, setShowLeave] = useState(null); // asstName
+  const [leaveDate, setLeaveDate] = useState('');
+  const [leaveType, setLeaveType] = useState('特休');
+  const [leaveSessions, setLeaveSessions] = useState(['早','午','晚']);
+  const [monthTarget, setMonthTarget] = useState('');
+  const [editingNameId, setEditingNameId] = useState(null);
+  const [tempName, setTempName] = useState('');
+  const [dragIdx, setDragIdx] = useState(null);
+
+  const allPositions = [...FIXED_POSITIONS, ...data.doctors];
+  const numWeeks = getMonthWeeks(year, month).length;
+
+  function addAssistant() {
+    if (!newName.trim()) return;
+    onUpdate(d => {
+      d.assistants.push({
+        id: 'a'+Date.now(), name: newName.trim(),
+        eligiblePositions: [], color: newColor, isPartTime: false,
+        isReceptionist: false, activeFrom: null, activeTo: null,
+        adminClinic: { enabled: false, days: 1, frequency: 'weekly' },
+      });
+    });
+    setNewName(''); setAddMode(false);
+  }
+
+  function removeAssistant(id) {
+    if (!confirm('確定刪除此助理？')) return;
+    onUpdate(d => { d.assistants = d.assistants.filter(a => a.id !== id); });
+  }
+
+  function togglePosition(id, pos) {
+    onUpdate(d => {
+      const a = d.assistants.find(x => x.id === id);
+      if (!a) return;
+      if (a.eligiblePositions.includes(pos)) {
+        a.eligiblePositions = a.eligiblePositions.filter(p => p !== pos);
+      } else {
+        a.eligiblePositions = [...a.eligiblePositions, pos];
+      }
+    });
+  }
+
+  function addLeave(asstName) {
+    if (!leaveDate) return;
+    onUpdate(d => {
+      if (!d.leaveRequests[mk]) d.leaveRequests[mk] = {};
+      if (!d.leaveRequests[mk][asstName]) d.leaveRequests[mk][asstName] = {};
+      d.leaveRequests[mk][asstName][leaveDate] = { type: leaveType, sessions: [...leaveSessions] };
+    });
+    setLeaveDate('');
+  }
+
+  function removeLeave(asstName, ds) {
+    onUpdate(d => {
+      if (d.leaveRequests?.[mk]?.[asstName]) {
+        delete d.leaveRequests[mk][asstName][ds];
+      }
+    });
+  }
+
+  function saveTarget(asstName, val) {
+    const n = parseInt(val);
+    if (isNaN(n)) return;
+    onUpdate(d => {
+      if (!d.sessionTargets[mk]) d.sessionTargets[mk] = {};
+      d.sessionTargets[mk][asstName] = n;
+    });
+  }
+
+  function saveRename(id, oldName, newName) {
+    const trimmed = newName.trim();
+    if (!trimmed || trimmed === oldName) { setEditingNameId(null); return; }
+    onUpdate(d => {
+      const a = d.assistants.find(x => x.id === id);
+      if (!a) return;
+      a.name = trimmed;
+      // Migrate schedule keys
+      Object.keys(d.schedule).forEach(mkey => {
+        Object.keys(d.schedule[mkey]).forEach(ds => {
+          Object.keys(d.schedule[mkey][ds]).forEach(sh => {
+            if (d.schedule[mkey][ds][sh][oldName] !== undefined) {
+              d.schedule[mkey][ds][sh][trimmed] = d.schedule[mkey][ds][sh][oldName];
+              delete d.schedule[mkey][ds][sh][oldName];
+            }
+          });
+        });
+      });
+      // Migrate leaveRequests keys
+      Object.keys(d.leaveRequests).forEach(mkey => {
+        if (d.leaveRequests[mkey][oldName] !== undefined) {
+          d.leaveRequests[mkey][trimmed] = d.leaveRequests[mkey][oldName];
+          delete d.leaveRequests[mkey][oldName];
+        }
+      });
+      // Migrate sessionTargets keys
+      Object.keys(d.sessionTargets).forEach(mkey => {
+        if (d.sessionTargets[mkey][oldName] !== undefined) {
+          d.sessionTargets[mkey][trimmed] = d.sessionTargets[mkey][oldName];
+          delete d.sessionTargets[mkey][oldName];
+        }
+      });
+    });
+    setEditingNameId(null);
+  }
+
+  return (
+    <div>
+      {/* 月設定：完整休息日天數 */}
+      <div className="section-card" style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}}>
+        <h3 style={{margin:0,border:'none',padding:0}}>{year}年{month}月 設定</h3>
+        <span style={{fontSize:13,fontWeight:600,color:'#555'}}>本月完整休息日天數：</span>
+        <input type="number" min={0} max={15}
+          value={data.restDays?.[mk] ?? ''}
+          placeholder={String(DEFAULT_REST_DAYS)}
+          onChange={e => onUpdate(d => { if(!d.restDays) d.restDays={}; const v=e.target.value; if(v==='') delete d.restDays[mk]; else d.restDays[mk]=Math.max(0,+v); })}
+          style={{width:64,padding:'4px 8px',border:'1px solid #ccc',borderRadius:4,fontSize:13}}/>
+        <span style={{fontSize:11,color:'#999'}}>（每位全職本月應有的完整休息日數；留空＝預設 {DEFAULT_REST_DAYS}）</span>
+      </div>
+
+      {/* Add new assistant */}
+      <div className="section-card">
+        <h3>助理名單管理</h3>
+        {addMode ? (
+          <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
+            <input value={newName} onChange={e => setNewName(e.target.value)}
+              placeholder="輸入姓名" style={{padding:'5px 8px',border:'1px solid #ccc',borderRadius:4,fontSize:13}}/>
+            <input type="color" value={newColor} onChange={e => setNewColor(e.target.value)} style={{width:36,height:28,border:'none',cursor:'pointer'}}/>
+            <button className="s-btn s-btn-primary" onClick={addAssistant}>新增</button>
+            <button className="s-btn s-btn-secondary" onClick={() => setAddMode(false)}>取消</button>
+          </div>
+        ) : (
+          <button className="s-btn s-btn-primary" onClick={() => setAddMode(true)}>+ 新增助理</button>
+        )}
+      </div>
+
+      {data.assistants.map((asst, idx) => {
+        const leaves = data.leaveRequests?.[mk]?.[asst.name] || {};
+        const target = data.sessionTargets?.[mk]?.[asst.name] || '';
+        const weeklyTarget = target ? Math.round(target / numWeeks) : null;
+
+        return (
+          <div className="s-asst-card" key={asst.id}
+            draggable={true}
+            onDragStart={() => setDragIdx(idx)}
+            onDragOver={e => e.preventDefault()}
+            onDrop={() => { onUpdate(d => { const arr=[...d.assistants]; const [m]=arr.splice(dragIdx,1); arr.splice(idx,0,m); d.assistants=arr; }); setDragIdx(null); }}>
+            <h4>
+              <span style={{cursor:'grab',fontSize:16,color:'#bbb',marginRight:6,userSelect:'none'}}>≡</span>
+              <span style={{display:'inline-block',width:14,height:14,borderRadius:3,background:asst.color,marginRight:6,verticalAlign:'middle'}}/>
+              {editingNameId === asst.id ? (
+                <input
+                  value={tempName}
+                  onChange={e => setTempName(e.target.value)}
+                  onBlur={() => saveRename(asst.id, asst.name, tempName)}
+                  onKeyDown={e => { if (e.key === 'Enter') saveRename(asst.id, asst.name, tempName); if (e.key === 'Escape') setEditingNameId(null); }}
+                  autoFocus
+                  style={{padding:'2px 6px',border:'1px solid #aac',borderRadius:3,fontSize:13,width:90}}
+                />
+              ) : (
+                <>
+                  {asst.name}
+                  <button onClick={() => { setEditingNameId(asst.id); setTempName(asst.name); }}
+                    style={{background:'none',border:'none',cursor:'pointer',fontSize:12,color:'#888',marginLeft:5,padding:'0 2px'}}
+                    title="編輯姓名">✏</button>
+                </>
+              )}
+              <label style={{fontSize:11,display:'inline-flex',alignItems:'center',gap:3,marginLeft:10,cursor:'pointer',
+                color: asst.isPartTime ? '#8a6a3a' : '#aaa', fontWeight: asst.isPartTime ? 700 : 400}}>
+                <input type="checkbox" checked={!!asst.isPartTime}
+                  onChange={e => onUpdate(d => { const a=d.assistants.find(x=>x.id===asst.id); if(a) a.isPartTime=e.target.checked; })}/>
+                兼職
+              </label>
+              <label style={{fontSize:11,display:'inline-flex',alignItems:'center',gap:3,marginLeft:8,cursor:'pointer',
+                color: asst.isReceptionist ? '#6b9478' : '#aaa', fontWeight: asst.isReceptionist ? 700 : 400}}>
+                <input type="checkbox" checked={!!asst.isReceptionist}
+                  onChange={e => onUpdate(d => { const a=d.assistants.find(x=>x.id===asst.id); if(a) a.isReceptionist=e.target.checked; })}/>
+                櫃檯專職
+              </label>
+              <input type="color" value={asst.color}
+                onChange={e => onUpdate(d => { const a = d.assistants.find(x=>x.id===asst.id); if(a) a.color=e.target.value; })}
+                style={{width:24,height:22,border:'none',cursor:'pointer',borderRadius:2,marginLeft:8}}
+                title="更改顏色"/>
+              <button className="s-btn s-btn-danger" style={{marginLeft:'auto',padding:'2px 10px',fontSize:11}}
+                onClick={() => removeAssistant(asst.id)}>刪除</button>
+            </h4>
+
+            {/* Month session target */}
+            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:10,fontSize:12}}>
+              <span>本月目標診次：</span>
+              <input type="number" min={0} max={100}
+                defaultValue={target}
+                key={asst.id+mk}
+                onBlur={e => saveTarget(asst.name, e.target.value)}
+                style={{width:60,padding:'3px 6px',border:'1px solid #ccc',borderRadius:4,fontSize:12}}
+                placeholder="總診次"/>
+              {weeklyTarget !== null && (
+                <span style={{color:'#555'}}>→ 每週目標 {weeklyTarget} 診</span>
+              )}
+            </div>
+
+            {/* 在職區間 + 行政診設定 */}
+            <div style={{display:'flex',alignItems:'center',gap:14,marginBottom:10,fontSize:12,flexWrap:'wrap',
+              background:'#f7f8fc',borderRadius:6,padding:'8px 10px'}}>
+              <span style={{fontWeight:600,color:'#555'}}>在職區間：</span>
+              <input type="month" value={asst.activeFrom || ''}
+                onChange={e => onUpdate(d => { const a=d.assistants.find(x=>x.id===asst.id); if(a) a.activeFrom=e.target.value||null; })}
+                style={{padding:'2px 4px',border:'1px solid #ccc',borderRadius:4,fontSize:12}}/>
+              <span style={{color:'#999'}}>~</span>
+              <input type="month" value={asst.activeTo || ''}
+                onChange={e => onUpdate(d => { const a=d.assistants.find(x=>x.id===asst.id); if(a) a.activeTo=e.target.value||null; })}
+                style={{padding:'2px 4px',border:'1px solid #ccc',borderRadius:4,fontSize:12}}/>
+              <span style={{fontSize:10,color:'#aaa'}}>(留空＝不限)</span>
+              {!isAsstActive(asst, mk) && <span style={{fontSize:11,color:'#c0504d',fontWeight:700}}>本月未在職</span>}
+            </div>
+
+            {/* 行政診設定 */}
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10,fontSize:12,flexWrap:'wrap'}}>
+              <label style={{display:'inline-flex',alignItems:'center',gap:4,cursor:'pointer',fontWeight:600,
+                color: asst.adminClinic?.enabled ? '#8fa888' : '#888'}}>
+                <input type="checkbox" checked={!!asst.adminClinic?.enabled}
+                  onChange={e => onUpdate(d => { const a=d.assistants.find(x=>x.id===asst.id); if(a){ a.adminClinic={...(a.adminClinic||{days:1,frequency:'weekly'}),enabled:e.target.checked}; } })}/>
+                安排行政診
+              </label>
+              {asst.adminClinic?.enabled && (
+                <>
+                  <span>天數</span>
+                  <input type="number" min={1} max={31} value={asst.adminClinic?.days ?? 1}
+                    onChange={e => onUpdate(d => { const a=d.assistants.find(x=>x.id===asst.id); if(a){ a.adminClinic={...a.adminClinic,days:Math.max(1,+e.target.value||1)}; } })}
+                    style={{width:48,padding:'2px 4px',border:'1px solid #ccc',borderRadius:4,fontSize:12}}/>
+                  <span>頻率</span>
+                  <select value={asst.adminClinic?.frequency || 'weekly'}
+                    onChange={e => onUpdate(d => { const a=d.assistants.find(x=>x.id===asst.id); if(a){ a.adminClinic={...a.adminClinic,frequency:e.target.value}; } })}
+                    style={{padding:'2px 4px',border:'1px solid #ccc',borderRadius:4,fontSize:12}}>
+                    <option value="weekly">每週</option>
+                    <option value="monthly">每月共計</option>
+                    <option value="monthStart">月初</option>
+                    <option value="monthEnd">月底</option>
+                  </select>
+                  <span style={{fontSize:10,color:'#aaa'}}>
+                    {asst.adminClinic?.frequency==='weekly' ? '每週前 N 個工作日排行政'
+                      : asst.adminClinic?.frequency==='monthly' ? '整月共 N 天平均分散'
+                      : asst.adminClinic?.frequency==='monthStart' ? '月初連續 N 個工作日'
+                      : '月底連續 N 個工作日'}
+                  </span>
+                </>
+              )}
+            </div>
+
+            {/* Eligible positions */}
+            <div style={{marginBottom:10}}>
+              <div style={{fontSize:12,fontWeight:600,color:'#555',marginBottom:5}}>可擔任崗位（可複選）：</div>
+              <div className="tag-group">
+                {allPositions.map(pos => {
+                  const sel = asst.eligiblePositions.includes(pos);
+                  const color = data.doctors.includes(pos) ? '#1a3a6e' : '#4a7c33';
+                  return (
+                    <span key={pos} className={`tag${sel?' selected':''}`}
+                      style={sel ? {background:color,borderColor:color} : {}}
+                      onClick={() => togglePosition(asst.id, pos)}>
+                      {pos}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Leave requests */}
+            <div>
+              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
+                <span style={{fontSize:12,fontWeight:600,color:'#555'}}>休假申請（{mk.slice(0,7)}）：</span>
+                <button onClick={() => setShowLeave(showLeave===asst.name ? null : asst.name)}
+                  style={{padding:'2px 10px',border:'1px solid #ccc',borderRadius:3,cursor:'pointer',fontSize:11,background:showLeave===asst.name?'#e8eaf6':'white'}}>
+                  {showLeave===asst.name ? '收起' : '新增 / 管理'}
+                </button>
+              </div>
+
+              {/* Existing leaves */}
+              {Object.keys(leaves).length > 0 && (
+                <div style={{display:'flex',flexWrap:'wrap',gap:5,marginBottom:6}}>
+                  {Object.entries(leaves).sort().map(([ds, lv]) => {
+                    const [,mm,dd] = ds.split('-');
+                    return (
+                      <span key={ds} style={{display:'inline-flex',alignItems:'center',gap:4,padding:'2px 8px',borderRadius:12,background:LEAVE_COLORS[lv.type]||'#9e9e9e',color:'#fff',fontSize:11}}>
+                        {parseInt(mm)}/{parseInt(dd)} {lv.type} ({lv.sessions.join('')})
+                        <span style={{cursor:'pointer',fontWeight:700,marginLeft:2}} onClick={() => removeLeave(asst.name, ds)}>×</span>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+
+              {showLeave === asst.name && (
+                <div style={{background:'#f5f5f5',padding:'10px',borderRadius:4,marginTop:4}}>
+                  <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
+                    <input type="date" value={leaveDate} onChange={e => setLeaveDate(e.target.value)}
+                      min={`${year}-${String(month).padStart(2,'0')}-01`}
+                      max={`${year}-${String(month).padStart(2,'0')}-${daysInMonth(year,month)}`}
+                      style={{padding:'4px 6px',border:'1px solid #ccc',borderRadius:4,fontSize:12}}/>
+                    <select value={leaveType} onChange={e => setLeaveType(e.target.value)}
+                      style={{padding:'4px 6px',border:'1px solid #ccc',borderRadius:4,fontSize:12}}>
+                      {LEAVE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                    <div style={{display:'flex',gap:6,alignItems:'center',fontSize:12}}>
+                      {SHIFTS.map(sh => (
+                        <label key={sh} style={{cursor:'pointer',display:'flex',alignItems:'center',gap:2}}>
+                          <input type="checkbox" checked={leaveSessions.includes(sh)}
+                            onChange={e => {
+                              if (e.target.checked) setLeaveSessions(prev => [...prev,sh]);
+                              else setLeaveSessions(prev => prev.filter(s => s!==sh));
+                            }}/>
+                          {sh}
+                        </label>
+                      ))}
+                    </div>
+                    <button className="s-btn s-btn-primary" onClick={() => addLeave(asst.name)}>新增假</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: RemarkManager (備註管理)
+// ═══════════════════════════════════════════
+function RemarkManager({ data, year, month, onUpdate }) {
+  const mk = monthKey(year, month);
+  const weeks = useMemo(() => getMonthWeeks(year, month), [year, month]);
+  const [interviewAsst, setInterviewAsst] = useState({});
+  const [customText, setCustomText] = useState({});
+
+  function saveRemarks(ds, arr) {
+    onUpdate(d => {
+      if (!d.remarks) d.remarks = {};
+      if (!d.remarks[mk]) d.remarks[mk] = {};
+      const clean = arr.filter(Boolean);
+      if (clean.length === 0) delete d.remarks[mk][ds];
+      else d.remarks[mk][ds] = clean;
+    });
+  }
+
+  function togglePreset(ds, preset, remarks) {
+    const next = [...remarks];
+    if (preset === '面談') {
+      const idx = next.findIndex(r => r.startsWith('面談'));
+      if (idx >= 0) {
+        next.splice(idx, 1);
+        setInterviewAsst(prev => { const p={...prev}; delete p[ds]; return p; });
+      } else {
+        const ia = interviewAsst[ds] || '';
+        next.push(ia ? `面談：${ia}` : '面談');
+      }
+    } else {
+      const idx = next.indexOf(preset);
+      if (idx >= 0) next.splice(idx, 1);
+      else next.push(preset);
+    }
+    saveRemarks(ds, next);
+  }
+
+  return (
+    <div>
+      <div className="section-card">
+        <h3>日期備註管理 — {year}年{month}月</h3>
+        <p style={{color:'#888',fontSize:11,marginBottom:14}}>可同時選取多個標籤，再次點擊可取消。</p>
+        {weeks.map((wdates, wi) => {
+          const validDs = wdates.filter(ds => ds && !isCrossMonth(ds, year, month) && weekday(ds) !== 0);
+          if (!validDs.length) return null;
+          return (
+            <div key={wi} style={{marginBottom:16}}>
+              <div style={{fontSize:12,fontWeight:700,color:'#555',marginBottom:8}}>W{wi+1}</div>
+              <div style={{display:'flex',flexWrap:'wrap',gap:10}}>
+                {validDs.map(ds => {
+                  const wd = weekday(ds);
+                  const [,mm,dd] = ds.split('-');
+                  const remarks = getRemarks(data, mk, ds);
+                  const ia = interviewAsst[ds] || (() => {
+                    const entry = remarks.find(r => r.startsWith('面談：'));
+                    return entry ? entry.slice(3) : '';
+                  })();
+                  const hasInterview = remarks.some(r => r.startsWith('面談'));
+                  const ct = customText[ds] !== undefined ? customText[ds]
+                    : (remarks.find(r => !REMARK_PRESETS.some(p => r === p || (p === '面談' && r.startsWith('面談')))) || '');
+
+                  return (
+                    <div key={ds} style={{
+                      border:'1px solid #ddd', borderRadius:6, padding:'8px 10px',
+                      minWidth:165, background: remarks.length ? '#fdf0f2' : '#fafafa'
+                    }}>
+                      <div style={{fontSize:11,fontWeight:700,color:'#555',marginBottom:6}}>
+                        {parseInt(mm)}/{parseInt(dd)}（{WDAY_LABELS[wd===0?6:wd-1]}）
+                      </div>
+                      {/* Preset chips — multi-select */}
+                      <div style={{display:'flex',flexWrap:'wrap',gap:4,marginBottom:6}}>
+                        {REMARK_PRESETS.map(p => {
+                          const isActive = p === '面談'
+                            ? remarks.some(r => r.startsWith('面談'))
+                            : remarks.includes(p);
+                          return (
+                            <button key={p} onClick={() => togglePreset(ds, p, remarks)} style={{
+                              padding:'2px 7px', borderRadius:10, fontSize:11,
+                              cursor:'pointer', border:'none',
+                              background: isActive ? MORANDI_PINK : '#e8e8ec',
+                              color: isActive ? '#2d2020' : '#555',
+                              fontWeight: isActive ? 700 : 400,
+                            }}>{p}</button>
+                          );
+                        })}
+                      </div>
+                      {/* Interview assistant picker */}
+                      {hasInterview && (
+                        <select value={ia} onChange={e => {
+                          const v = e.target.value;
+                          setInterviewAsst(prev => ({...prev, [ds]: v}));
+                          const next = remarks.map(r => r.startsWith('面談') ? (v ? `面談：${v}` : '面談') : r);
+                          saveRemarks(ds, next);
+                        }} style={{fontSize:11,padding:'2px 4px',border:'1px solid #ccc',borderRadius:3,width:'100%',marginBottom:4}}>
+                          <option value="">（未指定）</option>
+                          {(data.assistants||[]).map(a => <option key={a.id} value={a.name}>{a.name}</option>)}
+                        </select>
+                      )}
+                      {/* Custom free text */}
+                      <input
+                        value={ct}
+                        onChange={e => setCustomText(prev => ({...prev, [ds]: e.target.value}))}
+                        onBlur={e => {
+                          const v = e.target.value.trim();
+                          const next = remarks.filter(r => REMARK_PRESETS.some(p => r === p || (p === '面談' && r.startsWith('面談'))));
+                          if (v) next.push(v);
+                          setCustomText(prev => ({...prev, [ds]: undefined}));
+                          saveRemarks(ds, next);
+                        }}
+                        placeholder="自訂備註…"
+                        style={{width:'100%',padding:'3px 6px',border:'1px solid #ddd',borderRadius:3,fontSize:11}}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: Statistics
+// ═══════════════════════════════════════════
+function monthsInRange(sy, sm, ey, em) {
+  const list = [];
+  let y = sy, m = sm;
+  while (y < ey || (y === ey && m <= em)) {
+    list.push({y, m});
+    m++; if (m > 12) { m = 1; y++; }
+  }
+  return list;
+}
+
+function calcRangeStats(data, sy, sm, ey, em, asstName) {
+  const total = {早:0,午:0,晚:0,全天:0,週六:0,完整休息:0,特休:0,指休:0,國定假日:0,教育訓練:0};
+  monthsInRange(sy, sm, ey, em).forEach(({y, m}) => {
+    const s = calcMonthStats(data, monthKey(y, m), asstName);
+    Object.keys(total).forEach(k => total[k] += s[k]||0);
+  });
+  return total;
+}
+
+function Statistics({ data, year, month }) {
+  const [sy, setSy] = useState(year);
+  const [sm, setSm] = useState(month);
+  const [ey, setEy] = useState(year);
+  const [em, setEm] = useState(month);
+
+  const isRange = sy !== ey || sm !== em;
+  const rangeLabel = isRange
+    ? `${sy}年${sm}月 ～ ${ey}年${em}月`
+    : `${sy}年${sm}月`;
+
+  const stats = useMemo(() =>
+    data.assistants.filter(a => !a.isPartTime).map(a => ({ ...a, s: calcRangeStats(data, sy, sm, ey, em, a.name) })),
+    [data, sy, sm, ey, em]);
+
+  const totals = stats.reduce((acc, { s }) => {
+    Object.keys(s).forEach(k => acc[k] = (acc[k]||0) + s[k]);
+    return acc;
+  }, {});
+
+  const years = [2025, 2026, 2027];
+  const months = [1,2,3,4,5,6,7,8,9,10,11,12];
+
+  function clampEnd(ny, nm) {
+    // ensure end >= start
+    if (ny < sy || (ny === sy && nm < sm)) { setEy(sy); setEm(sm); }
+  }
+
+  return (
+    <div>
+      {/* Range selector */}
+      <div style={{background:'#fff',borderRadius:8,padding:'10px 14px',marginBottom:10,
+        boxShadow:'0 1px 3px rgba(0,0,0,0.07)',display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>
+        <span style={{fontSize:12,fontWeight:700,color:'#2d3f8a'}}>統計區間</span>
+        <select value={sy} onChange={e => { const v=+e.target.value; setSy(v); if(v>ey||(v===ey&&sm>em)){setEy(v);setEm(sm);} }}
+          style={{padding:'3px 6px',borderRadius:4,border:'1px solid #c8d0e8',fontSize:12}}>
+          {years.map(y => <option key={y} value={y}>{y}年</option>)}
+        </select>
+        <select value={sm} onChange={e => { const v=+e.target.value; setSm(v); if(sy>ey||(sy===ey&&v>em)){setEy(sy);setEm(v);} }}
+          style={{padding:'3px 6px',borderRadius:4,border:'1px solid #c8d0e8',fontSize:12}}>
+          {months.map(m => <option key={m} value={m}>{m}月</option>)}
+        </select>
+        <span style={{fontSize:12,color:'#666'}}>至</span>
+        <select value={ey} onChange={e => { const v=+e.target.value; setEy(v); clampEnd(v,em); }}
+          style={{padding:'3px 6px',borderRadius:4,border:'1px solid #c8d0e8',fontSize:12}}>
+          {years.map(y => <option key={y} value={y}>{y}年</option>)}
+        </select>
+        <select value={em} onChange={e => { const v=+e.target.value; setEm(v); clampEnd(ey,v); }}
+          style={{padding:'3px 6px',borderRadius:4,border:'1px solid #c8d0e8',fontSize:12}}>
+          {months.map(m => <option key={m} value={m}>{m}月</option>)}
+        </select>
+        {isRange && <span style={{fontSize:11,color:'#5568a8',fontWeight:600}}>跨 {monthsInRange(sy,sm,ey,em).length} 個月</span>}
+        <button onClick={() => { setSy(year); setSm(month); setEy(year); setEm(month); }}
+          style={{marginLeft:'auto',padding:'3px 10px',fontSize:11,background:'#f2f4fc',border:'1px solid #c0c8e8',
+            borderRadius:4,cursor:'pointer',color:'#3a52a0',fontWeight:600}}>
+          回到當月
+        </button>
+      </div>
+      <div className="section-card">
+        <h3>統計表 — {rangeLabel}</h3>
+        <div style={{overflowX:'auto'}}>
+          <table className="stats-table">
+            <thead>
+              <tr>
+                <th className="name-col">人員</th>
+                <th style={{background:'#deefd6'}}>早診數</th>
+                <th style={{background:'#d4e4f4'}}>午診數</th>
+                <th style={{background:'#f0e0d8'}}>晚診數</th>
+                <th>合計診次</th>
+                <th style={{background:'#fff3e0'}}>全天班</th>
+                <th>週六出勤</th>
+                <th style={{background:'#e8eaf6'}}>完整休息日</th>
+                <th style={{background:'#fff8e1'}}>特休</th>
+                <th>指休</th>
+                <th>國定假日</th>
+                <th style={{background:'#f3e5f5'}}>教育訓練</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.map(({ id, name, color, s }) => (
+                <tr key={id}>
+                  <td className="name-col">
+                    <span style={{display:'inline-block',width:4,height:12,borderRadius:2,background:color,marginRight:4,verticalAlign:'middle'}}/>
+                    {name}
+                  </td>
+                  <td><span className="s-badge" style={{background:SHIFT_COLORS['早']}}>{s.早}</span></td>
+                  <td><span className="s-badge" style={{background:SHIFT_COLORS['午']}}>{s.午}</span></td>
+                  <td><span className="s-badge" style={{background:SHIFT_COLORS['晚']}}>{s.晚}</span></td>
+                  <td style={{fontWeight:700}}>{s.早+s.午+s.晚}</td>
+                  <td style={{color:s.全天>0?'#e65100':'#ccc',fontWeight:s.全天>0?700:'normal'}}>{s.全天||'—'}</td>
+                  <td>{s.週六||'—'}</td>
+                  <td style={{fontWeight:700,color:'#1a3a6e'}}>{s.完整休息}</td>
+                  <td style={{color:s.特休>0?LEAVE_COLORS['特休']:'#ccc'}}>{s.特休||'—'}</td>
+                  <td style={{color:s.指休>0?LEAVE_COLORS['指休']:'#ccc'}}>{s.指休||'—'}</td>
+                  <td style={{color:s.國定假日>0?LEAVE_COLORS['國定假日']:'#ccc'}}>{s.國定假日||'—'}</td>
+                  <td style={{color:s.教育訓練>0?LEAVE_COLORS['教育訓練']:'#ccc'}}>{s.教育訓練||'—'}</td>
+                </tr>
+              ))}
+              {/* Totals row */}
+              <tr style={{background:'#e8eaf6',fontWeight:700}}>
+                <td className="name-col">合計</td>
+                <td>{totals.早||0}</td><td>{totals.午||0}</td><td>{totals.晚||0}</td>
+                <td>{(totals.早||0)+(totals.午||0)+(totals.晚||0)}</td>
+                <td>{totals.全天||0}</td><td>{totals.週六||0}</td>
+                <td>{totals.完整休息||0}</td>
+                <td>{totals.特休||0}</td><td>{totals.指休||0}</td>
+                <td>{totals.國定假日||0}</td><td>{totals.教育訓練||0}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Shift balance analysis */}
+        <div style={{marginTop:16}}>
+          <div style={{fontSize:13,fontWeight:700,color:'#1a3a6e',marginBottom:8}}>早午晚分配分析</div>
+          <div style={{display:'flex',gap:16,flexWrap:'wrap'}}>
+            {stats.map(({ id, name, color, s }) => {
+              const total = s.早+s.午+s.晚;
+              if (total === 0) return null;
+              return (
+                <div key={id} style={{minWidth:140}}>
+                  <div style={{fontSize:11,fontWeight:600,marginBottom:3}}>
+                    <span style={{display:'inline-block',width:8,height:8,borderRadius:2,background:color,marginRight:4}}/>
+                    {name}（共{total}診）
+                  </div>
+                  <div style={{display:'flex',height:14,borderRadius:2,overflow:'hidden'}}>
+                    {total > 0 && <>
+                      <div style={{width:`${s.早/total*100}%`,background:SHIFT_COLORS['早']}} title={`早:${s.早}`}/>
+                      <div style={{width:`${s.午/total*100}%`,background:SHIFT_COLORS['午']}} title={`午:${s.午}`}/>
+                      <div style={{width:`${s.晚/total*100}%`,background:SHIFT_COLORS['晚']}} title={`晚:${s.晚}`}/>
+                    </>}
+                  </div>
+                  <div style={{fontSize:10,color:'#666',marginTop:2}}>
+                    早{Math.round(s.早/total*100)}% 午{Math.round(s.午/total*100)}% 晚{Math.round(s.晚/total*100)}%
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: ValidationPanel
+// ═══════════════════════════════════════════
+function ValidationPanel({ violations }) {
+  if (violations.length === 0) {
+    return (
+      <div style={{padding:'10px 14px',background:'#e8f5e9',borderRadius:6,color:'#2e7d32',
+        fontSize:13,fontWeight:600,marginBottom:12,border:'1px solid #a5d6a7'}}>
+        ✓ 目前排班符合所有規則
+      </div>
+    );
+  }
+
+  const byType = {};
+  violations.forEach(v => { if (!byType[v.type]) byType[v.type] = []; byType[v.type].push(v); });
+
+  const typeLabels = {
+    session_count: '診次統計', rest_days: '完整休息日',
+    head_tail: '頭尾班（嚴禁）', consecutive_all_day: '連續全天班',
+    missing_mandatory_follow: '專跟缺席（嚴禁）', understaffed: '人力配置',
+  };
+
+  return (
+    <div style={{marginBottom:12}}>
+      {Object.entries(byType).map(([type, items]) => {
+        const hasError = items.some(i => i.severity === 'error');
+        return (
+          <div key={type} style={{background:'#fff',borderRadius:6,border:`1px solid ${hasError?'#ef9a9a':'#ffe082'}`,marginBottom:8,overflow:'hidden'}}>
+            <div style={{padding:'6px 12px',background:hasError?'#ffebee':'#fff8e1',
+              fontWeight:700,fontSize:12,color:hasError?'#b71c1c':'#e65100',
+              borderBottom:'1px solid #eee',display:'flex',alignItems:'center',gap:6}}>
+              <span>{hasError ? '✗' : '△'}</span>
+              <span>{typeLabels[type] || type}</span>
+              <span style={{marginLeft:'auto',fontWeight:400,fontSize:11,color:'#888'}}>{items.length} 項</span>
+            </div>
+            <div style={{padding:'6px 12px 8px'}}>
+              {items.slice(0, 10).map((v, i) => (
+                <div key={i} style={{fontSize:12,padding:'2px 0',color:v.severity==='error'?'#c62828':'#795548',
+                  display:'flex',alignItems:'flex-start',gap:5}}>
+                  <span style={{flexShrink:0,color:v.severity==='error'?'#e53935':'#ff9800',fontWeight:700,fontSize:11,marginTop:1}}>
+                    {v.severity==='error'?'●':'◆'}
+                  </span>
+                  <span>{v.message}</span>
+                </div>
+              ))}
+              {items.length > 10 && (
+                <div style={{fontSize:11,color:'#999',paddingTop:3}}>…另 {items.length-10} 項</div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: ClearScheduleModal
+// ═══════════════════════════════════════════
+function ClearScheduleModal({ defaultYear, defaultMonth, onConfirm, onClose }) {
+  const [clearYear, setClearYear] = useState(defaultYear);
+  const [clearMonth, setClearMonth] = useState(defaultMonth);
+  const [clearLeave, setClearLeave] = useState(false);
+  const mk = monthKey(clearYear, clearMonth);
+  const years = [2025, 2026, 2027];
+
+  return (
+    <div className="modal-bg" onClick={onClose}>
+      <div className="s-modal" style={{minWidth:300,maxWidth:380}} onClick={e => e.stopPropagation()}>
+        <h3>清除班表</h3>
+        <div style={{padding:'8px 10px',background:'#fdf0f0',borderRadius:5,fontSize:12,color:'#b04040',border:'1px solid #f0c8c8',marginBottom:14}}>
+          此操作將清除指定月份的所有排班記錄，無法復原，請確認後再繼續。
+        </div>
+
+        <label>選擇年份</label>
+        <select value={clearYear} onChange={e => setClearYear(Number(e.target.value))} style={{width:'100%',padding:'6px 8px',border:'1px solid #ccc',borderRadius:4,fontSize:13,marginBottom:2}}>
+          {years.map(y => <option key={y} value={y}>{y} 年</option>)}
+        </select>
+
+        <label>選擇月份</label>
+        <select value={clearMonth} onChange={e => setClearMonth(Number(e.target.value))} style={{width:'100%',padding:'6px 8px',border:'1px solid #ccc',borderRadius:4,fontSize:13}}>
+          {Array.from({length:12},(_,i)=>i+1).map(m => (
+            <option key={m} value={m}>{m} 月</option>
+          ))}
+        </select>
+
+        <label className="check-row">
+          <input type="checkbox" checked={clearLeave} onChange={e => setClearLeave(e.target.checked)} />
+          同時清除 {clearYear}年{clearMonth}月 的休假申請
+        </label>
+
+        <div style={{marginTop:12,padding:'6px 10px',background:'#f8f8fc',borderRadius:4,fontSize:11,color:'#666'}}>
+          將清除：<strong>{clearYear}年{clearMonth}月</strong> 排班資料
+          {clearLeave && <span>及休假申請</span>}
+        </div>
+
+        <div className="modal-btns">
+          <button className="s-btn s-btn-secondary" onClick={onClose}>取消</button>
+          <button className="s-btn s-btn-danger" onClick={() => onConfirm(clearYear, clearMonth, clearLeave)}>
+            確認清除
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: PrevStatsModal
+// ═══════════════════════════════════════════
+function PrevStatsModal({ data, year, month, onClose }) {
+  const label = `${year}年${month}月`;
+  const mk = monthKey(year, month);
+  const stats = data.assistants
+    .filter(a => !a.isPartTime)
+    .map(a => ({ ...a, s: calcMonthStats(data, mk, a.name) }));
+
+  return (
+    <div className="modal-bg" onClick={onClose}>
+      <div className="s-modal" style={{minWidth:680,maxWidth:'95vw',maxHeight:'85vh',overflow:'auto'}} onClick={e => e.stopPropagation()}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
+          <h3 style={{margin:0}}>前月統計 — {label}</h3>
+          <button onClick={onClose} style={{background:'none',border:'none',fontSize:18,cursor:'pointer',color:'#888',lineHeight:1,padding:'0 4px'}}>×</button>
+        </div>
+        <div style={{overflowX:'auto'}}>
+          <table className="stats-table">
+            <thead>
+              <tr>
+                <th className="name-col">人員</th>
+                <th style={{background:'#deefd6'}}>早</th>
+                <th style={{background:'#d4e4f4'}}>午</th>
+                <th style={{background:'#f0e0d8'}}>晚</th>
+                <th>合計</th>
+                <th>全天班</th>
+                <th>週六</th>
+                <th style={{background:'#e8eaf6'}}>完整休息</th>
+                <th>特休</th>
+                <th>指休</th>
+                <th>國定</th>
+                <th>教育訓練</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.map(({ id, name, color, s }) => (
+                <tr key={id}>
+                  <td className="name-col">
+                    <span style={{display:'inline-block',width:4,height:12,borderRadius:2,background:color,marginRight:4,verticalAlign:'middle'}}/>
+                    {name}
+                  </td>
+                  <td><span className="s-badge" style={{background:SHIFT_COLORS['早']}}>{s.早}</span></td>
+                  <td><span className="s-badge" style={{background:SHIFT_COLORS['午']}}>{s.午}</span></td>
+                  <td><span className="s-badge" style={{background:SHIFT_COLORS['晚']}}>{s.晚}</span></td>
+                  <td style={{fontWeight:700}}>{s.早+s.午+s.晚}</td>
+                  <td style={{color:s.全天>0?'#e65100':'#ccc'}}>{s.全天||'—'}</td>
+                  <td>{s.週六||'—'}</td>
+                  <td style={{fontWeight:700,color:'#1a3a6e'}}>{s.完整休息}</td>
+                  <td style={{color:s.特休>0?LEAVE_COLORS['特休']:'#ccc'}}>{s.特休||'—'}</td>
+                  <td style={{color:s.指休>0?LEAVE_COLORS['指休']:'#ccc'}}>{s.指休||'—'}</td>
+                  <td style={{color:s.國定假日>0?LEAVE_COLORS['國定假日']:'#ccc'}}>{s.國定假日||'—'}</td>
+                  <td style={{color:s.教育訓練>0?LEAVE_COLORS['教育訓練']:'#ccc'}}>{s.教育訓練||'—'}</td>
+                </tr>
+              ))}
+              {stats.length === 0 && (
+                <tr><td colSpan={12} style={{textAlign:'center',color:'#aaa',padding:16}}>本月無資料</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: App (Root)
+// ═══════════════════════════════════════════
+function App() {
+  const [data, setDataRaw] = useState(() => loadData());
+  const [page, setPage] = useState('schedule');   // 'schedule'|'doctor'|'manage'|'stats'
+  const [schedView, setSchedView] = useState('asst'); // 'asst'|'pos'
+  const [viewYear, setViewYear] = useState(() => new Date().getFullYear());
+  const [viewMonth, setViewMonth] = useState(() => new Date().getMonth() + 1);
+  const [showValidation, setShowValidation] = useState(false);
+  const [showClearModal, setShowClearModal] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
+  const [showPrevStats, setShowPrevStats] = useState(false);
+  const backupInputRef = useRef(null);
+
+  const prevStatsYear = viewMonth === 1 ? viewYear - 1 : viewYear;
+  const prevStatsMonth = viewMonth === 1 ? 12 : viewMonth - 1;
+
+  function handleApplyRestDays() {
+    const mk = monthKey(viewYear, viewMonth);
+    // Pre-scan current data (synchronous) to count applicable entries
+    let toApply = 0;
+    const leaves = data.leaveRequests?.[mk] || {};
+    Object.entries(leaves).forEach(([asstName, leaveDates]) => {
+      Object.entries(leaveDates).forEach(([ds, lv]) => {
+        if (!lv || !lv.sessions || lv.type !== '指休') return;
+        lv.sessions.forEach(sh => {
+          const cur = data.schedule?.[mk]?.[ds]?.[sh]?.[asstName];
+          if (!isWorkValue(cur)) toApply++;
+        });
+      });
+    });
+    if (toApply === 0) { alert('本月無待套用的指休。'); return; }
+    onUpdate(draft => {
+      Object.entries(draft.leaveRequests?.[mk] || {}).forEach(([asstName, leaveDates]) => {
+        Object.entries(leaveDates).forEach(([ds, lv]) => {
+          if (!lv || !lv.sessions || lv.type !== '指休') return;
+          if (!draft.schedule[mk]) draft.schedule[mk] = {};
+          if (!draft.schedule[mk][ds]) draft.schedule[mk][ds] = {};
+          lv.sessions.forEach(sh => {
+            if (!draft.schedule[mk][ds][sh]) draft.schedule[mk][ds][sh] = {};
+            if (!isWorkValue(draft.schedule[mk][ds][sh][asstName]))
+              draft.schedule[mk][ds][sh][asstName] = '指休';
+          });
+        });
+      });
+    });
+    alert(`已套用 ${toApply} 個指休格至班表。`);
+  }
+
+  function handleExportBackup() {
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const now = new Date();
+    const stamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+    const a = document.createElement('a');
+    a.download = `立馥排班備份_${stamp}.json`;
+    a.href = url;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function handleImportBackup(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    e.target.value = '';
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const imported = JSON.parse(ev.target.result);
+        if (!imported.assistants || !imported.schedule) {
+          alert('備份檔案格式不正確，無法匯入。');
+          return;
+        }
+        if (!confirm(`確定要匯入備份「${file.name}」？\n\n目前所有資料將被覆蓋，此操作無法復原。`)) return;
+        _store.replaceAll(imported)
+          .then(() => { setDataRaw(normalizeData(_store.get())); alert('備份匯入成功！'); })
+          .catch(err => alert('匯入失敗：' + err.message));
+      } catch {
+        alert('讀取備份檔案失敗，請確認檔案格式為 JSON。');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  const violations = useMemo(() =>
+    checkScheduleRules(data, viewYear, viewMonth),
+    [data, viewYear, viewMonth]);
+
+  // 其他裝置的修改即時同步進來
+  useEffect(() => _store.subscribe(remote => { if (!_store.isEmpty()) setDataRaw(normalizeData(remote)); }), []);
+
+  // Auto-save to Firestore on every change
+  useEffect(() => { saveData(data); }, [data]);
+
+  // Immutable update helper — records lastModified timestamp on every edit
+  const onUpdate = useCallback((mutator) => {
+    setDataRaw(prev => {
+      const clone = JSON.parse(JSON.stringify(prev));
+      mutator(clone);
+      const now = new Date();
+      clone.lastModified = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      return clone;
+    });
+  }, []);
+
+  function handleAutoSchedule() {
+    const target = `${viewYear}年${viewMonth}月`;
+    if (!confirm(`確定對 ${target} 執行自動排班？\n\n這將依規則重新分配所有班次（休假申請保留）。\n建議先備份或記錄現有排班。`)) return;
+    const result = autoSchedule(data, viewYear, viewMonth);
+    onUpdate(draft => { draft.schedule[result.mk] = result.schedule; });
+  }
+
+  function handleClearSchedule(y, m, clearLeave) {
+    const mk = monthKey(y, m);
+    onUpdate(draft => {
+      if (draft.schedule[mk]) delete draft.schedule[mk];
+      if (clearLeave && draft.leaveRequests[mk]) delete draft.leaveRequests[mk];
+    });
+    setShowClearModal(false);
+  }
+
+  // 一鍵清除當月排班（保留休假申請）
+  function handleClearThisMonth() {
+    const mk = monthKey(viewYear, viewMonth);
+    if (!confirm(`確定清除 ${viewYear}年${viewMonth}月 的排班？\n（休假申請會保留，方便重新自動排班）`)) return;
+    onUpdate(draft => { if (draft.schedule[mk]) delete draft.schedule[mk]; });
+  }
+
+  function prevMonth() {
+    if (viewMonth === 1) { setViewYear(y => y-1); setViewMonth(12); }
+    else setViewMonth(m => m-1);
+  }
+  function nextMonth() {
+    if (viewMonth === 12) { setViewYear(y => y+1); setViewMonth(1); }
+    else setViewMonth(m => m+1);
+  }
+
+  function addNewMonthDoctorSchedule() {
+    const mk = monthKey(viewYear, viewMonth);
+    if (data.doctorSchedule?.[mk]) return;
+    onUpdate(d => {
+      if (!d.doctorSchedule) d.doctorSchedule = {};
+      const gen = {};
+      const total = daysInMonth(viewYear, viewMonth);
+      for (let day = 1; day <= total; day++) {
+        const ds = fmtDate(viewYear, viewMonth, day);
+        const wd = weekday(ds);
+        if (wd === 0) { gen[ds] = {早:[],午:[],晚:[]}; continue; }
+        const wdKey = String(wd);
+        const entry = {早:[],午:[],晚:[]};
+        d.doctors.forEach(doc => {
+          const pattern = d.doctorPatterns[doc] || {};
+          (pattern[wdKey]||[]).forEach(sh => { entry[sh] = [...(entry[sh]||[]), doc]; });
+        });
+        gen[ds] = entry;
+      }
+      d.doctorSchedule[mk] = gen;
+    });
+  }
+
+  // Auto-generate doctor schedule for months without one
+  useEffect(() => {
+    const mk = monthKey(viewYear, viewMonth);
+    if (!data.doctorSchedule?.[mk]) addNewMonthDoctorSchedule();
+  }, [viewYear, viewMonth]);
+
+  const showMonthNav = true;
+
+  return (
+    <div>
+      {/* Top navigation */}
+      <div className="topbar">
+        <span className="topbar-title">立馥助理排班系統</span>
+        <button className={`tab-btn${page==='schedule'?' active':''}`} onClick={() => setPage('schedule')}>助理班表</button>
+        <button className={`tab-btn${page==='doctor'?' active':''}`} onClick={() => setPage('doctor')}>醫師班表</button>
+        <button className={`tab-btn${page==='manage'?' active':''}`} onClick={() => setPage('manage')}>助理管理</button>
+        <button className={`tab-btn${page==='stats'?' active':''}`} onClick={() => setPage('stats')}>統計</button>
+        <button className={`tab-btn${page==='remarks'?' active':''}`} onClick={() => setPage('remarks')}>備註</button>
+
+        {/* Month navigation */}
+        <div className="month-nav">
+          <button onClick={prevMonth}>‹</button>
+          <span style={{minWidth:60,textAlign:'center',fontWeight:600}}>{viewYear}年{viewMonth}月</span>
+          <button onClick={nextMonth}>›</button>
+        </div>
+      </div>
+
+      {/* Sub-navigation bar */}
+      <div className="subnav">
+        {page === 'schedule' && (
+          <div className="subnav-toggle">
+            <button className={schedView==='asst'?'active':''} onClick={() => setSchedView('asst')}>助理視角</button>
+            <button className={schedView==='pos'?'active':''} onClick={() => setSchedView('pos')}>崗位視角</button>
+          </div>
+        )}
+        <button className="btn-action" onClick={handleAutoSchedule}>自動排班</button>
+        <button className={`btn-check${showValidation?' active':''}`} onClick={() => setShowValidation(v => !v)}>
+          規則檢核
+          {violations.length > 0 && (
+            <span style={{
+              marginLeft:6, background: violations.some(v => v.severity==='error') ? '#c84040' : '#d08020',
+              color:'#fff', borderRadius:8, padding:'1px 6px', fontSize:10, fontWeight:700,
+            }}>{violations.length}</span>
+          )}
+        </button>
+        {showValidation && (
+          <span style={{fontSize:11,color:'#888',marginLeft:4}}>
+            {violations.length === 0 ? '✓ 無違規' : `${violations.filter(v=>v.severity==='error').length} 錯誤 ／ ${violations.filter(v=>v.severity==='warn').length} 警告`}
+          </span>
+        )}
+        {/* Lock button + last modified */}
+        <button
+          className={`btn-check${isLocked?' active':''}`}
+          onClick={() => setIsLocked(v => !v)}
+          title={isLocked ? '點擊解鎖班表' : '點擊鎖定班表（防止誤觸）'}
+          style={{minWidth:60}}>
+          {isLocked ? '🔒 已鎖定' : '🔓 鎖定'}
+        </button>
+        {data.lastModified && (
+          <span style={{fontSize:11,color:'#888'}}>上次修改：{data.lastModified}</span>
+        )}
+        <div style={{marginLeft:'auto',display:'flex',gap:6,alignItems:'center'}}>
+          <button className="btn-check" onClick={() => setShowPrevStats(true)}
+            title={`查看 ${prevStatsYear}年${prevStatsMonth}月 統計`}>
+            前月統計
+          </button>
+          <button className="btn-check" onClick={handleApplyRestDays}
+            title="將助理管理中設定的指休寫入本月班表">
+            套用指休
+          </button>
+          <button className="btn-action" onClick={handleExportBackup} title="下載目前所有資料的 JSON 備份">備份匯出</button>
+          <button className="btn-action" onClick={() => backupInputRef.current?.click()} title="從備份 JSON 檔案還原資料">備份匯入</button>
+          <input ref={backupInputRef} type="file" accept=".json,application/json" style={{display:'none'}} onChange={handleImportBackup} />
+          <button className="btn-clear" onClick={handleClearThisMonth} title={`一鍵清除 ${viewYear}年${viewMonth}月 排班（保留休假）`}>🧹 清除當月</button>
+          <button className="btn-clear" onClick={() => setShowClearModal(true)}>🗑 清除班表</button>
+        </div>
+      </div>
+
+      {/* Version tag */}
+      <div style={{position:'fixed',bottom:6,right:10,fontSize:10,color:'#bbb',zIndex:99,pointerEvents:'none'}}>v3.0 • 崗位視角排班・清除班表・待排狀態</div>
+
+      {/* Clear schedule modal */}
+      {showClearModal && (
+        <ClearScheduleModal
+          defaultYear={viewYear}
+          defaultMonth={viewMonth}
+          onConfirm={handleClearSchedule}
+          onClose={() => setShowClearModal(false)}
+        />
+      )}
+
+      {/* Previous month stats modal */}
+      {showPrevStats && (
+        <PrevStatsModal data={data} year={prevStatsYear} month={prevStatsMonth} onClose={() => setShowPrevStats(false)} />
+      )}
+
+      {/* Content */}
+      <div className="content">
+        {showValidation && (
+          <div style={{marginBottom:14,maxWidth:900}}>
+            <ValidationPanel violations={violations} />
+          </div>
+        )}
+        {page === 'schedule' && schedView === 'asst' && (
+          <AssistantView data={data} year={viewYear} month={viewMonth} onUpdate={onUpdate} isLocked={isLocked} />
+        )}
+        {page === 'schedule' && schedView === 'pos' && (
+          <PositionView data={data} year={viewYear} month={viewMonth} onUpdate={onUpdate} isLocked={isLocked} />
+        )}
+        {page === 'doctor' && (
+          <DoctorScheduleView data={data} year={viewYear} month={viewMonth} onUpdate={onUpdate} />
+        )}
+        {page === 'manage' && (
+          <div>
+            <AssistantManager data={data} year={viewYear} month={viewMonth} onUpdate={onUpdate} />
+          </div>
+        )}
+        {page === 'remarks' && (
+          <RemarkManager data={data} year={viewYear} month={viewMonth} onUpdate={onUpdate} />
+        )}
+        {page === 'stats' && (
+          <Statistics data={data} year={viewYear} month={viewMonth} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// 尚無雲端資料時：匯入歷史備份
+// ═══════════════════════════════════════════
+function EmptyState() {
+  const [busy, setBusy] = useState(false);
+  const fileRef = useRef(null);
+  async function importData(obj) {
+    if (!obj || !obj.assistants || !obj.schedule) { alert('備份檔案格式不正確，無法匯入。'); return; }
+    setBusy(true);
+    try { await _store.replaceAll(obj); }
+    catch (e) { alert('匯入失敗：' + e.message); setBusy(false); }
+  }
+  async function importBundled() {
+    setBusy(true);
+    try {
+      const res = await fetch(_opts.backupUrl, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      await importData(await res.json());
+    } catch (e) {
+      setBusy(false);
+      alert('無法讀取內建備份（' + e.message + '），請改用「從檔案匯入」。');
+    }
+  }
+  function onFile(e) {
+    const file = e.target.files[0]; e.target.value = '';
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = ev => { try { importData(JSON.parse(ev.target.result)); } catch { alert('讀取備份檔案失敗，請確認檔案格式為 JSON。'); } };
+    r.readAsText(file);
+  }
+  return (
+    <div className="section-card" style={{maxWidth:520,margin:'40px auto'}}>
+      <h3>尚未建立雲端排班資料</h3>
+      <p style={{fontSize:13,color:'#555',lineHeight:1.7,marginBottom:16}}>
+        排班資料改存到雲端後，所有有權限的裝置都會看到同一份班表。第一次使用請先匯入歷史排班。
+      </p>
+      <div style={{display:'flex',flexDirection:'column',gap:8}}>
+        <button className="s-btn s-btn-primary" disabled={busy} onClick={importBundled}>匯入歷史排班（2026/09/26 備份）</button>
+        <button className="s-btn s-btn-secondary" disabled={busy} onClick={() => fileRef.current?.click()}>從檔案匯入</button>
+        <button className="s-btn s-btn-secondary" disabled={busy} onClick={() => { if (confirm('確定從空白開始？')) importData(makeInitialData()); }}>從空白開始</button>
+      </div>
+      <input ref={fileRef} type="file" accept=".json,application/json" style={{display:'none'}} onChange={onFile} />
+      {busy && <p style={{fontSize:12,color:'#888',marginTop:12}}>處理中…</p>}
+    </div>
+  );
+}
+
+function Root() {
+  const [empty, setEmpty] = useState(() => _store.isEmpty());
+  useEffect(() => _store.subscribe(() => setEmpty(_store.isEmpty())), []);
+  return empty ? <EmptyState /> : <App />;
+}
+
+// ═══════════════════════════════════════════
+// 模組出口：由點數系統整合層呼叫
+// ═══════════════════════════════════════════
+window.SchedModule = {
+  mount(el, store, ctx, opts) {
+    _store = store; _ctx = ctx || _ctx; _opts = opts || {};
+    const root = ReactDOM.createRoot(el);
+    root.render(<Root />);
+    return root;
+  },
+  setCtx(ctx) { _ctx = ctx || _ctx; },
+};
+
+})();
 </script>
 </body>
 </html>
