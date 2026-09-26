@@ -571,7 +571,7 @@
         .dash-link{cursor:pointer;transition:border-color .15s;}
         .dash-link:hover{border-color:var(--border-strong);}
         .dash-pie-wrap{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;}
-        .dash-pie{width:260px;max-width:100%;flex-shrink:0;margin:0 auto;}
+        .dash-pie{width:320px;max-width:100%;flex-shrink:0;margin:0 auto;}
         .dash-legend{flex:1;min-width:220px;}
         .dash-legend thead th{padding:8px 10px;}
         .dash-legend tbody td{padding:8px 10px;}
@@ -615,6 +615,27 @@
 #sched-root .sched-table tr.asst-row td:not(.full-off) .shift-block:hover{transform:scale(1.18);box-shadow:0 2px 8px rgba(0,0,0,.25);position:relative;z-index:2;filter:none}
 #sched-root .sched-table tr.asst-row td.full-off .shift-block:hover{filter:none}
 #sched-root .topbar{position:sticky;top:0;z-index:60;min-height:44px}
+#sched-root table.sched-table tr.asst-row > td{height:1px}
+#sched-root table.sched-table .shift-block{border-radius:0;min-height:26px;height:100%;padding:0 2px}
+#sched-root .flat-toggles{display:flex;min-height:28px}
+#sched-root .flat-toggles > div{flex:1;display:flex;align-items:center;justify-content:center;font-size:11px;color:#b3b9c9;cursor:pointer;user-select:none;min-width:24px}
+#sched-root .flat-toggles > div + div{border-left:1px solid #eef0f4}
+#sched-root .flat-toggles > div.on{color:#fff;font-weight:700}
+#sched-root .flat-toggles > div:hover:not(.on){background:#f3f5fa;color:#6b7390}
+#sched-root .doc-pattern-table td.ft-cell{padding:0}
+#sched-root .doc-pattern-table tbody tr:nth-child(even):not(.special-row),#sched-root .doc-pattern-table tbody tr:nth-child(odd):not(.special-row){background:#fff}
+#sched-root .m-weeknav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:14px;font-weight:700;color:#2d3142}
+#sched-root .m-weeknav button{width:44px;height:36px;border:1px solid #d0d4e0;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#2d3142;cursor:pointer}
+#sched-root .m-weeknav button:disabled{opacity:.3;cursor:default}
+#sched-root .m-days{display:flex;gap:4px;margin-bottom:8px}
+#sched-root .m-days button{flex:1;display:flex;flex-direction:column;align-items:center;padding:4px 0;border:1px solid #d8dcea;background:#fff;border-radius:8px;cursor:pointer;color:#2d3142;line-height:1.2}
+#sched-root .m-days .m-dnum{font-size:14px;font-weight:700}
+#sched-root .m-days .m-dwd{font-size:10px;color:#888}
+#sched-root .m-days button.on{background:#1e3566;border-color:#1e3566;color:#fff}
+#sched-root .m-days button.on .m-dwd{color:rgba(255,255,255,.75)}
+#sched-root .m-scroll{overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+#sched-root .m-scroll th.m-day{scroll-snap-align:start}
+@media(max-width:700px){#sched-root .m-scroll table.sched-table .shift-block{min-height:34px}#sched-root .m-scroll .sb-value{font-size:13px}}
 #sched-root .sched-table .name-cell,#sched-root .sched-table thead tr:first-child > th:first-child,
 #sched-root .doc-pattern-table th:first-child,#sched-root .doc-pattern-table td:first-child,
 #sched-root .pos-table .pos-name{position:sticky;left:0;z-index:4}
@@ -2145,10 +2166,21 @@ async function submitPreLeave() {
 // ================================================================
 // 院長總覽（Dashboard）：本月加班時數與各助理占比
 // ================================================================
-// 已驗證的 8 色類別色盤（依序套用，不循環；超過 8 人併入「其他」）
+// 排班系統未設定顏色時的備用色盤
 const DASH_PALETTE = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#4a3aa7', '#e34948'];
-const DASH_OTHER = '#9a9a9a';
-let _dashMonth = null, _dashChart = null;
+let _dashMonth = null, _dashChart = null, _dashColors = null;
+// 助理顏色＝排班系統「助理管理」設定的顏色（依姓名對應）
+function dashAsstColors() {
+    const fromStore = schedStore.docs.meta?.assistants;
+    if (fromStore) return Object.fromEntries(fromStore.map(a => [a.name, a.color]));
+    if (_dashColors) return _dashColors;
+    _dashColors = {};
+    db.collection(col('schedule')).doc('meta').get().then(s => {
+        _dashColors = Object.fromEntries((s.data()?.assistants || []).map(a => [a.name, a.color]));
+        if (currentPage === 'dashboard') renderDashboard();
+    }).catch(() => {});
+    return _dashColors;
+}
 
 // 每位助理用一個字代表：三字姓名取中間字，兩字取末字；撞字時改用末字
 function dashShortNames(list) {
@@ -2189,17 +2221,13 @@ function renderDashboard() {
         return { id, name: a.name, min };
     }).sort((x, y) => y.min - x.min);
     const short = dashShortNames(rows);
-    const MAXC = DASH_PALETTE.length;
-    const shown = rows.length > MAXC ? rows.slice(0, MAXC - 1) : rows;
-    const rest = rows.length > MAXC ? rows.slice(MAXC - 1) : [];
-    const slices = shown.map((r, i) => ({ label: short[r.id], name: r.name, min: r.min, color: DASH_PALETTE[i] }));
-    if (rest.length) slices.push({ label: '他', name: '其他 ' + rest.length + ' 人', min: rest.reduce((s, r) => s + r.min, 0), color: DASH_OTHER });
+    const colorMap = dashAsstColors();
+    const slices = rows.map((r, i) => ({ label: short[r.id], name: r.name, min: r.min, color: colorMap[r.name] || DASH_PALETTE[i % DASH_PALETTE.length] }));
 
     const legend = rows.map((r, i) => {
-        const inRest = i >= shown.length;
-        const color = inRest ? DASH_OTHER : DASH_PALETTE[i];
+        const color = slices[i].color;
         const pct = totalMin ? (r.min / totalMin * 100).toFixed(1) : '0.0';
-        return `<tr><td><span class="dash-chip" style="background:${color};color:${dashInk(color)}">${inRest ? '他' : short[r.id]}</span>${r.name}</td>
+        return `<tr><td><span class="dash-chip" style="background:${color};color:${dashInk(color)}">${short[r.id]}</span>${r.name}</td>
             <td class="num">${hrs(r.min)} h</td><td class="num muted">${pct}%</td></tr>`;
     }).join('');
 
@@ -2220,26 +2248,34 @@ function renderDashboard() {
     if (_dashChart) { _dashChart.destroy(); _dashChart = null; }
     const canvas = document.getElementById('dash-pie');
     if (!canvas || !window.Chart) return;
-    // 在扇形上直接標一個字（深色扇形用白字，淺色用深字）
+    // 以引線把每位助理的字拉到圓餅外（同側標籤上下錯開避免重疊）
     const sliceLabels = {
         id: 'sliceLabels',
         afterDatasetsDraw(chart) {
             const { ctx } = chart;
-            const meta = chart.getDatasetMeta(0);
-            const total = slices.reduce((s, x) => s + x.min, 0);
-            meta.data.forEach((arc, i) => {
-                if (slices[i].min / total < 0.035) return;
-                const p = arc.tooltipPosition();
-                const hex = slices[i].color.slice(1);
-                const [r, g, b] = [0, 2, 4].map(k => parseInt(hex.slice(k, k + 2), 16));
-                const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-                ctx.save();
-                ctx.fillStyle = lum > 0.62 ? '#1a1a1a' : '#ffffff';
-                ctx.font = '700 15px "Noto Sans JP", sans-serif';
-                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText(slices[i].label, p.x, p.y);
-                ctx.restore();
+            const labs = chart.getDatasetMeta(0).data.map((arc, i) => {
+                const a = (arc.startAngle + arc.endAngle) / 2, r = arc.outerRadius;
+                const cos = Math.cos(a), sin = Math.sin(a);
+                return { i, right: cos >= 0, cx: arc.x, r,
+                    x0: arc.x + cos * (r - 2), y0: arc.y + sin * (r - 2),
+                    x1: arc.x + cos * (r + 10), y1: arc.y + sin * (r + 10) };
             });
+            [true, false].forEach(side => {
+                const arr = labs.filter(l => l.right === side).sort((a, b) => a.y1 - b.y1);
+                for (let k = 1; k < arr.length; k++) if (arr[k].y1 - arr[k - 1].y1 < 15) arr[k].y1 = arr[k - 1].y1 + 15;
+            });
+            ctx.save();
+            ctx.font = '700 13px "Noto Sans JP", sans-serif';
+            ctx.textBaseline = 'middle';
+            labs.forEach(l => {
+                const xEnd = l.cx + (l.right ? 1 : -1) * (l.r + 20);
+                ctx.strokeStyle = '#a0a0a0'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(l.x0, l.y0); ctx.lineTo(l.x1, l.y1); ctx.lineTo(xEnd, l.y1); ctx.stroke();
+                ctx.fillStyle = '#1a1a1a';
+                ctx.textAlign = l.right ? 'left' : 'right';
+                ctx.fillText(slices[l.i].label, xEnd + (l.right ? 3 : -3), l.y1);
+            });
+            ctx.restore();
         },
     };
     _dashChart = new Chart(canvas, {
@@ -2247,6 +2283,7 @@ function renderDashboard() {
         data: { labels: slices.map(s => s.name), datasets: [{ data: slices.map(s => Math.round(s.min / 6) / 10), backgroundColor: slices.map(s => s.color), borderColor: '#ffffff', borderWidth: 2, hoverOffset: 6 }] },
         options: {
             responsive: true, maintainAspectRatio: true, animation: { duration: 300 },
+            layout: { padding: { left: 34, right: 34, top: 22, bottom: 22 } },
             plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.label}：${c.parsed.toFixed(1)} 小時（${(slices[c.dataIndex].min / totalMin * 100).toFixed(1)}%）` } } },
         },
         plugins: [sliceLabels],
@@ -7941,21 +7978,32 @@ async function captureWeekBlock(weekBlockEl, filename) {
 // ═══════════════════════════════════════════
 // COMPONENT: ShiftBlock
 // ═══════════════════════════════════════════
-function ShiftBlock({ shift, value, onClick, noLabel, locked, fullRestDay, isPartTime }) {
+// 手機寬度判斷（與點數系統的 700px 斷點一致）
+function useIsMobile() {
+  const q = '(max-width: 700px)';
+  const [m, setM] = useState(() => window.matchMedia(q).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(q);
+    const on = e => setM(e.matches);
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
+  return m;
+}
+
+function ShiftBlock({ shift, value, onClick, noLabel, locked, fullRestDay, isPartTime, full }) {
   const isEmpty = isPartTime && (!value || value === '休');
   const bg = isEmpty ? '#f5f5f7' : cellBg(value, fullRestDay);
   const isWhite = bg === '#ffffff';
   const isNationalHoliday = value === '國定假日';
   const isZhixiu = value === '指休';
-  const display = isEmpty ? '' : (noLabel ? abbrev1(value) : (value || '休'));
-  const border = isZhixiu ? '1.5px solid #c0504d'
-    : isWhite ? '1px solid #d0d4e0'
-    : undefined;
+  const display = isEmpty ? '' : full ? (value || '休') : (noLabel ? abbrev1(value) : (value || '休'));
+  const ring = isZhixiu ? 'inset 0 0 0 1.5px #c0504d' : undefined;
   return (
     <div className="shift-block"
       style={{background:bg, justifyContent:noLabel?'center':undefined,
         cursor: isEmpty || locked ? 'default' : 'pointer',
-        border, boxSizing:'border-box'}}
+        boxShadow: ring, boxSizing:'border-box'}}
       onClick={isEmpty || locked ? undefined : onClick}
       title={isEmpty ? '' : `${shift}: ${value||'休'}`}>
       {!noLabel && <span className="sb-label">{shift}</span>}
@@ -8193,6 +8241,148 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
     data.assistants.reduce((acc, a) => ({ ...acc, [a.name]: calcMonthStats(data, mk, a.name) }), {}),
     [data, mk]);
 
+  // ── 手機版：一次一週、姓名欄凍結、一個畫面一天，左右滑動換日、上下箭頭換週 ──
+  const isMobile = useIsMobile();
+  const mWeeks = useMemo(() => weeks
+    .map(w => w.filter(ds => ds && !isCrossMonth(ds, year, month) && weekday(ds) !== 0))
+    .filter(w => w.length), [weeks, year, month]);
+  const todayDs = (() => { const t = new Date(); return fmtDate(t.getFullYear(), t.getMonth() + 1, t.getDate()); })();
+  const [mWeek, setMWeek] = useState(() => Math.max(0, mWeeks.findIndex(w => w.includes(todayDs))));
+  const [mDay, setMDay] = useState(0);
+  const mScrollRef = useRef(null);
+  const [mWrapW, setMWrapW] = useState(0);
+  useEffect(() => { setMWeek(Math.max(0, mWeeks.findIndex(w => w.includes(todayDs)))); }, [year, month]);
+  useEffect(() => {
+    const el = mScrollRef.current; if (!el) return;
+    const ro = new ResizeObserver(() => setMWrapW(el.clientWidth));
+    ro.observe(el); setMWrapW(el.clientWidth);
+    return () => ro.disconnect();
+  }, [isMobile]);
+  const M_NAME_W = 64;
+  const mDayW = Math.max(200, mWrapW - M_NAME_W);
+  const mDates = mWeeks[Math.min(mWeek, mWeeks.length - 1)] || [];
+  // 換週時捲到今天（若在該週）或第一天
+  useEffect(() => {
+    const el = mScrollRef.current; if (!el) return;
+    const idx = Math.max(0, mDates.indexOf(todayDs));
+    el.scrollLeft = idx * mDayW; setMDay(idx);
+  }, [mWeek, year, month, mDayW > 200]);
+  function mGoDay(i) { const el = mScrollRef.current; if (el) el.scrollTo({ left: i * mDayW, behavior: 'smooth' }); }
+  function mOnScroll(e) { const i = Math.round(e.currentTarget.scrollLeft / mDayW); if (i !== mDay) setMDay(i); }
+
+  function renderMobile() {
+    const wi = Math.min(mWeek, mWeeks.length - 1);
+    const first = mDates[0], last = mDates[mDates.length - 1];
+    const md = ds => `${parseInt(ds.slice(5, 7))}/${parseInt(ds.slice(8))}`;
+    const Chevron = ({ up }) => (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points={up ? '6 15 12 9 18 15' : '6 9 12 15 18 9'} />
+      </svg>
+    );
+    return (
+      <div>
+        <div className="m-weeknav">
+          <button aria-label="上一週" disabled={wi <= 0} onClick={() => setMWeek(wi - 1)}><Chevron up /></button>
+          <span>第 {wi + 1} 週・{first && md(first)} – {last && md(last)}</span>
+          <button aria-label="下一週" disabled={wi >= mWeeks.length - 1} onClick={() => setMWeek(wi + 1)}><Chevron /></button>
+        </div>
+        <div className="m-days">
+          {mDates.map((ds, i) => (
+            <button key={ds} className={i === mDay ? 'on' : ''} onClick={() => mGoDay(i)}>
+              <span className="m-dnum">{parseInt(ds.slice(8))}</span>
+              <span className="m-dwd" style={{color: holidays[ds] && i !== mDay ? '#c62828' : undefined}}>{WDAY_LABELS[weekday(ds) - 1]}</span>
+            </button>
+          ))}
+        </div>
+        <div className="week-block">
+          <div className="m-scroll" ref={mScrollRef} onScroll={mOnScroll} style={{scrollPaddingLeft: M_NAME_W}}>
+            <table className="sched-table" style={{width: M_NAME_W + mDates.length * mDayW, tableLayout:'fixed'}}>
+              <colgroup>
+                <col style={{width: M_NAME_W}}/>
+                {mDates.flatMap(ds => getShiftsForDate(ds).map(sh => <col key={ds + sh} style={{width: mDayW / getShiftsForDate(ds).length}}/>))}
+              </colgroup>
+              <thead>
+                <tr>
+                  <th rowSpan={2} style={{background:'#e8eaf6',verticalAlign:'middle'}}>人員</th>
+                  {mDates.map(ds => {
+                    const info = doctorSched[ds] || {};
+                    return (
+                      <th key={ds} className="m-day" colSpan={getShiftsForDate(ds).length}
+                        style={{...getDayHeaderStyle(ds), padding:'4px', borderLeft:'2px solid #9098b8'}}>
+                        <span style={{fontSize:13,fontWeight:700}}>{md(ds)}（{WDAY_LABELS[weekday(ds) - 1]}）</span>
+                        {holidays[ds] && <span style={{fontSize:11,color:'#c62828',fontWeight:700,marginLeft:6}}>{holidays[ds]}</span>}
+                        {info._note && info._note !== holidays[ds] && <span style={{fontSize:11,color:'#b04040',fontWeight:600,marginLeft:6}}>{info._note}</span>}
+                      </th>
+                    );
+                  })}
+                </tr>
+                <tr>
+                  {mDates.flatMap(ds => getShiftsForDate(ds).map(sh => {
+                    const status = getShiftPositionStatus(data, mk, ds, sh);
+                    return (
+                      <th key={ds + sh} style={{background:'#eceef8',padding:'2px',borderLeft: sh === '早' ? '2px solid #9098b8' : undefined}}>
+                        <div style={{fontSize:11,fontWeight:700,color:'#5568a8'}}>{sh}</div>
+                        {status && status.length > 0 && (
+                          <div style={{display:'flex',flexWrap:'wrap',justifyContent:'center',gap:'0 4px',fontSize:10,lineHeight:1.4}}>
+                            {status.map(({label, full, filled, extra}, k) => (
+                              <span key={k} title={full} style={{fontWeight: filled ? 700 : 400, color: filled ? SHIFT_COLORS[sh] : '#c4c6d0'}}>
+                                {label}{extra > 0 && <sup style={{color:'#c04040',fontSize:8}}>{extra}</sup>}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </th>
+                    );
+                  }))}
+                </tr>
+              </thead>
+              <tbody>
+                {data.assistants.filter(a => isAsstActive(a, mk)).map(asst => {
+                  const fullOffOf = ds => !asst.isPartTime && getShiftsForDate(ds).every(sh => !isWorkValue(getCellValue(data, mk, ds, sh, asst.name)));
+                  const cum = mWeeks.slice(0, wi + 1).flat().filter(fullOffOf).length;
+                  return (
+                    <tr key={asst.id} className="asst-row">
+                      <td className="name-cell" style={{padding:'2px 4px'}}>
+                        <span className="color-bar" style={{background:asst.color}}/>{asst.name}
+                        {!asst.isPartTime && <div style={{fontSize:9,color:'#b0322e',fontWeight:700}}>休{cum}</div>}
+                      </td>
+                      {mDates.flatMap(ds => {
+                        const off = fullOffOf(ds) ? 'full-off' : undefined;
+                        const isNatHoliday = (doctorSched[ds] || {})._note === '國定假日';
+                        return getShiftsForDate(ds).map(sh => {
+                          let v = getCellValue(data, mk, ds, sh, asst.name);
+                          if (isNatHoliday && v === '休') v = '國定假日';
+                          return (
+                            <td key={ds + sh} className={off} style={{padding:0, borderLeft: sh === '早' ? '2px solid #9098b8' : undefined}}>
+                              <ShiftBlock shift={sh} value={v} full onClick={() => handleCellClick(asst, ds, sh)} noLabel locked={isLocked} isPartTime={asst.isPartTime}/>
+                            </td>
+                          );
+                        });
+                      })}
+                    </tr>
+                  );
+                })}
+                <tr>
+                  <td className="name-cell" style={{fontSize:10,color:'#888',fontWeight:400}}>備註</td>
+                  {mDates.map(ds => (
+                    <td key={ds} colSpan={getShiftsForDate(ds).length} className="remark-cell" style={{borderLeft:'2px solid #9098b8'}}>
+                      {getRemarks(data, mk, ds).map((r, ri) => <span key={ri} style={{display:'inline-block',padding:'1px 6px',borderRadius:10,background:MORANDI_PINK,color:'#2d2020',fontWeight:700,fontSize:11,marginRight:3}}>{r}</span>)}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {editTarget && (
+          <EditCellModal asst={editTarget.asst} dateStr={editTarget.dateStr} shift={editTarget.shift}
+            currentValue={editTarget.currentValue} data={data} mk={mk} onSave={handleSave} onClose={() => setEditTarget(null)} />
+        )}
+      </div>
+    );
+  }
+  if (isMobile) return renderMobile();
+
   return (
     <div>
       {/* Legend */}
@@ -8415,7 +8605,7 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
                             let v = getCellValue(data, mk, ds, sh, asst.name);
                             if (isNatHoliday && v === '休') v = '國定假日';
                             return (
-                              <td key={`${ds}${sh}`} className={baseCls + offCls} style={{padding:2, borderLeft:sh==='早'?'2px solid #9098b8':undefined}}>
+                              <td key={`${ds}${sh}`} className={baseCls + offCls} style={{padding:0, borderLeft:sh==='早'?'2px solid #9098b8':undefined}}>
                                 <ShiftBlock shift={sh} value={v} onClick={() => handleCellClick(asst, ds, sh)} noLabel locked={isLocked} fullRestDay={isFullRestDay} isPartTime={asst.isPartTime}/>
                               </td>
                             );
@@ -8972,16 +9162,13 @@ function DoctorScheduleView({ data, year, month, onUpdate }) {
                     {['1','2','3','4','5','6'].map(wd => {
                       const arr = data.doctorPatterns?.[doc]?.[wd] || [];
                       return (
-                        <td key={wd}>
-                          <div className="shift-check">
-                            {SHIFTS.map(sh => (
-                              <label key={sh} style={{color: arr.includes(sh) ? SHIFT_COLORS[sh] : '#7080a0', fontWeight: arr.includes(sh) ? 700 : 400}}>
-                                <input type="checkbox" checked={arr.includes(sh)}
-                                  onChange={() => togglePattern(doc, wd, sh)}
-                                  style={{marginRight:2,accentColor: SHIFT_COLORS[sh]}}/>
-                                {sh}
-                              </label>
-                            ))}
+                        <td key={wd} className="ft-cell">
+                          <div className="flat-toggles">
+                            {SHIFTS.map(sh => {
+                              const on = arr.includes(sh);
+                              return <div key={sh} className={on ? 'on' : undefined} style={on ? {background:SHIFT_COLORS[sh]} : undefined}
+                                onClick={() => togglePattern(doc, wd, sh)}>{sh}</div>;
+                            })}
                           </div>
                         </td>
                       );
@@ -9035,20 +9222,12 @@ function DoctorScheduleView({ data, year, month, onUpdate }) {
                             const info = doctorSched[ds] || {};
                             const shiftsForDay = wd === 6 ? SAT_SHIFTS : SHIFTS;
                             return (
-                              <td key={ds} style={{padding:'3px'}}>
-                                <div style={{display:'flex',gap:3,justifyContent:'center'}}>
+                              <td key={ds} className="ft-cell">
+                                <div className="flat-toggles">
                                   {shiftsForDay.map(sh => {
                                     const has = (info[sh]||[]).includes(doc);
-                                    return (
-                                      <div key={sh} onClick={() => toggleDateShift(doc, ds, sh)}
-                                        style={{padding:'2px 6px',borderRadius:3,cursor:'pointer',fontSize:11,
-                                          background: has ? SHIFT_COLORS[sh] : '#edf0f8',
-                                          color: has ? '#fff' : '#8898c0',
-                                          fontWeight: has ? 700 : 500,
-                                          border: has ? 'none' : '1px solid #d0d8ea'}}>
-                                        {sh}
-                                      </div>
-                                    );
+                                    return <div key={sh} className={has ? 'on' : undefined} style={has ? {background:SHIFT_COLORS[sh]} : undefined}
+                                      onClick={() => toggleDateShift(doc, ds, sh)}>{sh}</div>;
                                   })}
                                 </div>
                               </td>
@@ -9064,17 +9243,16 @@ function DoctorScheduleView({ data, year, month, onUpdate }) {
                           const wd = weekday(ds);
                           if (wd === 0) return <td key={ds} style={{background:'#eee'}}></td>;
                           const note = (doctorSched[ds] || {})._note || '';
-                          const btn = (label, val, activeStyle) => (
-                            <button key={val} onClick={() => setDayNote(ds, note===val ? '' : val)} style={{
-                              padding:'1px 5px', borderRadius:3, cursor:'pointer', fontSize:10, fontWeight:600,
-                              border:'1px solid', marginRight:2,
-                              ...(note===val ? activeStyle : {background:'#f5f5f5',borderColor:'#ddd',color:'#aaa'}),
-                            }}>{label}</button>
+                          const btn = (label, val, color) => (
+                            <div key={val} className={note===val ? 'on' : undefined} style={note===val ? {background:color} : undefined}
+                              onClick={() => setDayNote(ds, note===val ? '' : val)}>{label}</div>
                           );
                           return (
-                            <td key={ds} style={{padding:'2px 3px',textAlign:'center',verticalAlign:'middle'}}>
-                              {btn('國定','國定假日',{background:'#fef2f2',borderColor:'#e57373',color:'#c62828'})}
-                              {btn('無診','整日無診',{background:'#fce4ec',borderColor:'#e091a0',color:'#880e4f'})}
+                            <td key={ds} className="ft-cell">
+                              <div className="flat-toggles">
+                                {btn('國定','國定假日','#c0504d')}
+                                {btn('無診','整日無診','#a0607a')}
+                              </div>
                             </td>
                           );
                         })}
