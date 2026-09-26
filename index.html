@@ -518,14 +518,10 @@
             body.on-sched.drawer-open .sidebar{transform:none;}
             body.on-sched .sidebar-brand{padding-left:56px;}
             body.on-sched .main{margin-left:0;}
-            body.on-sched .menu-btn{display:flex;color:#fff;width:44px;height:44px;background:#1e3566;}
-            body.on-sched .menu-btn svg{width:20px;height:20px;}
-            body.on-sched .menu-badge{top:9px;right:8px;width:8px;height:8px;border-width:1.5px;}
-            body.on-sched.drawer-open .menu-btn{color:var(--text-primary);width:52px;height:53px;background:none;}
+            body.on-sched.drawer-open .menu-btn{display:flex;}
             body.on-sched.drawer-open .drawer-backdrop{display:block;}
-            body.on-sched #sched-root .topbar{padding-left:52px;}
         }
-        @media(max-width:700px){ body.on-sched .menu-btn{color:#fff;width:44px;height:44px;background:#1e3566;} body.on-sched .menu-btn svg{width:20px;height:20px;} body.on-sched .menu-badge{top:9px;right:8px;width:8px;height:8px;border-width:1.5px;} body.on-sched.drawer-open .menu-btn{color:var(--text-primary);width:52px;height:53px;background:none;} }
+        body.on-sched:not(.drawer-open) .menu-btn{display:none!important;}
         .sched-boot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:80px 20px;color:var(--text-muted);font-size:var(--fs-base);text-align:center;}
 
         /* iOS 風格開關 */
@@ -583,6 +579,13 @@
         .annual-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
         .annual-card .ac-bars{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 6px;}
 
+        /* iPhone 安全區：內容不被狀態列／動態島擋住（沒有安全區的裝置數值為 0，不受影響） */
+        body{padding-top:env(safe-area-inset-top,0px);}
+        body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:950;pointer-events:none;}
+        body.on-sched::before{background:#1e3566;}
+        .menu-btn{top:env(safe-area-inset-top,0px);}
+        /* iPhone 點輸入框時會自動放大（字小於 16px），放大後登入畫面就被切邊：手機一律 16px */
+        @media(max-width:700px){ input,select,textarea{font-size:16px!important;} }
         /* 手機一打開就完整顯示：內容不得撐寬頁面（寬表格改在自己的區塊內滑動） */
         .main,.page,.page-content{min-width:0;}
 
@@ -645,7 +648,31 @@
 #sched-root .sched-table tr.asst-row .shift-block{transition:transform .12s,box-shadow .12s}
 #sched-root .sched-table tr.asst-row .shift-block:hover{transform:scale(1.18);box-shadow:0 2px 8px rgba(0,0,0,.25);position:relative;z-index:2;filter:none}
 #sched-root table.sched-table td{overflow:visible}
-@media(max-width:700px){#sched-root .topbar{padding-left:52px;flex-wrap:wrap}}
+#sched-root .topbar{top:env(safe-area-inset-top,0px)!important;flex-wrap:wrap}
+#sched-root .sched-menu{position:relative;width:36px;height:36px;margin-left:-8px;border:none;background:none;color:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+#sched-root .sched-menu:hover{background:rgba(255,255,255,.14)}
+#sched-root .sched-menu-dot{position:absolute;top:6px;right:5px;width:8px;height:8px;border-radius:50%;background:#E8380D;border:1.5px solid #1e3566}
+#sched-root .topbar .tabs{display:flex;gap:6px;align-items:center}
+#sched-root .dd-wrap{position:relative}
+#sched-root .tab-btn .dd-caret{display:inline-block;vertical-align:middle;margin-left:4px;transition:transform .15s}
+#sched-root .tab-btn.open .dd-caret{transform:rotate(180deg)}
+#sched-root .dd-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:168px;background:#fff;border:1px solid #d8dcea;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.16);padding:6px;z-index:80}
+#sched-root .dd-menu button{display:block;width:100%;text-align:left;padding:9px 12px;border:none;background:none;border-radius:6px;font-size:13px;color:#2d3142;cursor:pointer}
+#sched-root .dd-menu button:hover{background:#f0f2f8}
+#sched-root .dd-menu button.on{font-weight:700;background:#eef1fa}
+#sched-root .dd-menu button.danger{color:#b3261e}
+#sched-root .dd-sep{height:1px;background:#eceef4;margin:5px 4px}
+#sched-root .subnav-meta{font-size:11px;color:#888}
+@media(max-width:700px){
+#sched-root .topbar{padding:6px 10px;gap:6px}
+#sched-root .topbar-title{font-size:14px;margin-right:auto}
+#sched-root .topbar .tabs{order:3;width:100%;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+#sched-root .topbar .tabs .tab-btn{width:100%;padding:6px 0;text-align:center}
+#sched-root .topbar .dd-menu{min-width:180px}
+#sched-root .month-nav{margin-left:0}
+#sched-root .subnav{flex-wrap:nowrap;padding:6px 10px;gap:6px}
+#sched-root .subnav-meta{display:none}
+}
 #sched-root *{box-sizing:border-box}
 #sched-root{font-family:-apple-system,'PingFang TC','Microsoft JhengHei',Arial,sans-serif;font-size:13px;background:#eef0f5;color:#2d3142;line-height:normal;letter-spacing:normal}
 #sched-root .topbar{background:linear-gradient(135deg,#1e3566 0%,#2d508a 100%);color:#fff;display:flex;align-items:center;gap:8px;padding:7px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
@@ -8323,7 +8350,7 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
                       <th key={ds + sh} style={{background:'#eceef8',padding:'2px',borderLeft: sh === '早' ? '2px solid #9098b8' : undefined}}>
                         <div style={{fontSize:11,fontWeight:700,color:'#5568a8'}}>{sh}</div>
                         {status && status.length > 0 && (
-                          <div style={{display:'flex',flexWrap:'wrap',justifyContent:'center',gap:'0 4px',fontSize:10,lineHeight:1.4}}>
+                          <div style={{display:'flex',flexWrap:'nowrap',justifyContent:'center',gap:'0 2px',fontSize:9,lineHeight:1.4,overflow:'hidden',whiteSpace:'nowrap'}}>
                             {status.map(({label, full, filled, extra}, k) => (
                               <span key={k} title={full} style={{fontWeight: filled ? 700 : 400, color: filled ? SHIFT_COLORS[sh] : '#c4c6d0'}}>
                                 {label}{extra > 0 && <sup style={{color:'#c04040',fontSize:8}}>{extra}</sup>}
@@ -8845,6 +8872,7 @@ function EditPositionModal({ position, dateStr, shift, data, mk, onSave, onClose
 // COMPONENT: PositionView (崗位視角)
 // ═══════════════════════════════════════════
 function PositionView({ data, year, month, onUpdate, isLocked }) {
+  const isMobile = useIsMobile();
   const mk = monthKey(year, month);
   const [weekIdx, setWeekIdx] = useState(0);
   const [editTarget, setEditTarget] = useState(null); // { position, dateStr, shift }
@@ -8905,6 +8933,17 @@ function PositionView({ data, year, month, onUpdate, isLocked }) {
   return (
     <div>
       {/* Week navigation */}
+      {isMobile ? (
+        <div className="m-weeknav">
+          <button aria-label="上一週" disabled={weekIdx <= 0} onClick={() => setWeekIdx(weekIdx - 1)}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 15 12 9 18 15"/></svg>
+          </button>
+          <span>第 {weekIdx + 1} 週・{parseInt(fm)}/{parseInt(fd)} – {parseInt(lm)}/{parseInt(ld)}</span>
+          <button aria-label="下一週" disabled={weekIdx >= weeks.length - 1} onClick={() => setWeekIdx(weekIdx + 1)}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+      ) : (
       <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10,flexWrap:'wrap'}}>
         {weeks.map((wd2,i) => {
           const vd = wd2.filter(Boolean);
@@ -8924,6 +8963,7 @@ function PositionView({ data, year, month, onUpdate, isLocked }) {
         })}
         <span style={{fontSize:11,color:'#888',marginLeft:4}}>點選格子可指派助理</span>
       </div>
+      )}
 
       <div className="week-block">
         <div className="week-header-row">
@@ -9810,57 +9850,6 @@ function ValidationPanel({ violations }) {
 }
 
 // ═══════════════════════════════════════════
-// COMPONENT: ClearScheduleModal
-// ═══════════════════════════════════════════
-function ClearScheduleModal({ defaultYear, defaultMonth, onConfirm, onClose }) {
-  const [clearYear, setClearYear] = useState(defaultYear);
-  const [clearMonth, setClearMonth] = useState(defaultMonth);
-  const [clearLeave, setClearLeave] = useState(false);
-  const mk = monthKey(clearYear, clearMonth);
-  const years = [2025, 2026, 2027];
-
-  return (
-    <div className="modal-bg" onClick={onClose}>
-      <div className="s-modal" style={{minWidth:300,maxWidth:380}} onClick={e => e.stopPropagation()}>
-        <h3>清除班表</h3>
-        <div style={{padding:'8px 10px',background:'#fdf0f0',borderRadius:5,fontSize:12,color:'#b04040',border:'1px solid #f0c8c8',marginBottom:14}}>
-          此操作將清除指定月份的所有排班記錄，無法復原，請確認後再繼續。
-        </div>
-
-        <label>選擇年份</label>
-        <select value={clearYear} onChange={e => setClearYear(Number(e.target.value))} style={{width:'100%',padding:'6px 8px',border:'1px solid #ccc',borderRadius:4,fontSize:13,marginBottom:2}}>
-          {years.map(y => <option key={y} value={y}>{y} 年</option>)}
-        </select>
-
-        <label>選擇月份</label>
-        <select value={clearMonth} onChange={e => setClearMonth(Number(e.target.value))} style={{width:'100%',padding:'6px 8px',border:'1px solid #ccc',borderRadius:4,fontSize:13}}>
-          {Array.from({length:12},(_,i)=>i+1).map(m => (
-            <option key={m} value={m}>{m} 月</option>
-          ))}
-        </select>
-
-        <label className="check-row">
-          <input type="checkbox" checked={clearLeave} onChange={e => setClearLeave(e.target.checked)} />
-          同時清除 {clearYear}年{clearMonth}月 的休假申請
-        </label>
-
-        <div style={{marginTop:12,padding:'6px 10px',background:'#f8f8fc',borderRadius:4,fontSize:11,color:'#666'}}>
-          將清除：<strong>{clearYear}年{clearMonth}月</strong> 排班資料
-          {clearLeave && <span>及休假申請</span>}
-        </div>
-
-        <div className="modal-btns">
-          <button className="s-btn s-btn-secondary" onClick={onClose}>取消</button>
-          <button className="s-btn s-btn-danger" onClick={() => onConfirm(clearYear, clearMonth, clearLeave)}>
-            確認清除
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════
 // COMPONENT: StatsModal（統計浮動視窗：當月／近三個月）
 // ═══════════════════════════════════════════
 function StatsModal({ data, year, month, onClose }) {
@@ -10139,9 +10128,29 @@ function App() {
   const [viewYear, setViewYear] = useState(() => new Date().getFullYear());
   const [viewMonth, setViewMonth] = useState(() => new Date().getMonth() + 1);
   const [showValidation, setShowValidation] = useState(false);
-  const [showClearModal, setShowClearModal] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [showStats, setShowStats] = useState(false);
+  const [ddOpen, setDdOpen] = useState(false);
+  const ddRef = useRef(null);
+  const SETUP_PAGES = ['preleave', 'doctor', 'manage'];
+  function goSetup(p) { setPage(p); setDdOpen(false); }
+  // 點選單以外的地方關閉下拉
+  useEffect(() => {
+    if (!ddOpen) return;
+    const close = e => { if (ddRef.current && !ddRef.current.contains(e.target)) setDdOpen(false); };
+    document.addEventListener('pointerdown', close);
+    return () => document.removeEventListener('pointerdown', close);
+  }, [ddOpen]);
+  // 同步點數系統選單的紅點（有待簽核項目）
+  const [menuDot, setMenuDot] = useState(false);
+  useEffect(() => {
+    const b = document.getElementById('menu-badge'); if (!b) return;
+    const sync = () => setMenuDot(!b.classList.contains('hidden'));
+    sync();
+    const mo = new MutationObserver(sync);
+    mo.observe(b, { attributes: true, attributeFilter: ['class'] });
+    return () => mo.disconnect();
+  }, []);
   const backupInputRef = useRef(null);
 
 
@@ -10211,15 +10220,6 @@ function App() {
     onUpdate(draft => { draft.schedule[result.mk] = result.schedule; });
   }
 
-  function handleClearSchedule(y, m, clearLeave) {
-    const mk = monthKey(y, m);
-    onUpdate(draft => {
-      if (draft.schedule[mk]) delete draft.schedule[mk];
-      if (clearLeave && draft.leaveRequests[mk]) delete draft.leaveRequests[mk];
-    });
-    setShowClearModal(false);
-  }
-
   // 一鍵清除當月排班（保留休假申請）
   function handleClearThisMonth() {
     const mk = monthKey(viewYear, viewMonth);
@@ -10271,76 +10271,70 @@ function App() {
     <div>
       {/* Top navigation */}
       <div className="topbar">
+        <button className="sched-menu" aria-label="開啟功能選單" onClick={() => window.toggleDrawer && window.toggleDrawer()}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+          {menuDot && <span className="sched-menu-dot"/>}
+        </button>
         <span className="topbar-title">立馥助理排班系統</span>
-        <button className={`tab-btn${page==='schedule'?' active':''}`} onClick={() => setPage('schedule')}>助理班表</button>
-        <button className={`tab-btn${page==='preleave'?' active':''}`} onClick={() => setPage('preleave')}>預假</button>
-        <button className={`tab-btn${page==='doctor'?' active':''}`} onClick={() => setPage('doctor')}>醫師班表</button>
-        <button className={`tab-btn${page==='manage'?' active':''}`} onClick={() => setPage('manage')}>助理管理</button>
-        <button className={`tab-btn${showStats?' active':''}`} onClick={() => setShowStats(true)}>統計</button>
-        <button className={`tab-btn${page==='remarks'?' active':''}`} onClick={() => setPage('remarks')}>備註</button>
+        <div className="tabs">
+          <button className={`tab-btn${page==='schedule'?' active':''}`} onClick={() => setPage('schedule')}>助理班表</button>
+          <div className="dd-wrap" ref={ddRef}>
+            <button className={`tab-btn${SETUP_PAGES.includes(page)?' active':''}${ddOpen?' open':''}`} onClick={() => setDdOpen(v => !v)}>
+              前置設定
+              <svg className="dd-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            {ddOpen && (
+              <div className="dd-menu">
+                <button className={page==='preleave'?'on':''} onClick={() => goSetup('preleave')}>預假</button>
+                <button className={page==='doctor'?'on':''} onClick={() => goSetup('doctor')}>醫師班表</button>
+                <button className={page==='manage'?'on':''} onClick={() => goSetup('manage')}>助理管理</button>
+                <div className="dd-sep"/>
+                <button onClick={() => { setDdOpen(false); handleExportBackup(); }}>備份匯出</button>
+                <button onClick={() => { setDdOpen(false); backupInputRef.current?.click(); }}>備份匯入</button>
+                <div className="dd-sep"/>
+                <button className="danger" onClick={() => { setDdOpen(false); handleClearThisMonth(); }}>清除當月排班</button>
+              </div>
+            )}
+          </div>
+          <button className={`tab-btn${showStats?' active':''}`} onClick={() => setShowStats(true)}>統計</button>
+          <button className={`tab-btn${page==='remarks'?' active':''}`} onClick={() => setPage('remarks')}>備註</button>
+        </div>
 
         {/* Month navigation */}
         <div className="month-nav">
-          <button onClick={prevMonth}>‹</button>
+          <button onClick={prevMonth} aria-label="上個月">‹</button>
           <span style={{minWidth:60,textAlign:'center',fontWeight:600}}>{viewYear}年{viewMonth}月</span>
-          <button onClick={nextMonth}>›</button>
+          <button onClick={nextMonth} aria-label="下個月">›</button>
         </div>
       </div>
+      <input ref={backupInputRef} type="file" accept=".json,application/json" style={{display:'none'}} onChange={handleImportBackup} />
 
-      {/* Sub-navigation bar */}
-      <div className="subnav">
-        {page === 'schedule' && (
+      {/* 班表功能列（只在助理班表頁） */}
+      {page === 'schedule' && (
+        <div className="subnav">
           <div className="subnav-toggle">
             <button className={schedView==='asst'?'active':''} onClick={() => setSchedView('asst')}>助理視角</button>
             <button className={schedView==='pos'?'active':''} onClick={() => setSchedView('pos')}>崗位視角</button>
           </div>
-        )}
-        <button className="btn-action" onClick={handleAutoSchedule}>自動排班</button>
-        <button className={`btn-check${showValidation?' active':''}`} onClick={() => setShowValidation(v => !v)}>
-          規則檢核
-          {violations.length > 0 && (
-            <span style={{
-              marginLeft:6, background: violations.some(v => v.severity==='error') ? '#c84040' : '#d08020',
-              color:'#fff', borderRadius:8, padding:'1px 6px', fontSize:10, fontWeight:700,
-            }}>{violations.length}</span>
-          )}
-        </button>
-        {showValidation && (
-          <span style={{fontSize:11,color:'#888',marginLeft:4}}>
-            {violations.length === 0 ? '✓ 無違規' : `${violations.filter(v=>v.severity==='error').length} 錯誤 ／ ${violations.filter(v=>v.severity==='warn').length} 警告`}
-          </span>
-        )}
-        {/* Lock button + last modified */}
-        <button
-          className={`btn-check${isLocked?' active':''}`}
-          onClick={() => setIsLocked(v => !v)}
-          title={isLocked ? '點擊解鎖班表' : '點擊鎖定班表（防止誤觸）'}
-          style={{minWidth:60}}>
-          {isLocked ? '🔒 已鎖定' : '🔓 鎖定'}
-        </button>
-        {data.lastModified && (
-          <span style={{fontSize:11,color:'#888'}}>上次修改：{data.lastModified}</span>
-        )}
-        <div style={{marginLeft:'auto',display:'flex',gap:6,alignItems:'center'}}>
-          <button className="btn-action" onClick={handleExportBackup} title="下載目前所有資料的 JSON 備份">備份匯出</button>
-          <button className="btn-action" onClick={() => backupInputRef.current?.click()} title="從備份 JSON 檔案還原資料">備份匯入</button>
-          <input ref={backupInputRef} type="file" accept=".json,application/json" style={{display:'none'}} onChange={handleImportBackup} />
-          <button className="btn-clear" onClick={handleClearThisMonth} title={`一鍵清除 ${viewYear}年${viewMonth}月 排班（保留休假）`}>🧹 清除當月</button>
-          <button className="btn-clear" onClick={() => setShowClearModal(true)}>🗑 清除班表</button>
+          <button className={`btn-check${showValidation?' active':''}`} onClick={() => setShowValidation(v => !v)}>
+            規則檢核
+            {violations.length > 0 && (
+              <span style={{
+                marginLeft:6, background: violations.some(v => v.severity==='error') ? '#c84040' : '#d08020',
+                color:'#fff', borderRadius:8, padding:'1px 6px', fontSize:10, fontWeight:700,
+              }}>{violations.length}</span>
+            )}
+          </button>
+          <button
+            className={`btn-check${isLocked?' active':''}`}
+            onClick={() => setIsLocked(v => !v)}
+            title={isLocked ? '點擊解鎖班表' : '點擊鎖定班表（防止誤觸）'}
+            style={{display:'inline-flex',alignItems:'center',gap:4}}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d={isLocked ? 'M8 11V7a4 4 0 0 1 8 0v4' : 'M8 11V7a4 4 0 0 1 7.5-2'}/></svg>
+            {isLocked ? '已鎖定' : '鎖定'}
+          </button>
+          {data.lastModified && <span className="subnav-meta">上次修改：{data.lastModified}</span>}
         </div>
-      </div>
-
-      {/* Version tag */}
-      <div style={{position:'fixed',bottom:6,right:10,fontSize:10,color:'#bbb',zIndex:99,pointerEvents:'none'}}>v3.0 • 崗位視角排班・清除班表・待排狀態</div>
-
-      {/* Clear schedule modal */}
-      {showClearModal && (
-        <ClearScheduleModal
-          defaultYear={viewYear}
-          defaultMonth={viewMonth}
-          onConfirm={handleClearSchedule}
-          onClose={() => setShowClearModal(false)}
-        />
       )}
 
       {/* 統計浮動視窗 */}
@@ -10350,7 +10344,7 @@ function App() {
 
       {/* Content */}
       <div className="content">
-        {showValidation && (
+        {page === 'schedule' && showValidation && (
           <div style={{marginBottom:14,maxWidth:900}}>
             <ValidationPanel violations={violations} />
           </div>
