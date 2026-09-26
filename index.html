@@ -603,37 +603,46 @@
 
         /* 助理：我的班表 */
         .mnb-myshift{display:none!important}
+        #myshift-content{max-width:560px;}
+        .mc-sum{display:flex;gap:16px;align-items:baseline;font-size:var(--fs-sm);color:var(--text-muted);margin:0 2px 10px;}
+        .mc-sum b{font-size:var(--fs-hd);color:var(--text-primary);font-weight:700;margin-right:2px;}
+        .mc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+        .mc-wd{text-align:center;font-size:var(--fs-xs);color:var(--text-muted);padding-bottom:2px;}
+        .mc-day{display:flex;flex-direction:column;align-items:stretch;gap:3px;padding:4px 3px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;cursor:pointer;min-width:0;color:var(--text-primary);-webkit-tap-highlight-color:transparent;}
+        .mc-day.past{opacity:.45;}
+        .mc-day.today{border-color:var(--text-primary);}
+        .mc-day.sel{box-shadow:0 0 0 2px var(--text-primary);border-color:var(--text-primary);opacity:1;}
+        .mc-day.sun{background:var(--surface-alt);border-color:var(--surface-alt);cursor:default;align-items:center;box-shadow:none;}
+        .mc-num{font-size:var(--fs-sm);font-weight:700;line-height:1.1;text-align:center;}
+        .mc-num.red{color:var(--red);}
+        .mc-closed{font-size:10px;color:#b8b8b8;margin-top:8px;}
+        .mc-bars{display:flex;flex-direction:column;gap:2px;}
+        .mc-bar{display:flex;align-items:center;justify-content:center;height:14px;border-radius:3px;font-size:10px;font-weight:700;line-height:1;font-style:normal;}
+        .mc-bar.work{background:var(--text-primary);color:#fff;}
+        .mc-bar.rest{background:#EDEDED;}
+        .mc-bar.pre{background:#fff;box-shadow:inset 0 0 0 1px #c0504d;color:#b0322e;}
+        .mc-bar.leave{background:var(--red-light);color:var(--red);}
+        .mc-bar.none{background:transparent;}
+        .mc-bar.pending{box-shadow:inset 0 0 0 2px var(--gold);}
+        .mc-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:var(--fs-xs);color:var(--text-muted);margin:8px 2px 12px;}
+        .mc-legend span{display:inline-flex;align-items:center;gap:4px;}
+        .mc-legend .mc-bar{width:18px;}
+        .mc-detail{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px 4px;}
+        .mc-dhd{font-size:var(--fs-base);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+        .mc-hol{font-size:var(--fs-xs);color:var(--red);font-weight:700;}
+        .mc-today{font-size:var(--fs-xs);background:var(--text-primary);color:#fff;border-radius:10px;padding:1px 8px;font-weight:500;}
+        .mc-row{display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 0;border-top:1px solid var(--border);}
+        .mc-sh{width:22px;font-size:var(--fs-sm);color:var(--text-muted);flex-shrink:0;}
+        .mc-pos{flex:1;font-size:var(--fs-base);font-weight:600;min-width:0;}
+        .mc-pos.rest{color:var(--text-muted);font-weight:400;}
+        .mc-pos.pre{color:#b0322e;}
+        .mc-pos.leave{color:var(--red);}
+        .mc-pos em{font-style:normal;font-size:var(--fs-xs);color:var(--text-secondary);margin-left:6px;font-weight:700;}
+        .mc-tag{font-size:var(--fs-xs);color:#996600;background:var(--gold-light);border:1px solid var(--gold-border);border-radius:10px;padding:1px 8px;flex-shrink:0;}
+        .mc-empty{font-size:var(--fs-sm);color:var(--text-muted);padding:6px 0 10px;}
+        .mc-reqs{margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px 2px;}
+        .mc-reqs-hd{font-size:var(--fs-sm);font-weight:700;}
         body.assistant-mode .mnb-myshift{display:flex!important}
-        .ms-top{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
-        .ms-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;display:flex;flex-direction:column;gap:2px;}
-        .ms-stat b{font-size:var(--fs-hd);font-weight:700;line-height:1.1;}
-        .ms-stat span{font-size:var(--fs-xs);color:var(--text-muted);}
-        .ms-hint{font-size:var(--fs-sm);color:var(--text-muted);margin:4px 2px 0;}
-        .ms-week{font-size:var(--fs-xs);font-weight:700;color:var(--text-muted);margin:16px 2px 6px;letter-spacing:.06em;}
-        .ms-day{display:flex;align-items:stretch;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:6px;margin-bottom:6px;}
-        .ms-day.today{border-color:var(--text-primary);box-shadow:inset 3px 0 0 var(--text-primary);}
-        .ms-day.past{opacity:.5;}
-        .ms-date{width:44px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2;}
-        .ms-date b{font-size:var(--fs-hd);font-weight:700;}
-        .ms-date b.red,.ms-date .hol{color:var(--red);}
-        .ms-date span{font-size:var(--fs-xs);color:var(--text-muted);}
-        .ms-date .hol{font-weight:700;}
-        .ms-cells{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;min-width:0;}
-        .ms-cell{min-height:48px;border:1px solid var(--border);border-radius:6px;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-family:inherit;cursor:pointer;padding:3px 2px;color:var(--text-primary);min-width:0;-webkit-tap-highlight-color:transparent;}
-        .ms-cell:active:not(:disabled){background:var(--surface-alt);}
-        .ms-cell .sh{font-size:var(--fs-xs);color:var(--text-muted);}
-        .ms-cell .pos{font-size:var(--fs-cap);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
-        .ms-cell .px{font-size:var(--fs-xs);color:var(--text-secondary);font-weight:700;}
-        .ms-cell.rest{background:#EDEDED;border-color:#EDEDED;}
-        .ms-cell.rest .pos{font-weight:400;color:var(--text-muted);}
-        .ms-cell.pre{background:#EDEDED;border-color:transparent;box-shadow:inset 0 0 0 1.5px #c0504d;}
-        .ms-cell.pre .pos{color:#b0322e;font-weight:700;}
-        .ms-cell.leave{background:var(--red-light);border-color:var(--red-border);}
-        .ms-cell.leave .pos{color:var(--red);}
-        .ms-cell.pending{box-shadow:inset 0 0 0 1.5px var(--gold);}
-        .ms-cell.pending .sh{color:#996600;font-weight:700;}
-        .ms-cell:disabled{cursor:default;}
-        .ms-cell.empty{visibility:hidden;}
         .ms-req{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:var(--fs-sm);}
         .ms-req:last-child{border-bottom:none;}
         .ms-req-sub{color:var(--text-muted);font-size:var(--fs-xs);margin-top:2px;}
@@ -698,6 +707,84 @@
         .abbr-chip{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 4px;border-radius:4px;background:var(--surface-alt);border:1px solid var(--border);font-size:var(--fs-xs);font-weight:700;color:var(--text-secondary);}
         .abbr-menu{min-width:140px;}
         .abbr-menu .csel-opt[data-c]:not([data-c=""]){font-size:var(--fs-sub);}
+
+        /* ─── 待辦清單（仿 Things 3）─── */
+        .ntodo,.mnb-todo{display:none!important}
+        body.todo-access .ntodo,body.todo-access .mnb-todo{display:flex!important}
+        body.todo-access .ntodo-lbl{display:block!important}
+        .ntodo-lbl{display:none!important}
+        #todo-content{max-width:680px;padding-bottom:calc(96px + var(--mnav));}
+        .td-views{display:flex;gap:4px;background:var(--surface-alt);border-radius:9px;padding:3px;margin-bottom:12px;}
+        .td-views button{flex:1;border:none;background:none;border-radius:7px;padding:7px 4px;font-family:inherit;font-size:var(--fs-sm);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;}
+        .td-views button span{font-size:var(--fs-xs);color:var(--text-muted);font-weight:500;}
+        .td-views button.on{background:var(--surface);color:var(--text-primary);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.12);}
+        .td-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+        .td-filters .csel-btn{padding:6px 10px;font-size:var(--fs-sm);border-radius:6px;}
+        .td-group{margin-bottom:18px;}
+        .td-ghd{font-size:var(--fs-sub);font-weight:700;color:var(--text-primary);padding:0 4px 6px;border-bottom:1px solid var(--border);margin-bottom:2px;}
+        .td-ghd.late{color:var(--red);}
+        .td-item{display:flex;align-items:flex-start;gap:12px;padding:10px 6px;border-radius:8px;transition:background .12s;}
+        .td-item:hover{background:#F4F6F8;}
+        .td-check{width:20px;height:20px;border-radius:50%;border:1.6px solid #B9BEC5;background:var(--surface);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .15s,border-color .15s;}
+        .td-check:hover{border-color:var(--accent);}
+        .td-check.on{background:var(--accent);border-color:var(--accent);}
+        .td-check.ghost{cursor:default;border-style:dashed;}
+        .td-main{flex:1;min-width:0;cursor:pointer;}
+        .td-title{font-size:var(--fs-sub);color:var(--text-primary);line-height:1.4;display:flex;align-items:center;gap:6px;word-break:break-word;}
+        .td-item.done .td-title{color:var(--text-muted);text-decoration:line-through;text-decoration-color:#c8c8c8;}
+        .td-flag{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;}
+        .td-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+        .td-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-top:3px;font-size:var(--fs-xs);color:var(--text-muted);}
+        .td-meta span{display:inline-flex;align-items:center;gap:3px;}
+        .td-cat{background:var(--surface-alt);color:var(--text-secondary)!important;border-radius:4px;padding:1px 6px;}
+        .td-due.late{color:var(--red);font-weight:700;}
+        .td-empty{text-align:center;color:var(--text-muted);font-size:var(--fs-base);padding:48px 0;}
+        .td-card{background:var(--surface);border-radius:12px;box-shadow:0 2px 14px rgba(0,0,0,.10),0 0 0 1px rgba(0,0,0,.04);padding:14px 16px;margin:8px 0 14px;}
+        .td-card-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+        .td-title-in{flex:1;border:none;outline:none;font-family:inherit;font-size:var(--fs-sub);font-weight:600;color:var(--text-primary);background:none;padding:2px 0;min-width:0;}
+        .td-fields{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 12px;}
+        .td-fields label{display:flex;flex-direction:column;gap:4px;font-size:var(--fs-xs);color:var(--text-muted);min-width:0;}
+        .td-fields input,.td-fields .csel-btn{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:var(--fs-base);color:var(--text-primary);background:var(--surface);}
+        .td-creator{font-size:var(--fs-xs);color:var(--text-muted);margin-top:12px;}
+        .td-thread{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+        .td-msg{align-self:flex-start;max-width:85%;background:var(--surface-alt);border-radius:10px 10px 10px 3px;padding:7px 10px;}
+        .td-msg.me{align-self:flex-end;background:var(--accent-light);border-radius:10px 10px 3px 10px;}
+        .td-msg-hd{font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:2px;}
+        .td-msg-body{font-size:var(--fs-base);color:var(--text-primary);white-space:pre-wrap;word-break:break-word;}
+        .td-reply{display:flex;gap:6px;margin-top:10px;}
+        .td-reply input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--border);border-radius:18px;font-family:inherit;font-size:var(--fs-base);outline:none;}
+        .td-reply input:focus{border-color:var(--accent);}
+        .td-card-ft{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+        .td-fab{position:fixed;right:22px;bottom:calc(22px + var(--mnav));width:52px;height:52px;border-radius:50%;border:none;background:var(--accent);box-shadow:0 4px 14px rgba(0,104,183,.35);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:90;}
+        .td-fab:active{transform:scale(.96);}
+        /* 通知鈴鐺 */
+        #nt-bell{display:none;position:fixed;top:16px;left:calc(var(--sw) - 46px);width:34px;height:34px;border:1px solid var(--border);background:var(--surface);border-radius:8px;align-items:center;justify-content:center;color:var(--text-primary);cursor:pointer;z-index:101;padding:0;}
+        body.nt-access #nt-bell{display:flex;}
+        body.on-sched #nt-bell{display:none!important;}
+        #nt-bell:hover{background:var(--surface-alt);}
+        #nt-bell .nt-count{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:var(--fs-xs);font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);}
+        #nt-panel{position:fixed;z-index:1100;width:340px;max-height:70vh;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.16);padding:8px;}
+        .nt-hd{font-size:var(--fs-cap);font-weight:700;padding:4px 6px 8px;border-bottom:1px solid var(--border);}
+        .nt-sec{font-size:var(--fs-xs);font-weight:700;color:var(--text-muted);padding:10px 6px 4px;}
+        .nt-item{display:block;width:100%;text-align:left;border:none;background:none;font-family:inherit;padding:9px 8px;border-radius:8px;color:var(--text-primary);}
+        .nt-todo{cursor:pointer;}
+        .nt-todo:hover{background:var(--surface-alt);}
+        .nt-rem{background:var(--gold-light);border:1px solid var(--gold-border);margin-bottom:6px;}
+        .nt-title{font-size:var(--fs-base);font-weight:700;}
+        .nt-sub{font-size:var(--fs-sm);color:var(--text-secondary);margin-top:2px;}
+        .nt-act{display:flex;gap:6px;justify-content:flex-end;margin-top:8px;}
+        .nt-empty{font-size:var(--fs-sm);color:var(--text-muted);text-align:center;padding:18px 0;}
+        @media(max-width:700px){
+            #nt-bell{left:auto;right:10px;top:calc(env(safe-area-inset-top,0px) + 10px);}
+            body.drawer-open #nt-bell{display:none;}
+            .page-header > h2,.page-header > p,.page-header > div:first-child{padding-right:44px;}
+            #nt-panel{width:auto;}
+            .td-fields{grid-template-columns:1fr 1fr;}
+            .td-fab{right:16px;bottom:calc(16px + var(--mnav));}
+        }
+        .mgr-row .mgr-sched + .mgr-sched{margin-left:10px;}
+        .asst-todo{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:var(--fs-xs);color:var(--text-muted);}
+        .asst-todo .ios-switch{transform:scale(.8);transform-origin:left center;}
 
         /* 院長總覽 */
         .nprin{display:none!important}
@@ -1019,6 +1106,10 @@
 </head>
 <body>
 <div id="top-safe" aria-hidden="true"></div>
+<button id="nt-bell" onclick="ntToggle()" aria-label="通知">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+    <span class="nt-count hidden">0</span>
+</button>
 
 <!-- ══ Login Screen ══ -->
 <div id="login-screen" class="hidden">
@@ -1193,6 +1284,12 @@ appId: "..."'></textarea>
     </div>
     <div class="sidebar-nav">
         <div class="nav-sec-label n-overview-lbl">概覽</div>
+        <button class="nav-item ntodo" onclick="navigate('todo')" style="justify-content:space-between">
+            <span style="display:flex;align-items:center;gap:9px">
+                <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>待辦清單
+            </span>
+            <span id="todo-badge" class="hidden" style="background:var(--accent);color:#fff;border-radius:999px;font-size:var(--fs-xs);font-weight:700;padding:1px 7px;min-width:18px;text-align:center"></span>
+        </button>
         <button class="nav-item nprin" onclick="navigate('dashboard')">
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/></svg>總覽
         </button>
@@ -1660,6 +1757,12 @@ appId: "..."'></textarea>
         <div class="page-content" id="dash-content"></div>
     </div>
 
+    <!-- ── 待辦清單 ── -->
+    <div id="page-todo" class="page">
+        <div class="page-header"><h2>待辦清單</h2><p>指派、追蹤與回覆</p></div>
+        <div class="page-content" id="todo-content"></div>
+    </div>
+
     <!-- ── 助理：我的班表 ── -->
     <div id="page-myshift" class="page">
         <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
@@ -1709,6 +1812,10 @@ appId: "..."'></textarea>
     <button class="mn-item mnb-attendance" onclick="navigate('attendance')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       假勤管理
+    </button>
+    <button class="mn-item mnb-todo" onclick="navigate('todo')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="8 12 11 15 16 9"/></svg>
+      待辦
     </button>
     <button class="mn-item mnb-myview" onclick="navigate('myview')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -2052,6 +2159,7 @@ function onSchedAccessChanged() {
     document.body.classList.toggle('sched-access', canUseSchedule());
     if (canUseSchedule()) { schedStartSwaps(); msEnsureSched(); }
     updateSwapBadge();
+    ntApplyAccess();
     if (currentPage === 'schedule' && !canUseSchedule()) navigate('overview');
 }
 
@@ -2688,60 +2796,88 @@ function renderMyShift() {
     if (_msErr) { el.innerHTML = `<div class="info-box">班表讀取失敗：${_msErr.code === 'permission-denied' ? '請院長在 Firebase 安全性規則允許 schedule 資料表' : _msErr.message}</div>`; return; }
     if (!_msLoaded) { el.innerHTML = '<div class="sched-boot"><div class="spinner"></div></div>'; return; }
     const data = schedStore.get();
-    if (!data.schedule?.[mk] && !Object.keys(data.schedule || {}).length) { el.innerHTML = '<div class="empty-state"><p>尚無班表</p></div>'; return; }
 
     const [y, m] = mk.split('-').map(Number);
     const days = new Date(y, m, 0).getDate();
     const today = msToday();
     const hol = hostHolidays();
     const WD = ['日', '一', '二', '三', '四', '五', '六'];
+    const md = ds => `${+ds.slice(5, 7)}/${+ds.slice(8)}`;
     const myPending = schedSwaps.filter(r => r.requesterId === asst.id && r.status === 'pending');
-    let sessions = 0, fullOff = 0, weekNo = 0, html = '';
+    // 選取的日期：預設今天（不在本月則為 1 號）
+    if (!_msSel || !_msSel.startsWith(mk)) _msSel = today.startsWith(mk) ? today : `${mk}-01`;
+
+    const dayCells = ds => msShifts(ds).map(sh => ({ sh, ...msCell(data, mk, ds, sh, asst.name, asst.id) }));
+    let sessions = 0, fullOff = 0;
+    let cal = ['一', '二', '三', '四', '五', '六', '日'].map(w => `<div class="mc-wd">${w}</div>`).join('');
+    const lead = (new Date(y, m - 1, 1).getDay() + 6) % 7;
+    for (let i = 0; i < lead; i++) cal += '<div></div>';
     for (let d = 1; d <= days; d++) {
         const ds = `${mk}-${String(d).padStart(2, '0')}`;
         const wd = new Date(y, m - 1, d).getDay();
-        if (wd === 0) continue;
-        if (wd === 1 || weekNo === 0) { weekNo++; html += `<div class="ms-week">第 ${weekNo} 週</div>`; }
-        const shs = msShifts(ds);
-        const cells = shs.map(sh => ({ sh, ...msCell(data, mk, ds, sh, asst.name, asst.id) }));
+        const cls = ['mc-day'];
+        if (ds === today) cls.push('today');
+        if (ds === _msSel) cls.push('sel');
+        if (ds < today) cls.push('past');
+        if (wd === 0) {
+            cal += `<div class="${cls.join(' ')} sun"><span class="mc-num">${d}</span><span class="mc-closed">休診</span></div>`;
+            continue;
+        }
+        const cells = dayCells(ds);
         cells.forEach(c => { if (c.kind === 'work') sessions++; });
         if (cells.every(c => c.kind !== 'work')) fullOff++;
-        const past = ds < today;
-        const cellHtml = cells.map(c => {
+        const bars = cells.map(c => {
             const pend = myPending.some(r => r.date === ds && r.shift === c.sh);
+            const t = c.kind === 'rest' ? '' : msShort(c.text);
+            return `<span class="mc-bar ${c.kind}${pend ? ' pending' : ''}">${t}</span>`;
+        }).join('') + (cells.length === 2 ? '<span class="mc-bar none"></span>' : '');
+        cal += `<button type="button" class="${cls.join(' ')}" onclick="selectMyShiftDay('${ds}')" ${hol[ds] ? `title="${hol[ds]}"` : ''}>
+            <span class="mc-num${hol[ds] ? ' red' : ''}">${d}</span><span class="mc-bars">${bars}</span></button>`;
+    }
+
+    // 選取日明細
+    const sel = _msSel, selWd = new Date(sel + 'T00:00:00').getDay();
+    let detail;
+    if (selWd === 0) {
+        detail = `<div class="mc-detail"><div class="mc-dhd">${md(sel)}（日）</div><div class="mc-empty">週日休診</div></div>`;
+    } else {
+        const past = sel < today;
+        const rows = dayCells(sel).map(c => {
+            const pend = myPending.some(r => r.date === sel && r.shift === c.sh);
             const canSwap = !past && (c.kind === 'work' || c.kind === 'rest') && !pend;
-            return `<button type="button" class="ms-cell ${c.kind}${pend ? ' pending' : ''}" ${canSwap ? `onclick="openSwapSheet('${ds}','${c.sh}')"` : 'disabled'}>
-                <span class="sh">${c.sh}${pend ? '・調班中' : ''}</span><span class="pos">${c.text}</span>${c.proxy ? `<span class="px">${c.proxy}</span>` : ''}</button>`;
-        }).join('') + (shs.length === 2 ? '<span class="ms-cell empty"></span>' : '');
-        html += `<div class="ms-day${ds === today ? ' today' : ''}${past ? ' past' : ''}">
-            <div class="ms-date"><b${hol[ds] ? ' class="red"' : ''}>${d}</b><span>週${WD[wd]}</span>${hol[ds] ? `<span class="hol">${hol[ds].slice(0, 2)}</span>` : ''}</div>
-            <div class="ms-cells">${cellHtml}</div></div>`;
+            return `<div class="mc-row">
+                <span class="mc-sh">${c.sh}</span>
+                <span class="mc-pos ${c.kind}">${c.text}${c.proxy ? `<em>${c.proxy}</em>` : ''}</span>
+                ${pend ? '<span class="mc-tag">調班中</span>'
+                    : canSwap ? `<button class="btn btn-outline btn-sm" onclick="openSwapSheet('${sel}','${c.sh}')">調班</button><button class="btn btn-outline btn-sm" onclick="openPosSheet('${sel}','${c.sh}')">改崗位</button>` : ''}
+            </div>`;
+        }).join('');
+        detail = `<div class="mc-detail"><div class="mc-dhd">${md(sel)}（${WD[selWd]}）${hol[sel] ? `<span class="mc-hol">${hol[sel]}</span>` : ''}${sel === today ? '<span class="mc-today">今天</span>' : ''}</div>${rows}</div>`;
     }
-    const mine = schedSwaps.filter(r => r.requesterId === asst.id).slice(0, 10);
+
+    const mine = schedSwaps.filter(r => r.requesterId === asst.id).slice(0, 8);
     const stLabel = { pending: ['待確認', 'bgo'], approved: ['已對調', 'bg'], rejected: ['已退回', 'br'], cancelled: ['已取消', 'bgr'] };
-    const md = ds => `${+ds.slice(5, 7)}/${+ds.slice(8)}`;
-    const reqHtml = mine.length ? mine.map(r => `<div class="ms-req">
-            <div><div><b>${md(r.date)} ${r.shift}診</b>　與 ${r.targetName} 對調</div>
-            <div class="ms-req-sub">${r.requesterPos} ↔ ${r.targetPos}</div></div>
+    const reqHtml = mine.length ? `<div class="mc-reqs"><div class="mc-reqs-hd">我的調班申請</div>${mine.map(r => `<div class="ms-req">
+            <div><b>${md(r.date)} ${r.shift}診</b>　${r.type === 'position' ? '改崗位' : '與 ' + r.targetName}<div class="ms-req-sub">${r.type === 'position' ? `${r.requesterPos} → ${r.newPos}` : `${r.requesterPos} ↔ ${r.targetPos}`}</div></div>
             <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="badge ${stLabel[r.status]?.[1] || 'bgr'}">${stLabel[r.status]?.[0] || r.status}</span>
-            ${r.status === 'pending' ? `<button class="btn btn-outline btn-sm" onclick="cancelSwap('${r.id}')">取消</button>` : ''}</div></div>`).join('')
-        : '<div class="ms-req-empty">尚無調班申請</div>';
+            ${r.status === 'pending' ? `<button class="btn btn-outline btn-sm" onclick="cancelSwap('${r.id}')">取消</button>` : ''}</div></div>`).join('')}</div>` : '';
+
     el.innerHTML = `
-        <div class="ms-top">
-            <div class="ms-stat"><b>${sessions}</b><span>本月診次</span></div>
-            <div class="ms-stat"><b>${fullOff}</b><span>整天休息</span></div>
-            <div class="ms-stat"><b>${myPending.length}</b><span>調班待確認</span></div>
-        </div>
-        <div class="ms-hint">點任一格可申請與其他助理調班</div>
-        ${html}
-        <div class="card" style="margin-top:16px"><div class="card-title">我的調班申請</div>${reqHtml}</div>`;
-    // 第一次打開本月時，捲到今天
-    if (!_msScrolled && mk === currentMonth()) {
-        _msScrolled = true;
-        requestAnimationFrame(() => el.querySelector('.ms-day.today')?.scrollIntoView({ block: 'center' }));
-    }
+        <div class="mc-sum"><span><b>${sessions}</b> 診</span><span>整休 <b>${fullOff}</b> 天</span>${myPending.length ? `<span>調班待確認 <b>${myPending.length}</b></span>` : ''}</div>
+        <div class="mc-grid">${cal}</div>
+        <div class="mc-legend"><span><i class="mc-bar work">昶</i>上班</span><span><i class="mc-bar rest"></i>休</span><span><i class="mc-bar pre">指</i>指休</span><span><i class="mc-bar leave">病</i>請假</span></div>
+        ${detail}
+        ${reqHtml}`;
 }
-let _msScrolled = false;
+let _msSel = null;
+function selectMyShiftDay(ds) { _msSel = ds; renderMyShift(); }
+// 月曆格內的一字縮寫（醫師取中間字、崗位取代表字、假別取首字）
+function msShort(v) {
+    const map = { '流動': '流', '櫃檯': '櫃', '行政': '政', '諮詢': '詢', '打掃': '掃', '教育訓練': '訓', '國定假日': '國', '工傷病假': '傷', '其他假': '假' };
+    if (map[v]) return map[v];
+    if (/假$|休$/.test(v)) return v[0];
+    return v.length >= 3 ? v[1] : v.slice(-1);
+}
 
 // ── 調班申請：選擇對象 ──
 function openSwapSheet(ds, sh) {
@@ -2780,7 +2916,7 @@ function pickSwap(i) {
     document.querySelectorAll('#ms-sheet .ms-opt').forEach(b => b.classList.toggle('on', +b.dataset.i === i));
     const o = _msSheet.opts[i];
     const btn = document.getElementById('ms-submit');
-    btn.disabled = false; btn.textContent = `與 ${o.name} 對調`;
+    btn.disabled = false; btn.textContent = _msSheet.mode === 'position' ? `改為 ${o.name}` : `與 ${o.name} 對調`;
 }
 function closeSwapSheet() { document.getElementById('ms-sheet')?.remove(); _msSheet = null; }
 async function submitSwap() {
@@ -2789,14 +2925,12 @@ async function submitSwap() {
     const o = s.opts[s.pick];
     const btn = document.getElementById('ms-submit'); btn.disabled = true;
     try {
-        await db.collection(col('swapRequests')).add({
-            month: s.ds.slice(0, 7), date: s.ds, shift: s.sh,
-            requesterId: asst.id, requesterName: asst.name, requesterPos: s.me,
-            targetName: o.name, targetPos: o.text,
-            status: 'pending', createdAt: new Date().toISOString(),
-        });
+        const base = { month: s.ds.slice(0, 7), date: s.ds, shift: s.sh, requesterId: asst.id, requesterName: asst.name, requesterPos: s.me, status: 'pending', createdAt: new Date().toISOString() };
+        await db.collection(col('swapRequests')).add(s.mode === 'position'
+            ? { ...base, type: 'position', newPos: o.name, targetName: '', targetPos: '' }
+            : { ...base, type: 'swap', targetName: o.name, targetPos: o.text });
         closeSwapSheet();
-        toast('調班申請已送出，等待排班人員確認');
+        toast(s.mode === 'position' ? '改崗位申請已送出，等待排班人員確認' : '調班申請已送出，等待排班人員確認');
     } catch (e) {
         btn.disabled = false;
         toast(e.code === 'permission-denied' ? '送出被拒：請院長在 Firebase 安全性規則允許 swapRequests 資料表' : '送出失敗：' + e.message);
@@ -2851,6 +2985,426 @@ function openAbbrPicker(btn, id) {
 document.addEventListener('pointerdown', e => {
     if (_abbrMenu && !_abbrMenu.contains(e.target) && !e.target.closest('.abbr-name')) closeAbbrPicker();
 }, true);
+
+// ================================================================
+// 待辦清單（仿 Things 3）＋通知鈴鐺＋每月固定提醒
+// ================================================================
+const TODO_DEFAULT_ASSTS = ['黃莉婷', '盧蓓歆', '黃羿璇'];   // 助理預設開放（助理管理可逐一開關）
+const TODO_DEFAULT_ADMINS = ['黃敏琪'];                      // 管理者預設可看全部（系統設定可開關）
+const TODO_URG = [
+    { key: 'urgent', label: '急', color: '#E8380D' },
+    { key: 'week', label: '本週', color: '#F5A200' },
+    { key: 'month', label: '本月', color: '#0068B7' },
+    { key: 'none', label: '不急', color: '#9A9A9A' },
+];
+const TODO_CATS = ['技工單', '諮詢', '聽報告', '病人問題', '診斷書', '行政', '決議', '其他'];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function asstTodoEnabled(a) { return !!a && (a.todoEnabled ?? TODO_DEFAULT_ASSTS.includes(a.name)); }
+function mgrTodoAdmin(m) { return !!m && (m.todoAdmin ?? TODO_DEFAULT_ADMINS.includes(m.name)); }
+function todoMe() {
+    if (viewMode === 'principal') return { key: 'p', name: '院長' };
+    if (viewMode === 'manager') return { key: 'm_' + currentOperator, name: currentOperator };
+    if (viewMode === 'assistant' && currentAssistantView) return { key: 'a_' + currentAssistantView.id, name: currentAssistantView.name };
+    return null;
+}
+function canUseTodo() {
+    if (viewMode === 'principal' || viewMode === 'manager') return true;
+    if (viewMode === 'assistant' && currentAssistantView) return asstTodoEnabled(state.assistants.find(a => a.id === currentAssistantView.id) || currentAssistantView);
+    return false;
+}
+function isTodoAdmin() {
+    if (viewMode === 'principal') return true;
+    if (viewMode === 'manager') return mgrTodoAdmin((settings.managers || []).find(x => x.name === currentOperator));
+    return false;
+}
+// 可指派的對象：院長、管理者、有開通待辦的助理
+function todoPeople() {
+    return [{ key: 'p', name: '院長' },
+        ...(settings.managers || []).map(m => ({ key: 'm_' + m.name, name: m.name })),
+        ...state.assistants.filter(a => a.active && asstTodoEnabled(a)).map(a => ({ key: 'a_' + a.id, name: a.name }))];
+}
+async function setAsstTodo(id, on) {
+    try { await updDoc('assistants', id, { todoEnabled: !!on }); toast(on ? '已開啟待辦清單' : '已關閉待辦清單'); }
+    catch (e) { toast('儲存失敗：' + e.message); }
+}
+
+// ── 資料訂閱 ──
+let todos = [], _tdUnsub = null, _tdLoaded = false, _tdErr = null;
+let remDoc = {}, _remUnsub = null, _remMk = null;
+function todoStart() {
+    if (!_tdUnsub) {
+        _tdUnsub = db.collection(col('todos')).orderBy('createdAt', 'desc').limit(500).onSnapshot(snap => {
+            todos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            _tdLoaded = true; _tdErr = null;
+            ntRefresh();
+            if (currentPage === 'todo') tdSafeRender();
+        }, e => { console.error('todos', e); _tdErr = e; _tdUnsub = null; if (currentPage === 'todo') renderTodo(); });
+    }
+    const mk = currentMonth();
+    if (isTodoAdmin() && _remMk !== mk) {
+        _remUnsub?.(); _remMk = mk;
+        _remUnsub = db.collection(col('reminders')).doc(mk).onSnapshot(s => { remDoc = s.exists ? s.data() : {}; ntRefresh(); },
+            e => console.error('reminders', e));
+    }
+}
+function ntApplyAccess() {
+    const td = canUseTodo(), nt = td || isTodoAdmin();
+    document.body.classList.toggle('todo-access', td);
+    document.body.classList.toggle('nt-access', nt);
+    if (nt) { todoStart(); if (isTodoAdmin()) msEnsureSched(); }
+    ntRefresh();
+}
+
+// ── 每月固定提醒（院長與待辦管理者）──
+function reminderList() {
+    if (!isTodoAdmin()) return [];
+    const now = new Date(), day = now.getDate(), mk = currentMonth();
+    const m = now.getMonth() + 1, next = m === 12 ? 1 : m + 1, prev = m === 1 ? 12 : m - 1;
+    const out = [];
+    const hmk = hostHolidayReminder();
+    if (hmk && canUseSchedule()) out.push({ id: 'holiday', title: `設定 ${+hmk.slice(5)} 月國定假日`, sub: '設定並確認後，助理預假月曆才會顯示診所休假日', go: () => schedGoto('remarks', hmk), goLabel: '前往設定', noDone: true });
+    if (day >= 20 && !remDoc.schedule) out.push({ id: 'schedule', title: `排 ${next} 月班表`, sub: '每月 20 日提醒', go: canUseSchedule() ? () => schedGoto('schedule', null) : null, goLabel: '前往排班' });
+    if (day >= 8 && !remDoc.salary) out.push({ id: 'salary', title: `計算 ${prev} 月助理薪資`, sub: '每月 8 日提醒', go: viewMode === 'principal' ? () => navigate('salary') : null, goLabel: '前往薪資' });
+    if (day >= 18 && !remDoc.doctorSalary) out.push({ id: 'doctorSalary', title: '準備醫師薪資計算', sub: '每月 18 日提醒' });
+    return out;
+}
+async function reminderDone(id) {
+    const me = todoMe();
+    try { await db.collection(col('reminders')).doc(currentMonth()).set({ [id]: { by: me?.name || '', at: new Date().toISOString() } }, { merge: true }); }
+    catch (e) { toast('更新失敗：' + e.message); }
+}
+// 從點數系統跳到排班系統的某一頁／月份
+function schedGoto(page, mk) {
+    window._schedGoto = { page, mk };
+    ntClose();
+    navigate('schedule');
+    if (_schedMounted) schedStore._notify();
+}
+
+// ── 待辦通知：被指派、完成、回覆（自己做的不通知）──
+function todoVisible(t, me) {
+    if (!me) return false;
+    return isTodoAdmin() || t.assigneeKey === me.key || t.creatorKey === me.key;
+}
+function todoUnread(t, me) {
+    const ev = t.lastEvent;
+    if (!me || !ev || ev.by === me.key) return false;
+    if (t.assigneeKey !== me.key && t.creatorKey !== me.key) return false;
+    if (ev.type === 'created' && t.assigneeKey !== me.key) return false;
+    return ev.at > ((t.seen || {})[me.key] || '');
+}
+function todoNotifs() {
+    const me = todoMe(); if (!me || !canUseTodo()) return [];
+    return todos.filter(t => todoUnread(t, me)).sort((a, b) => b.lastEvent.at.localeCompare(a.lastEvent.at));
+}
+async function todoMarkSeen(t) {
+    const me = todoMe(); if (!me || !todoUnread(t, me)) return;
+    try { await db.collection(col('todos')).doc(t.id).update({ seen: { ...(t.seen || {}), [me.key]: new Date().toISOString() } }); } catch (e) { console.error(e); }
+}
+
+// ── 鈴鐺 ──
+let _ntOpen = false;
+function ntRefresh() {
+    const btn = document.getElementById('nt-bell'); if (!btn) return;
+    const n = reminderList().length + todoNotifs().length;
+    const c = btn.querySelector('.nt-count');
+    c.textContent = n; c.classList.toggle('hidden', !n);
+    const tb = document.getElementById('todo-badge');
+    if (tb) { const k = todoNotifs().length; tb.textContent = k; tb.classList.toggle('hidden', !k); updateMenuBadge(); }
+    if (_ntOpen) ntRender();
+}
+function ntToggle() { _ntOpen ? ntClose() : (_ntOpen = true, ntRender()); }
+function ntClose() { _ntOpen = false; document.getElementById('nt-panel')?.remove(); }
+function ntRender() {
+    let p = document.getElementById('nt-panel');
+    if (!p) { p = document.createElement('div'); p.id = 'nt-panel'; document.body.appendChild(p); }
+    const rems = reminderList(), ns = todoNotifs();
+    const evText = t => {
+        const e = t.lastEvent;
+        if (e.type === 'completed') return `<b>${esc(e.byName)}</b> 完成了`;
+        if (e.type === 'reopened') return `<b>${esc(e.byName)}</b> 重新開啟`;
+        if (e.type === 'reply') return `<b>${esc(e.byName)}</b> 回覆：${esc((e.text || '').slice(0, 40))}`;
+        return `<b>${esc(e.byName)}</b> 指派給你`;
+    };
+    const ago = iso => { const s = (Date.now() - new Date(iso)) / 1000; return s < 60 ? '剛剛' : s < 3600 ? Math.floor(s / 60) + ' 分鐘前' : s < 86400 ? Math.floor(s / 3600) + ' 小時前' : `${new Date(iso).getMonth() + 1}/${new Date(iso).getDate()}`; };
+    p.innerHTML = `<div class="nt-hd">通知</div>
+        ${rems.length ? `<div class="nt-sec">提醒</div>${rems.map(r => `<div class="nt-item nt-rem">
+            <div class="nt-title">${r.title}</div><div class="nt-sub">${r.sub}</div>
+            <div class="nt-act">${r.go ? `<button class="btn btn-outline btn-sm" onclick="ntGo('${r.id}')">${r.goLabel}</button>` : ''}
+            ${r.noDone ? '' : `<button class="btn btn-primary btn-sm" onclick="reminderDone('${r.id}')">完成</button>`}</div></div>`).join('')}` : ''}
+        ${ns.length ? `<div class="nt-sec">待辦</div>${ns.map(t => `<button type="button" class="nt-item nt-todo" onclick="ntOpenTodo('${t.id}')">
+            <div class="nt-title">${esc(t.title)}</div><div class="nt-sub">${evText(t)}・${ago(t.lastEvent.at)}</div></button>`).join('')}` : ''}
+        ${!rems.length && !ns.length ? '<div class="nt-empty">目前沒有新通知</div>' : ''}`;
+    const b = document.getElementById('nt-bell').getBoundingClientRect();
+    if (innerWidth > 700) { p.style.left = Math.max(8, b.left) + 'px'; p.style.right = 'auto'; }
+    else { p.style.left = '12px'; p.style.right = '12px'; }
+    p.style.top = (b.bottom + 8) + 'px';
+}
+function ntGo(id) { const r = reminderList().find(x => x.id === id); ntClose(); r?.go?.(); }
+function ntOpenTodo(id) { ntClose(); _tdView = 'all'; navigate('todo'); openTodo(id); }
+document.addEventListener('pointerdown', e => {
+    if (_ntOpen && !e.target.closest('#nt-panel') && !e.target.closest('#nt-bell')) ntClose();
+}, true);
+
+// ================================================================
+// 待辦清單畫面
+// ================================================================
+const _tdRecent = new Set();
+let _tdView = 'today', _tdOpen = null, _tdNew = false, _tdFilter = { who: '', cat: '', urg: '' };
+function tdToday() { return msToday(); }
+function tdDueLabel(due) {
+    const t = tdToday();
+    if (!due) return '';
+    const d = new Date(due + 'T00:00:00'), td = new Date(t + 'T00:00:00');
+    const diff = Math.round((d - td) / 864e5);
+    if (diff === 0) return '今天';
+    if (diff === 1) return '明天';
+    if (diff === -1) return '昨天';
+    return `${d.getMonth() + 1}/${d.getDate()}（${'日一二三四五六'[d.getDay()]}）`;
+}
+function tdList() {
+    const me = todoMe();
+    let list = todos.filter(t => todoVisible(t, me));
+    const f = _tdFilter;
+    if (f.who === 'mine') list = list.filter(t => t.assigneeKey === me.key);
+    else if (f.who === 'created') list = list.filter(t => t.creatorKey === me.key);
+    else if (f.who) list = list.filter(t => t.assigneeKey === f.who);
+    if (f.cat) list = list.filter(t => t.category === f.cat);
+    if (f.urg) list = list.filter(t => t.urgency === f.urg);
+    return list;
+}
+function tdGroups(list) {
+    // 剛勾選完成的項目先留在原位（打勾＋刪除線），稍後才移到已完成
+    const t = tdToday(), open = list.filter(x => !x.done || _tdRecent.has(x.id));
+    const byDue = (a, b) => (a.due || '9999').localeCompare(b.due || '9999');
+    const urgRank = k => TODO_URG.findIndex(u => u.key === k);
+    if (_tdView === 'today') {
+        const late = open.filter(x => x.due && x.due < t).sort(byDue);
+        const today = open.filter(x => !(x.due && x.due < t) && (x.due === t || x.urgency === 'urgent')).sort((a, b) => urgRank(a.urgency) - urgRank(b.urgency));
+        return [['逾期', late], ['今天', today]];
+    }
+    if (_tdView === 'upcoming') {
+        const fut = open.filter(x => x.due && x.due > t).sort(byDue);
+        const g = {}; fut.forEach(x => { (g[x.due] = g[x.due] || []).push(x); });
+        return Object.entries(g).map(([d, xs]) => [tdDueLabel(d), xs]);
+    }
+    if (_tdView === 'done') {
+        const done = list.filter(x => x.done && !_tdRecent.has(x.id)).sort((a, b) => (b.doneAt || '').localeCompare(a.doneAt || ''));
+        const g = {}; done.forEach(x => { const k = (x.doneAt || '').slice(0, 10); (g[k] = g[k] || []).push(x); });
+        return Object.entries(g).map(([d, xs]) => [d ? tdDueLabel(d) : '已完成', xs]);
+    }
+    return TODO_URG.map(u => [u.label, open.filter(x => x.urgency === u.key).sort(byDue)]);
+}
+const TD_ICON = {
+    cal: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>',
+    chat: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    user: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>',
+    check: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg>',
+};
+function renderTodo() {
+    const el = document.getElementById('todo-content'); if (!el) return;
+    if (!canUseTodo()) { el.innerHTML = '<div class="empty-state"><p>尚未開通待辦清單</p></div>'; return; }
+    todoStart();
+    if (_tdErr) { el.innerHTML = `<div class="info-box">待辦讀取失敗：${_tdErr.code === 'permission-denied' ? '請在 Firebase 安全性規則允許 todos 資料表' : esc(_tdErr.message)}</div>`; return; }
+    if (!_tdLoaded) { el.innerHTML = '<div class="sched-boot"><div class="spinner"></div></div>'; return; }
+    const me = todoMe(), admin = isTodoAdmin();
+    const all = tdList(), t = tdToday();
+    const counts = {
+        today: all.filter(x => !x.done && ((x.due && x.due <= t) || x.urgency === 'urgent')).length,
+        upcoming: all.filter(x => !x.done && x.due && x.due > t).length,
+        all: all.filter(x => !x.done).length,
+        done: all.filter(x => x.done).length,
+    };
+    const views = [['today', '今天'], ['upcoming', '即將到來'], ['all', '全部'], ['done', '已完成']];
+    const people = todoPeople();
+    const whoOpts = admin
+        ? `<option value="">所有人</option><option value="mine">指派給我</option><option value="created">我建立的</option>${people.map(p => `<option value="${esc(p.key)}">${esc(p.name)}</option>`).join('')}`
+        : `<option value="">全部</option><option value="mine">指派給我</option><option value="created">我建立的</option>`;
+    const groups = tdGroups(all).filter(([, xs]) => xs.length);
+    const newCard = _tdNew ? tdCard(null) : '';
+    el.innerHTML = `
+        <div class="td-views">${views.map(([k, l]) => `<button class="${_tdView === k ? 'on' : ''}" onclick="setTodoView('${k}')">${l}${counts[k] ? `<span>${counts[k]}</span>` : ''}</button>`).join('')}</div>
+        <div class="td-filters">
+            <select onchange="_tdFilter.who=this.value;renderTodo()">${whoOpts}</select>
+            ${admin ? `<select onchange="_tdFilter.cat=this.value;renderTodo()"><option value="">所有類別</option>${TODO_CATS.map(c => `<option>${c}</option>`).join('')}</select>
+            <select onchange="_tdFilter.urg=this.value;renderTodo()"><option value="">所有急迫性</option>${TODO_URG.map(u => `<option value="${u.key}">${u.label}</option>`).join('')}</select>` : ''}
+        </div>
+        ${newCard}
+        ${groups.length ? groups.map(([g, xs]) => `<div class="td-group"><div class="td-ghd${g === '逾期' ? ' late' : ''}">${esc(g)}</div>${xs.map(x => _tdOpen === x.id ? tdCard(x) : tdRow(x, me)).join('')}</div>`).join('')
+            : (_tdNew ? '' : `<div class="td-empty">${_tdView === 'done' ? '還沒有完成的待辦' : _tdView === 'upcoming' ? '沒有即將到期的待辦' : '沒有待辦事項'}</div>`)}
+        <button class="td-fab" onclick="newTodo()" aria-label="新增待辦"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>`;
+    // 還原篩選的選取值
+    const sels = el.querySelectorAll('.td-filters select');
+    sels[0].value = _tdFilter.who; if (sels[1]) sels[1].value = _tdFilter.cat; if (sels[2]) sels[2].value = _tdFilter.urg;
+    if (_tdNew) el.querySelector('.td-card .td-title-in')?.focus();
+}
+function tdRow(x, me) {
+    const u = TODO_URG.find(k => k.key === x.urgency) || TODO_URG[3];
+    const late = !x.done && x.due && x.due < tdToday();
+    const unread = todoUnread(x, me);
+    return `<div class="td-item${x.done ? ' done' : ''}">
+        <button class="td-check${x.done ? ' on' : ''}" onclick="toggleTodoDone('${x.id}')" aria-label="${x.done ? '標為未完成' : '完成'}">${x.done ? TD_ICON.check : ''}</button>
+        <div class="td-main" onclick="openTodo('${x.id}')">
+            <div class="td-title">${x.urgency === 'urgent' && !x.done ? '<span class="td-flag"></span>' : ''}${esc(x.title)}${unread ? '<span class="td-dot"></span>' : ''}</div>
+            <div class="td-meta">
+                <span class="td-cat">${esc(x.category || '其他')}</span>
+                ${x.urgency !== 'urgent' ? `<span style="color:${u.color}">${u.label}</span>` : ''}
+                ${x.due ? `<span class="td-due${late ? ' late' : ''}">${TD_ICON.cal}${tdDueLabel(x.due)}</span>` : ''}
+                <span>${TD_ICON.user}${esc(x.assigneeName || '—')}</span>
+                ${(x.replies || []).length ? `<span>${TD_ICON.chat}${x.replies.length}</span>` : ''}
+            </div>
+        </div>
+    </div>`;
+}
+function tdCard(x) {
+    const me = todoMe(), isNew = !x;
+    const v = x || { title: '', due: '', urgency: 'none', category: '其他', assigneeKey: me.key };
+    const canDelete = !isNew && (isTodoAdmin() || v.creatorKey === me.key);
+    const people = todoPeople();
+    if (!people.some(p => p.key === v.assigneeKey) && v.assigneeKey) people.push({ key: v.assigneeKey, name: v.assigneeName || '—' });
+    const fmt = iso => { const d = new Date(iso); return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+    const id = isNew ? 'new' : v.id;
+    const upd = f => isNew ? '' : `onchange="updateTodo('${id}','${f}',this.value)"`;
+    return `<div class="td-card" data-id="${id}">
+        <div class="td-card-top">
+            ${isNew ? '<span class="td-check ghost"></span>' : `<button class="td-check${v.done ? ' on' : ''}" onclick="toggleTodoDone('${id}')">${v.done ? TD_ICON.check : ''}</button>`}
+            <input class="td-title-in" placeholder="新待辦" value="${esc(v.title)}" ${isNew ? `onkeydown="if(event.key==='Enter')createTodo()"` : `onchange="updateTodo('${id}','title',this.value)"`}>
+        </div>
+        <div class="td-fields">
+            <label><span>到期日</span><input type="date" class="td-in" data-f="due" value="${esc(v.due)}" ${upd('due')}></label>
+            <label><span>急迫性</span><select class="td-in" data-f="urgency" ${upd('urgency')}>${TODO_URG.map(u => `<option value="${u.key}" ${u.key === v.urgency ? 'selected' : ''}>${u.label}</option>`).join('')}</select></label>
+            <label><span>類別</span><select class="td-in" data-f="category" ${upd('category')}>${TODO_CATS.map(c => `<option ${c === v.category ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+            <label><span>負責人</span><select class="td-in" data-f="assigneeKey" ${upd('assigneeKey')}>${people.map(p => `<option value="${esc(p.key)}" ${p.key === v.assigneeKey ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>
+        </div>
+        ${isNew ? `<div class="td-card-ft"><button class="btn btn-outline btn-sm" onclick="cancelNewTodo()">取消</button><button class="btn btn-primary btn-sm" onclick="createTodo()">建立</button></div>` : `
+        <div class="td-creator">由 ${esc(v.creatorName)} 建立・${fmt(v.createdAt)}${v.done && v.doneByName ? `　${esc(v.doneByName)} 於 ${fmt(v.doneAt)} 完成` : ''}</div>
+        <div class="td-thread">${(v.replies || []).map(r => `<div class="td-msg${r.by === me.key ? ' me' : ''}"><div class="td-msg-hd">${esc(r.byName)}・${fmt(r.at)}</div><div class="td-msg-body">${esc(r.text)}</div></div>`).join('')}</div>
+        <div class="td-reply"><input placeholder="回覆…" id="td-reply-in" onkeydown="if(event.key==='Enter')replyTodo('${id}')"><button class="btn btn-primary btn-sm" onclick="replyTodo('${id}')">送出</button></div>
+        <div class="td-card-ft">${canDelete ? `<button class="btn btn-danger btn-sm" onclick="deleteTodo('${id}')">刪除</button>` : ''}<button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="openTodo(null)">收合</button></div>`}
+    </div>`;
+}
+function setTodoView(v) { _tdView = v; _tdOpen = null; renderTodo(); }
+function openTodo(id) {
+    _tdOpen = _tdOpen === id ? null : id; _tdNew = false;
+    const t = todos.find(x => x.id === id);
+    if (t && _tdOpen) {
+        // 確保展開的項目在目前檢視內
+        const inView = tdGroups(tdList()).some(([, xs]) => xs.some(x => x.id === id));
+        if (!inView) _tdView = t.done ? 'done' : 'all';
+        todoMarkSeen(t);
+    }
+    renderTodo();
+    if (_tdOpen) requestAnimationFrame(() => document.querySelector(`.td-card[data-id="${id}"]`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }));
+}
+function newTodo() { _tdNew = true; _tdOpen = null; renderTodo(); }
+function cancelNewTodo() { _tdNew = false; renderTodo(); }
+async function createTodo() {
+    const card = document.querySelector('.td-card[data-id="new"]'); if (!card) return;
+    const title = card.querySelector('.td-title-in').value.trim();
+    if (!title) { toast('請輸入標題'); return; }
+    const f = k => card.querySelector(`[data-f="${k}"]`).value;
+    const me = todoMe(), now = new Date().toISOString();
+    const who = todoPeople().find(p => p.key === f('assigneeKey')) || me;
+    try {
+        await db.collection(col('todos')).add({
+            title, due: f('due'), urgency: f('urgency'), category: f('category'),
+            assigneeKey: who.key, assigneeName: who.name, creatorKey: me.key, creatorName: me.name,
+            done: false, replies: [], createdAt: now, updatedAt: now,
+            lastEvent: { type: 'created', by: me.key, byName: me.name, at: now }, seen: { [me.key]: now },
+        });
+        _tdNew = false; toast('已建立待辦');
+    } catch (e) { toast(e.code === 'permission-denied' ? '建立被拒：請在 Firebase 安全性規則允許 todos 資料表' : '建立失敗：' + e.message); }
+}
+async function updateTodo(id, field, value) {
+    const t = todos.find(x => x.id === id); if (!t) return;
+    const me = todoMe(), now = new Date().toISOString();
+    const patch = { updatedAt: now };
+    if (field === 'title') { if (!value.trim()) { toast('標題不可空白'); renderTodo(); return; } patch.title = value.trim(); }
+    else if (field === 'assigneeKey') {
+        const who = todoPeople().find(p => p.key === value); if (!who) return;
+        patch.assigneeKey = who.key; patch.assigneeName = who.name;
+        patch.lastEvent = { type: 'created', by: me.key, byName: me.name, at: now };   // 通知新的負責人
+        patch.seen = { ...(t.seen || {}), [me.key]: now };
+    } else patch[field] = value;
+    try { await db.collection(col('todos')).doc(id).update(patch); } catch (e) { toast('儲存失敗：' + e.message); }
+}
+async function toggleTodoDone(id) {
+    const t = todos.find(x => x.id === id); if (!t) return;
+    const me = todoMe(), now = new Date().toISOString(), done = !t.done;
+    if (done) {
+        _tdRecent.add(id);
+        setTimeout(() => {
+            _tdRecent.delete(id);
+            if (_tdOpen === id) _tdView = 'done';   // 展開中的項目跟著移到已完成，保持展開
+            if (currentPage === 'todo') tdSafeRender();
+        }, 1500);
+    }
+    try {
+        await db.collection(col('todos')).doc(id).update({
+            done, doneAt: done ? now : '', doneByName: done ? me.name : '', updatedAt: now,
+            lastEvent: { type: done ? 'completed' : 'reopened', by: me.key, byName: me.name, at: now },
+            seen: { ...(t.seen || {}), [me.key]: now },
+        });
+    } catch (e) { toast('更新失敗：' + e.message); }
+}
+async function replyTodo(id) {
+    const inp = document.getElementById('td-reply-in'); const text = inp?.value.trim(); if (!text) return;
+    const t = todos.find(x => x.id === id); if (!t) return;
+    const me = todoMe(), now = new Date().toISOString();
+    try {
+        await db.collection(col('todos')).doc(id).update({
+            replies: [...(t.replies || []), { by: me.key, byName: me.name, text, at: now }], updatedAt: now,
+            lastEvent: { type: 'reply', by: me.key, byName: me.name, text, at: now },
+            seen: { ...(t.seen || {}), [me.key]: now },
+        });
+    } catch (e) { toast('回覆失敗：' + e.message); }
+}
+function deleteTodo(id) {
+    confirm2('刪除這個待辦？', async () => {
+        try { await db.collection(col('todos')).doc(id).delete(); _tdOpen = null; toast('已刪除'); } catch (e) { toast('刪除失敗：' + e.message); }
+    });
+}
+
+// 使用者正在輸入時先不重畫，離開輸入框後再更新
+let _tdPending = false;
+function tdSafeRender() {
+    const a = document.activeElement;
+    if (a && a.closest && a.closest('#todo-content') && /INPUT|TEXTAREA/.test(a.tagName)) { _tdPending = true; return; }
+    renderTodo();
+}
+document.addEventListener('focusout', e => {
+    if (_tdPending && e.target.closest && e.target.closest('#todo-content')) {
+        setTimeout(() => { if (_tdPending && !(document.activeElement?.closest?.('#todo-content') && /INPUT|TEXTAREA/.test(document.activeElement.tagName))) { _tdPending = false; renderTodo(); } }, 150);
+    }
+});
+
+// ── 個人班表：申請調整崗位（排班人員在通知確認後生效）──
+function openPosSheet(ds, sh) {
+    const asst = currentAssistantView; if (!asst) return;
+    const mk = ds.slice(0, 7), data = schedStore.get();
+    const me = msCell(data, mk, ds, sh, asst.name, asst.id);
+    const sa = (data.assistants || []).find(a => a.name === asst.name);
+    const elig = sa?.eligiblePositions;
+    const ok = p => !elig || !elig.length || elig.includes(p);
+    const docs = (data.doctorSchedule?.[mk]?.[ds]?.[sh] || []).filter(ok);
+    const fixed = ['櫃檯', '流動', '諮詢', '行政', '打掃', '教育訓練'].filter(ok);
+    const opts = [...new Set([...docs, ...fixed, '休'])].filter(p => p !== me.text).map(p => ({ name: p, text: docs.includes(p) ? '跟診' : '', disabled: false }));
+    _msSheet = { ds, sh, me: me.text, opts, pick: null, mode: 'position' };
+    const wd = ['日', '一', '二', '三', '四', '五', '六'][new Date(ds + 'T00:00:00').getDay()];
+    const wrap = document.createElement('div');
+    wrap.className = 'ms-sheet-bd'; wrap.id = 'ms-sheet';
+    wrap.addEventListener('click', e => { if (e.target === wrap) closeSwapSheet(); });
+    wrap.innerHTML = `<div class="ms-sheet" role="dialog" aria-label="申請調整崗位">
+        <h3>申請調整崗位</h3>
+        <div class="sub">${+ds.slice(5, 7)}/${+ds.slice(8)}（${wd}）${sh}診・目前：${me.text}</div>
+        <div class="ms-opts">${opts.map((o, i) => `<button type="button" class="ms-opt" data-i="${i}" onclick="pickSwap(${i})"><span>${o.name}</span><span class="v">${o.text}</span></button>`).join('')}</div>
+        <div class="ms-sheet-ft">
+            <button class="btn btn-outline" onclick="closeSwapSheet()">取消</button>
+            <button class="btn btn-primary" id="ms-submit" disabled onclick="submitSwap()">送出申請</button>
+        </div></div>`;
+    document.body.appendChild(wrap);
+}
 // ================================================================
 // 手機版寬表格：凍結第一欄（姓名），其餘欄位左右自由滑動；只在手機、只對超出螢幕的表格
 // ================================================================
@@ -3327,7 +3881,7 @@ function subscribeData() {
     const sixAgoStr = `${sixAgo.getFullYear()}-${String(sixAgo.getMonth()+1).padStart(2,'0')}-01`;
 
     db.collection(col('assistants')).orderBy('createdAt')
-      .onSnapshot(snap => { state.assistants = snap.docs.map(d=>({id:d.id,...d.data()})); loaded.a=true; tryReady(); schedOnExtChange(); },
+      .onSnapshot(snap => { state.assistants = snap.docs.map(d=>({id:d.id,...d.data()})); loaded.a=true; tryReady(); schedOnExtChange(); if (appReady) { ntApplyAccess(); if (viewMode==='assistant' && currentPage==='todo' && !canUseTodo()) navigate('myview'); } },
         e => { console.error(e); setConn('error','連線錯誤'); });
 
     db.collection(col('rules')).orderBy('createdAt')
@@ -3702,9 +4256,9 @@ const ASST_PAGES = ['myview','overtime-apply'];
 function navigate(p) {
     if (p === 'overview' && viewMode === 'principal') p = 'dashboard';
     if (viewMode === 'viewer' && p !== 'overview') { showLoginScreen(); return; }
-    if (viewMode === 'manager'   && !['overview','record','leave-approve'].concat(canUseSchedule()?['schedule']:[]).includes(p)) return;
+    if (viewMode === 'manager'   && !['overview','record','leave-approve','todo'].concat(canUseSchedule()?['schedule']:[]).includes(p)) return;
     if (viewMode === 'doctor'    && !['overview','record','overtime-approve'].includes(p)) return;
-    if (viewMode === 'assistant' && !['overview','myview','overtime-apply','preleave','myshift'].includes(p)) return;
+    if (viewMode === 'assistant' && !['overview','myview','overtime-apply','preleave','myshift'].concat(canUseTodo()?['todo']:[]).includes(p)) return;
     // principal can go anywhere
     const el = document.getElementById('page-'+p);
     if (!el) return;
@@ -3736,7 +4290,7 @@ function toggleDrawer() {
 function updateMenuBadge() {
     const dot = document.getElementById('menu-badge');
     if (!dot) return;
-    const has = ['doc-pending-badge','att-pending-badge','leave-pending-badge','sched-swap-badge'].some(id => {
+    const has = ['doc-pending-badge','att-pending-badge','leave-pending-badge','sched-swap-badge','todo-badge'].some(id => {
         const b = document.getElementById(id);
         if (!b || b.classList.contains('hidden')) return false;
         const item = b.closest('.nav-item');
@@ -3756,6 +4310,7 @@ function renderPage(p) {
       schedule:renderSchedulePage,
       preleave:renderPreLeave,
       myshift:renderMyShift,
+      todo:renderTodo,
       dashboard:renderDashboard})[p]?.();
 }
 function refreshPage() { renderPage(currentPage); }
@@ -5117,6 +5672,7 @@ function renderAssistants() {
             <td>
                 <button type="button" class="abbr-name" onclick="openAbbrPicker(this,'${a.id}')" title="點選設定代號">${a.name}<span class="abbr-chip">${asstAbbr(a.name)}</span></button>
                 <div style="font-size:var(--fs-sm);color:var(--text-muted);margin-top:2px">到職：${a.hireDate||'—'}</div>
+                <label class="asst-todo">待辦清單<span class="ios-switch"><input type="checkbox" ${asstTodoEnabled(a)?'checked':''} onchange="setAsstTodo('${a.id}',this.checked)"><span class="ios-slider"></span></span></label>
             </td>
             <td><span class="badge ${a.active?'bg':'bgr'}">${a.active?'啟用':'停用'}</span></td>
             <td><span class="badge ${badgeCls}" style="font-size:var(--fs-xs);white-space:nowrap">${bonusEligibleLabel(be)}</span></td>
@@ -6156,6 +6712,7 @@ function applyViewMode() {
     document.body.classList.toggle('sched-access', canUseSchedule());
     if (canUseSchedule()) { schedStartSwaps(); msEnsureSched(); }
     updateSwapBadge();
+    ntApplyAccess();
 
     document.getElementById('btn-settings').classList.toggle('hidden', !isPrincipal);
     document.getElementById('btn-logout').classList.toggle('hidden', !loggedIn);
@@ -6172,10 +6729,10 @@ function applyViewMode() {
         chip.className = 'mode-chip' + (isPrincipal||isManager?' admin':isAsst||isDoctor?' assistant':'');
     }
 
-    if (isPrincipal) { if (!['record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report','leave','leave-approve','attendance','schedule','dashboard'].includes(currentPage)) navigate('dashboard'); else refreshPage(); return; }
-    if (isManager)   { if (!['overview','record','leave-approve'].concat(canUseSchedule()?['schedule']:[]).includes(currentPage)) navigate('overview'); else refreshPage(); return; }
+    if (isPrincipal) { if (!['record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report','leave','leave-approve','attendance','schedule','dashboard','todo'].includes(currentPage)) navigate('dashboard'); else refreshPage(); return; }
+    if (isManager)   { if (!['overview','record','leave-approve','todo'].concat(canUseSchedule()?['schedule']:[]).includes(currentPage)) navigate('overview'); else refreshPage(); return; }
     if (isDoctor)    { if (!['record','overtime-approve'].includes(currentPage)) navigate('record'); else refreshPage(); return; }
-    if (isAsst)      { if (!['myview','overtime-apply','preleave','myshift'].includes(currentPage)) navigate('myview'); else refreshPage(); return; }
+    if (isAsst)      { if (!['myview','overtime-apply','preleave','myshift'].concat(canUseTodo()?['todo']:[]).includes(currentPage)) navigate('myview'); else refreshPage(); return; }
     if (currentPage !== 'overview') navigate('overview'); else refreshPage();
 }
 
@@ -6188,6 +6745,7 @@ function adminLogout() {
 }
 
 function logoutAll() {
+    ntClose(); document.body.classList.remove('todo-access','nt-access');
     viewMode = 'viewer'; currentOperator = ''; currentAssistantView = null;
     currentDoctor = null;
     navigate('overview');
@@ -6434,6 +6992,9 @@ function renderMgrListUI() {
             <span class="mgr-name">${m.name} <span style="color:var(--text-muted);font-size:var(--fs-sm)">(${m.password})</span></span>
             <label class="mgr-sched" title="允許此管理者使用排班系統">排班
                 <span class="ios-switch"><input type="checkbox" ${m.scheduleAccess?'checked':''} onchange="_mgrDraft[${i}].scheduleAccess=this.checked"><span class="ios-slider"></span></span>
+            </label>
+            <label class="mgr-sched" title="可看所有人的待辦並收到每月提醒">待辦管理
+                <span class="ios-switch"><input type="checkbox" ${mgrTodoAdmin(m)?'checked':''} onchange="_mgrDraft[${i}].todoAdmin=this.checked"><span class="ios-slider"></span></span>
             </label>
             <button class="btn btn-sm btn-danger" onclick="removeManagerName(${i})">移除</button>
         </div>`).join('') || '<div style="font-size:var(--fs-sm);color:var(--text-muted);padding:4px 0">尚無管理者帳號</div>';
@@ -10936,6 +11497,18 @@ function applySwap(draft, req) {
   give(a, pb); give(b, pa);
 }
 
+function applyPosChange(draft, req) {
+  const mk = req.month, ds = req.date, sh = req.shift, name = req.requesterName;
+  draft.schedule[mk] = draft.schedule[mk] || {};
+  draft.schedule[mk][ds] = draft.schedule[mk][ds] || {};
+  const slot = draft.schedule[mk][ds][sh] = draft.schedule[mk][ds][sh] || {};
+  if (isWorkValue(req.newPos)) {
+    slot[name] = req.newPos;
+    const lv = draft.leaveRequests?.[mk]?.[name]?.[ds];
+    if (lv && !lv.ext && !lv.pre) { lv.sessions = lv.sessions.filter(s => s !== sh); if (!lv.sessions.length) delete draft.leaveRequests[mk][name][ds]; }
+  } else delete slot[name];
+}
+
 function SwapBell({ data, onUpdate, onGoHoliday }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(null);
@@ -10956,6 +11529,16 @@ function SwapBell({ data, onUpdate, onGoHoliday }) {
   const md = ds => `${parseInt(ds.slice(5, 7))}/${parseInt(ds.slice(8))}`;
   const cur = (req, name) => getCellValue(data, req.month, req.date, req.shift, name);
   async function approve(req) {
+    if (req.type === 'position') {
+      const lv = data.leaveRequests?.[req.month]?.[req.requesterName]?.[req.date];
+      if (lv && (lv.ext || lv.pre)) { alert('這位助理當天已請假或預假，無法調整崗位。'); return; }
+      if (!confirm(`確認將 ${req.requesterName} ${md(req.date)} ${req.shift}診 改為「${req.newPos}」？`)) return;
+      setBusy(req.id);
+      onUpdate(draft => applyPosChange(draft, req));
+      await _opts.resolveSwap(req.id, 'approved');
+      setBusy(null);
+      return;
+    }
     const la = data.leaveRequests?.[req.month]?.[req.requesterName]?.[req.date];
     const lb = data.leaveRequests?.[req.month]?.[req.targetName]?.[req.date];
     if ((la && (la.ext || la.pre)) || (lb && (lb.ext || lb.pre))) { alert('其中一位當天已請假或預假，無法對調。'); return; }
@@ -10993,18 +11576,24 @@ function SwapBell({ data, onUpdate, onGoHoliday }) {
           {list.length === 0 && !remind && <div className="bell-empty">目前沒有新通知</div>}
           {list.map(req => {
             const wd = WDAY_LABELS[(weekday(req.date) + 6) % 7];
-            const changed = cur(req, req.requesterName) !== req.requesterPos || cur(req, req.targetName) !== req.targetPos;
+            const isPos = req.type === 'position';
+            const changed = isPos ? cur(req, req.requesterName) !== req.requesterPos
+              : cur(req, req.requesterName) !== req.requesterPos || cur(req, req.targetName) !== req.targetPos;
             return (
               <div key={req.id} className="bell-item">
                 <div className="bell-title">{md(req.date)}（{wd}）{req.shift}診</div>
                 <div className="bell-body">
-                  <div><b>{req.requesterName}</b>　{cur(req, req.requesterName)}</div>
-                  <div><b>{req.targetName}</b>　{cur(req, req.targetName)}</div>
+                  {isPos ? (
+                    <div><b>{req.requesterName}</b>　申請改崗位：{cur(req, req.requesterName)} → {req.newPos}</div>
+                  ) : (<>
+                    <div><b>{req.requesterName}</b>　{cur(req, req.requesterName)}</div>
+                    <div><b>{req.targetName}</b>　{cur(req, req.targetName)}</div>
+                  </>)}
                 </div>
                 {changed && <div className="bell-warn">申請後班表已變動，將以目前崗位對調</div>}
                 <div className="bell-actions">
                   <button className="s-btn s-btn-secondary" disabled={busy === req.id} onClick={() => reject(req)}>退回</button>
-                  <button className="s-btn s-btn-primary" disabled={busy === req.id} onClick={() => approve(req)}>確認對調</button>
+                  <button className="s-btn s-btn-primary" disabled={busy === req.id} onClick={() => approve(req)}>{isPos ? '確認調整' : '確認對調'}</button>
                 </div>
               </div>
             );
@@ -11092,6 +11681,14 @@ function App() {
   const violations = useMemo(() =>
     checkScheduleRules(data, viewYear, viewMonth),
     [data, viewYear, viewMonth]);
+
+  // 點數系統的提醒要求跳到指定頁面／月份
+  useEffect(() => {
+    const g = window._schedGoto; if (!g) return;
+    window._schedGoto = null;
+    if (g.mk) { setViewYear(+g.mk.slice(0, 4)); setViewMonth(+g.mk.slice(5, 7)); }
+    setPage(g.page || 'schedule');
+  });
 
   // 其他裝置的修改即時同步進來
   useEffect(() => _store.subscribe(remote => { if (!_store.isEmpty()) setDataRaw(applyExt(normalizeData(remote))); }), []);
