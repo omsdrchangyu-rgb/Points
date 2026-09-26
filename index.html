@@ -595,6 +595,8 @@
            手機版頁首改為黏在最上方（白底），讓 Safari 永遠取到實色、不再模糊（排班頁的頂列本來就是這樣，所以一直清楚） */
         @media(max-width:700px){
             .page.active > .page-header{position:sticky;top:0;z-index:40;}
+            /* 左上角選單鈕固定在最上緣：透明時 Safari 取不到顏色就會改用模糊，給它與頁首相同的白底 */
+            body:not(.drawer-open) .menu-btn{background:var(--surface);}
         }
         /* 手機頁首：標題讓出左上角選單鈕，其餘（分頁、按鈕）與內容同樣靠左並撐滿 */
         @media(max-width:700px){
@@ -845,6 +847,8 @@
         .mgr-row .mgr-sched + .mgr-sched{margin-left:10px;}
         .asst-todo{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:var(--fs-xs);color:var(--text-muted);}
         .asst-todo .ios-switch{transform:scale(.8);transform-origin:left center;}
+
+        .app-ver{font-size:var(--fs-xs);color:#B8B8B8;text-align:center;margin-top:8px;}
 
         /* 院長總覽 */
         .nprin{display:none!important}
@@ -1425,6 +1429,7 @@ appId: "..."'></textarea>
         <button class="btn-sidebar hidden" id="btn-settings" onclick="openSettings()">系統設定</button>
         <button class="btn-sidebar hidden" id="btn-logout" onclick="logoutAll()">登出</button>
         <button class="btn-sidebar" onclick="showSetup()">重新設定連線</button>
+        <div class="app-ver">版本 0927-3</div>
     </div>
 </nav>
 
