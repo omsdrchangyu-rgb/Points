@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#ffffff">
@@ -711,40 +711,89 @@
         /* ─── 待辦清單（仿 Things 3）─── */
         .ntodo,.mnb-todo{display:none!important}
         body.todo-access .ntodo,body.todo-access .mnb-todo{display:flex!important}
-        body.todo-access .ntodo-lbl{display:block!important}
-        .ntodo-lbl{display:none!important}
-        #todo-content{max-width:680px;padding-bottom:calc(96px + var(--mnav));}
-        .td-views{display:flex;gap:4px;background:var(--surface-alt);border-radius:9px;padding:3px;margin-bottom:12px;}
-        .td-views button{flex:1;border:none;background:none;border-radius:7px;padding:7px 4px;font-family:inherit;font-size:var(--fs-sm);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;}
-        .td-views button span{font-size:var(--fs-xs);color:var(--text-muted);font-weight:500;}
-        .td-views button.on{background:var(--surface);color:var(--text-primary);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.12);}
+        #todo-content{padding-bottom:calc(96px + var(--mnav));}
+        .td-layout{display:flex;gap:28px;align-items:flex-start;max-width:1080px;}
+        .td-maincol{flex:1;min-width:0;max-width:720px;}
+        /* 右側概況（電腦版） */
+        .td-side{width:260px;flex-shrink:0;position:sticky;top:20px;display:flex;flex-direction:column;gap:12px;}
+        .td-side-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:6px;}
+        .td-side-hd{font-size:var(--fs-xs);font-weight:700;color:var(--text-muted);padding:8px 10px 4px;}
+        .td-side-row{display:flex;align-items:center;gap:10px;width:100%;border:none;background:none;padding:8px 10px;border-radius:8px;font-family:inherit;font-size:var(--fs-base);color:var(--text-primary);cursor:pointer;text-align:left;}
+        .td-side-row b{margin-left:auto;font-size:var(--fs-sm);color:var(--text-muted);font-weight:500;}
+        .td-side-row:hover{background:var(--surface-alt);}
+        .td-side-row.on{background:#E9EEF5;font-weight:700;}
+        .td-side-late{font-size:var(--fs-xs);color:var(--red);padding:4px 10px 8px;font-weight:700;}
+        .td-av{width:22px;height:22px;border-radius:50%;background:var(--surface-alt);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:var(--fs-xs);font-weight:700;flex-shrink:0;}
+        @media(max-width:1100px){ .td-side{display:none;} }
+        /* 檢視切換（帶顏色） */
+        .td-views{display:flex;gap:4px;background:var(--surface-alt);border-radius:10px;padding:3px;margin-bottom:12px;}
+        .td-views button{flex:1;border:none;background:none;border-radius:8px;padding:8px 4px;font-family:inherit;font-size:var(--fs-sm);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;transition:background .15s,color .15s;}
+        .td-views button span{font-size:var(--fs-xs);color:var(--text-muted);}
+        .td-views button.on{background:color-mix(in srgb,var(--vc) 14%,#fff);color:color-mix(in srgb,var(--vc) 72%,#000);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+        .td-views button.on span{color:inherit;}
         .td-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
         .td-filters .csel-btn{padding:6px 10px;font-size:var(--fs-sm);border-radius:6px;}
+        /* 分組與項目 */
         .td-group{margin-bottom:18px;}
-        .td-ghd{font-size:var(--fs-sub);font-weight:700;color:var(--text-primary);padding:0 4px 6px;border-bottom:1px solid var(--border);margin-bottom:2px;}
-        .td-ghd.late{color:var(--red);}
-        .td-item{display:flex;align-items:flex-start;gap:12px;padding:10px 6px;border-radius:8px;transition:background .12s;}
+        .td-ghd{display:flex;align-items:center;gap:8px;font-size:var(--fs-sub);font-weight:700;padding:0 6px 6px;border-bottom:1px solid var(--border);margin-bottom:2px;}
+        .td-ghd i{width:9px;height:9px;border-radius:50%;}
+        .td-ghd span{font-size:var(--fs-xs);color:var(--text-muted);font-weight:500;}
+        .td-item{display:flex;align-items:flex-start;gap:11px;padding:10px 8px;border-radius:8px;transition:background .12s,opacity .4s;}
         .td-item:hover{background:#F4F6F8;}
-        .td-check{width:20px;height:20px;border-radius:50%;border:1.6px solid #B9BEC5;background:var(--surface);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .15s,border-color .15s;}
+        .td-item.just{opacity:.5;}
+        .td-check{width:16px;height:16px;border-radius:4px;border:1.5px solid #B4B9C0;background:var(--surface);flex-shrink:0;margin-top:3px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .15s,border-color .15s;}
         .td-check:hover{border-color:var(--accent);}
         .td-check.on{background:var(--accent);border-color:var(--accent);}
+        .td-check.locked{cursor:not-allowed;opacity:.4;}
+        .td-check.locked:hover{border-color:#B4B9C0;}
         .td-check.ghost{cursor:default;border-style:dashed;}
         .td-main{flex:1;min-width:0;cursor:pointer;}
         .td-title{font-size:var(--fs-sub);color:var(--text-primary);line-height:1.4;display:flex;align-items:center;gap:6px;word-break:break-word;}
-        .td-item.done .td-title{color:var(--text-muted);text-decoration:line-through;text-decoration-color:#c8c8c8;}
-        .td-flag{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;}
+        .td-item.done .td-title,.td-item.just .td-title{color:var(--text-muted);text-decoration:line-through;text-decoration-color:#c8c8c8;}
         .td-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;}
         .td-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-top:3px;font-size:var(--fs-xs);color:var(--text-muted);}
         .td-meta span{display:inline-flex;align-items:center;gap:3px;}
-        .td-cat{background:var(--surface-alt);color:var(--text-secondary)!important;border-radius:4px;padding:1px 6px;}
+        .td-urg{font-weight:600;}
+        .td-urg i{width:6px;height:6px;border-radius:50%;}
+        .td-cat{background:var(--surface-alt);color:var(--text-secondary)!important;border-radius:4px;padding:1px 6px;font-size:var(--fs-xs);}
         .td-due.late{color:var(--red);font-weight:700;}
-        .td-empty{text-align:center;color:var(--text-muted);font-size:var(--fs-base);padding:48px 0;}
-        .td-card{background:var(--surface);border-radius:12px;box-shadow:0 2px 14px rgba(0,0,0,.10),0 0 0 1px rgba(0,0,0,.04);padding:14px 16px;margin:8px 0 14px;}
+        .td-empty{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--text-muted);font-size:var(--fs-base);padding:56px 0;}
+        /* 展開卡片 */
+        .td-card{background:var(--surface);border-radius:12px;box-shadow:0 2px 14px rgba(0,0,0,.10),0 0 0 1px rgba(0,0,0,.04);padding:14px 16px;margin:8px 0 14px;transform-origin:top center;}
+        .td-card.anim{animation:tdOpen .24s cubic-bezier(.2,.8,.2,1);}
+        .td-card.closing{animation:tdClose .17s ease forwards;}
+        @keyframes tdOpen{from{opacity:0;transform:translateY(-4px) scale(.985);clip-path:inset(0 0 65% 0 round 12px);}to{opacity:1;transform:none;clip-path:inset(0 0 0 0 round 12px);}}
+        @keyframes tdClose{from{opacity:1;clip-path:inset(0 0 0 0 round 12px);}to{opacity:0;transform:scale(.985);clip-path:inset(0 0 70% 0 round 12px);}}
+        @media(prefers-reduced-motion:reduce){ .td-card.anim,.td-card.closing{animation:none;} }
         .td-card-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+        .td-card-top .td-check{margin-top:0;}
         .td-title-in{flex:1;border:none;outline:none;font-family:inherit;font-size:var(--fs-sub);font-weight:600;color:var(--text-primary);background:none;padding:2px 0;min-width:0;}
-        .td-fields{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 12px;}
-        .td-fields label{display:flex;flex-direction:column;gap:4px;font-size:var(--fs-xs);color:var(--text-muted);min-width:0;}
-        .td-fields input,.td-fields .csel-btn{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:var(--fs-base);color:var(--text-primary);background:var(--surface);}
+        .td-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;}
+        .td-fields label,.td-who-field{display:flex;flex-direction:column;gap:4px;font-size:var(--fs-xs);color:var(--text-muted);min-width:0;}
+        .td-who-field{grid-column:1 / -1;}
+        .td-fields input,.td-fields .csel-btn{width:100%;min-width:0;max-width:100%;box-sizing:border-box;height:38px;padding:0 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:var(--fs-base);color:var(--text-primary);background:var(--surface);}
+        .td-fields input[type=date]{-webkit-appearance:none;appearance:none;display:block;line-height:36px;}
+        .td-fields input[type=date]::-webkit-date-and-time-value{text-align:left;}
+        .td-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:38px;}
+        .td-tag{display:inline-flex;align-items:center;gap:3px;padding:4px 4px 4px 10px;border-radius:14px;background:var(--accent-light);color:var(--accent);font-size:var(--fs-sm);font-weight:600;}
+        .td-tag button{border:none;background:none;color:inherit;cursor:pointer;display:flex;padding:3px;border-radius:50%;opacity:.7;}
+        .td-tag button:hover{opacity:1;background:rgba(0,104,183,.12);}
+        .td-tag-add{border:1px dashed var(--border-strong);background:none;border-radius:14px;padding:4px 10px;font-size:var(--fs-sm);color:var(--text-muted);cursor:pointer;font-family:inherit;}
+        .td-tag-add:hover{color:var(--text-primary);border-color:var(--text-muted);}
+        /* 子清單 */
+        .td-cl{margin-top:14px;border-top:1px solid var(--border);padding-top:4px;}
+        .td-cl-item,.td-cl-add{display:flex;align-items:center;gap:10px;padding:7px 2px;border-bottom:1px solid #F2F2F2;}
+        .td-cl-check{width:14px;height:14px;border-radius:50%;border:1.4px solid #B4B9C0;background:var(--surface);flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;}
+        .td-cl-check.on{background:#9AA3AD;border-color:#9AA3AD;}
+        .td-cl-check.on svg{width:8px;height:8px;}
+        .td-cl-check.ghost{border-style:dashed;cursor:default;}
+        .td-cl-item span{flex:1;font-size:var(--fs-base);min-width:0;word-break:break-word;}
+        .td-cl-item.done span{color:var(--text-muted);text-decoration:line-through;}
+        .td-cl-del{border:none;background:none;color:#B8B8B8;cursor:pointer;padding:4px;display:flex;opacity:0;}
+        .td-cl-item:hover .td-cl-del{opacity:1;}
+        @media(hover:none){ .td-cl-del{opacity:1;} }
+        .td-cl-add input{flex:1;border:none;outline:none;font-family:inherit;font-size:var(--fs-base);background:none;padding:2px 0;min-width:0;}
+        /* 建立人、回覆 */
         .td-creator{font-size:var(--fs-xs);color:var(--text-muted);margin-top:12px;}
         .td-thread{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
         .td-msg{align-self:flex-start;max-width:85%;background:var(--surface-alt);border-radius:10px 10px 10px 3px;padding:7px 10px;}
@@ -752,11 +801,17 @@
         .td-msg-hd{font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:2px;}
         .td-msg-body{font-size:var(--fs-base);color:var(--text-primary);white-space:pre-wrap;word-break:break-word;}
         .td-reply{display:flex;gap:6px;margin-top:10px;}
-        .td-reply input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--border);border-radius:18px;font-family:inherit;font-size:var(--fs-base);outline:none;}
+        .td-reply input{flex:1;min-width:0;padding:8px 12px;border:1px solid var(--border);border-radius:18px;font-family:inherit;font-size:var(--fs-base);outline:none;}
         .td-reply input:focus{border-color:var(--accent);}
         .td-card-ft{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
-        .td-fab{position:fixed;right:22px;bottom:calc(22px + var(--mnav));width:52px;height:52px;border-radius:50%;border:none;background:var(--accent);box-shadow:0 4px 14px rgba(0,104,183,.35);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:90;}
-        .td-fab:active{transform:scale(.96);}
+        .td-fab{position:fixed;right:28px;bottom:calc(24px + var(--mnav));width:52px;height:52px;border-radius:50%;border:none;background:var(--accent);box-shadow:0 4px 14px rgba(0,104,183,.35);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:90;transition:transform .12s;}
+        .td-fab:active{transform:scale(.94);}
+        @media(max-width:700px){ .td-fab.editing{display:none;} }
+        @media(max-width:700px){
+            .td-views button{font-size:var(--fs-xs);gap:3px;padding:8px 2px;}
+            .td-views button svg{width:12px;height:12px;}
+            .td-fab{right:16px;bottom:calc(16px + var(--mnav));}
+        }
         /* 通知鈴鐺 */
         #nt-bell{display:none;position:fixed;top:16px;left:calc(var(--sw) - 46px);width:34px;height:34px;border:1px solid var(--border);background:var(--surface);border-radius:8px;align-items:center;justify-content:center;color:var(--text-primary);cursor:pointer;z-index:101;padding:0;}
         body.nt-access #nt-bell{display:flex;}
@@ -779,7 +834,6 @@
             body.drawer-open #nt-bell{display:none;}
             .page-header > h2,.page-header > p,.page-header > div:first-child{padding-right:44px;}
             #nt-panel{width:auto;}
-            .td-fields{grid-template-columns:1fr 1fr;}
             .td-fab{right:16px;bottom:calc(16px + var(--mnav));}
         }
         .mgr-row .mgr-sched + .mgr-sched{margin-left:10px;}
@@ -3085,13 +3139,13 @@ function schedGoto(page, mk) {
 // ── 待辦通知：被指派、完成、回覆（自己做的不通知）──
 function todoVisible(t, me) {
     if (!me) return false;
-    return isTodoAdmin() || t.assigneeKey === me.key || t.creatorKey === me.key;
+    return isTodoAdmin() || tdIsAssignee(t, me.key) || t.creatorKey === me.key;
 }
 function todoUnread(t, me) {
     const ev = t.lastEvent;
     if (!me || !ev || ev.by === me.key) return false;
-    if (t.assigneeKey !== me.key && t.creatorKey !== me.key) return false;
-    if (ev.type === 'created' && t.assigneeKey !== me.key) return false;
+    if (!tdIsAssignee(t, me.key) && t.creatorKey !== me.key) return false;
+    if ((ev.type === 'assigned' || ev.type === 'created') && !(ev.to || [t.assigneeKey]).includes(me.key)) return false;
     return ev.at > ((t.seen || {})[me.key] || '');
 }
 function todoNotifs() {
@@ -3148,15 +3202,25 @@ document.addEventListener('pointerdown', e => {
 }, true);
 
 // ================================================================
-// 待辦清單畫面
+// 待辦清單畫面（仿 Things 3）
 // ================================================================
+// 負責人可多位（assignees）；舊資料只有 assigneeKey 時自動相容
+function tdAssignees(t) { return t && t.assignees && t.assignees.length ? t.assignees : (t && t.assigneeKey ? [{ key: t.assigneeKey, name: t.assigneeName || '' }] : []); }
+function tdIsAssignee(t, key) { return tdAssignees(t).some(a => a.key === key); }
+const TD_VIEWS = [
+    { key: 'today', label: '今天', color: '#F5A200', icon: '<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>' },
+    { key: 'upcoming', label: '即將到來', color: '#E8380D', icon: '<rect x="4" y="5" width="16" height="15" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="9" y1="3" x2="9" y2="7"/><line x1="15" y1="3" x2="15" y2="7"/>' },
+    { key: 'all', label: '全部', color: '#0068B7', icon: '<rect x="4" y="4" width="16" height="4" rx="1"/><rect x="4" y="10" width="16" height="4" rx="1"/><rect x="4" y="16" width="16" height="4" rx="1"/>' },
+    { key: 'done', label: '已完成', color: '#009B6B', icon: '<rect x="4" y="4" width="16" height="16" rx="4"/><polyline points="8 12 11 15 16 9"/>' },
+];
+const tdSvg = (d, color, size = 15) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const _tdRecent = new Set();
-let _tdView = 'today', _tdOpen = null, _tdNew = false, _tdFilter = { who: '', cat: '', urg: '' };
+let _tdAnim = null;
+let _tdView = 'today', _tdOpen = null, _tdNew = null, _tdFilter = { who: '', cat: '', urg: '' }, _tdBusy = false;
 function tdToday() { return msToday(); }
 function tdDueLabel(due) {
-    const t = tdToday();
     if (!due) return '';
-    const d = new Date(due + 'T00:00:00'), td = new Date(t + 'T00:00:00');
+    const d = new Date(due + 'T00:00:00'), td = new Date(tdToday() + 'T00:00:00');
     const diff = Math.round((d - td) / 864e5);
     if (diff === 0) return '今天';
     if (diff === 1) return '明天';
@@ -3167,41 +3231,54 @@ function tdList() {
     const me = todoMe();
     let list = todos.filter(t => todoVisible(t, me));
     const f = _tdFilter;
-    if (f.who === 'mine') list = list.filter(t => t.assigneeKey === me.key);
+    if (f.who === 'mine') list = list.filter(t => tdIsAssignee(t, me.key));
     else if (f.who === 'created') list = list.filter(t => t.creatorKey === me.key);
-    else if (f.who) list = list.filter(t => t.assigneeKey === f.who);
+    else if (f.who) list = list.filter(t => tdIsAssignee(t, f.who));
     if (f.cat) list = list.filter(t => t.category === f.cat);
     if (f.urg) list = list.filter(t => t.urgency === f.urg);
     return list;
 }
+function tdCounts(all) {
+    const t = tdToday();
+    return {
+        today: all.filter(x => !x.done && ((x.due && x.due <= t) || x.urgency === 'urgent')).length,
+        upcoming: all.filter(x => !x.done && x.due && x.due > t).length,
+        all: all.filter(x => !x.done).length,
+        done: all.filter(x => x.done).length,
+        late: all.filter(x => !x.done && x.due && x.due < t).length,
+    };
+}
+// 分組：[標題, 項目, 顏色]
 function tdGroups(list) {
-    // 剛勾選完成的項目先留在原位（打勾＋刪除線），稍後才移到已完成
     const t = tdToday(), open = list.filter(x => !x.done || _tdRecent.has(x.id));
     const byDue = (a, b) => (a.due || '9999').localeCompare(b.due || '9999');
     const urgRank = k => TODO_URG.findIndex(u => u.key === k);
     if (_tdView === 'today') {
         const late = open.filter(x => x.due && x.due < t).sort(byDue);
         const today = open.filter(x => !(x.due && x.due < t) && (x.due === t || x.urgency === 'urgent')).sort((a, b) => urgRank(a.urgency) - urgRank(b.urgency));
-        return [['逾期', late], ['今天', today]];
+        return [['逾期', late, '#E8380D'], ['今天', today, '#F5A200']];
     }
     if (_tdView === 'upcoming') {
         const fut = open.filter(x => x.due && x.due > t).sort(byDue);
         const g = {}; fut.forEach(x => { (g[x.due] = g[x.due] || []).push(x); });
-        return Object.entries(g).map(([d, xs]) => [tdDueLabel(d), xs]);
+        return Object.entries(g).map(([d, xs]) => [tdDueLabel(d), xs, '#1A1A1A']);
     }
     if (_tdView === 'done') {
         const done = list.filter(x => x.done && !_tdRecent.has(x.id)).sort((a, b) => (b.doneAt || '').localeCompare(a.doneAt || ''));
         const g = {}; done.forEach(x => { const k = (x.doneAt || '').slice(0, 10); (g[k] = g[k] || []).push(x); });
-        return Object.entries(g).map(([d, xs]) => [d ? tdDueLabel(d) : '已完成', xs]);
+        return Object.entries(g).map(([d, xs]) => [d ? tdDueLabel(d) : '已完成', xs, '#009B6B']);
     }
-    return TODO_URG.map(u => [u.label, open.filter(x => x.urgency === u.key).sort(byDue)]);
+    return TODO_URG.map(u => [u.label, open.filter(x => x.urgency === u.key).sort(byDue), u.color]);
 }
 const TD_ICON = {
     cal: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>',
     chat: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
     user: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>',
-    check: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg>',
+    list: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><polyline points="3 6 4.5 7.5 6.5 5"/><polyline points="3 12 4.5 13.5 6.5 11"/><circle cx="4.7" cy="18" r="1.2"/></svg>',
+    check: '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg>',
+    x: '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>',
 };
+
 function renderTodo() {
     const el = document.getElementById('todo-content'); if (!el) return;
     if (!canUseTodo()) { el.innerHTML = '<div class="empty-state"><p>尚未開通待辦清單</p></div>'; return; }
@@ -3209,49 +3286,64 @@ function renderTodo() {
     if (_tdErr) { el.innerHTML = `<div class="info-box">待辦讀取失敗：${_tdErr.code === 'permission-denied' ? '請在 Firebase 安全性規則允許 todos 資料表' : esc(_tdErr.message)}</div>`; return; }
     if (!_tdLoaded) { el.innerHTML = '<div class="sched-boot"><div class="spinner"></div></div>'; return; }
     const me = todoMe(), admin = isTodoAdmin();
-    const all = tdList(), t = tdToday();
-    const counts = {
-        today: all.filter(x => !x.done && ((x.due && x.due <= t) || x.urgency === 'urgent')).length,
-        upcoming: all.filter(x => !x.done && x.due && x.due > t).length,
-        all: all.filter(x => !x.done).length,
-        done: all.filter(x => x.done).length,
-    };
-    const views = [['today', '今天'], ['upcoming', '即將到來'], ['all', '全部'], ['done', '已完成']];
+    const all = tdList(), counts = tdCounts(all);
     const people = todoPeople();
     const whoOpts = admin
         ? `<option value="">所有人</option><option value="mine">指派給我</option><option value="created">我建立的</option>${people.map(p => `<option value="${esc(p.key)}">${esc(p.name)}</option>`).join('')}`
         : `<option value="">全部</option><option value="mine">指派給我</option><option value="created">我建立的</option>`;
     const groups = tdGroups(all).filter(([, xs]) => xs.length);
-    const newCard = _tdNew ? tdCard(null) : '';
-    el.innerHTML = `
-        <div class="td-views">${views.map(([k, l]) => `<button class="${_tdView === k ? 'on' : ''}" onclick="setTodoView('${k}')">${l}${counts[k] ? `<span>${counts[k]}</span>` : ''}</button>`).join('')}</div>
-        <div class="td-filters">
-            <select onchange="_tdFilter.who=this.value;renderTodo()">${whoOpts}</select>
-            ${admin ? `<select onchange="_tdFilter.cat=this.value;renderTodo()"><option value="">所有類別</option>${TODO_CATS.map(c => `<option>${c}</option>`).join('')}</select>
-            <select onchange="_tdFilter.urg=this.value;renderTodo()"><option value="">所有急迫性</option>${TODO_URG.map(u => `<option value="${u.key}">${u.label}</option>`).join('')}</select>` : ''}
+    const empty = { today: '今天沒有待辦，好好休息', upcoming: '沒有即將到期的待辦', all: '沒有待辦事項', done: '還沒有完成的待辦' }[_tdView];
+
+    // 右側概況（電腦版）
+    const byWho = {}, byCat = {};
+    all.filter(x => !x.done).forEach(x => { tdAssignees(x).forEach(a => { byWho[a.key] = byWho[a.key] || { name: a.name, n: 0 }; byWho[a.key].n++; }); byCat[x.category || '其他'] = (byCat[x.category || '其他'] || 0) + 1; });
+    const side = `<aside class="td-side">
+        <div class="td-side-card">
+            ${TD_VIEWS.map(v => `<button class="td-side-row${_tdView === v.key ? ' on' : ''}" onclick="setTodoView('${v.key}')">${tdSvg(v.icon, v.color)}<span>${v.label}</span><b>${counts[v.key] || ''}</b></button>`).join('')}
+            ${counts.late ? `<div class="td-side-late">${counts.late} 項已逾期</div>` : ''}
         </div>
-        ${newCard}
-        ${groups.length ? groups.map(([g, xs]) => `<div class="td-group"><div class="td-ghd${g === '逾期' ? ' late' : ''}">${esc(g)}</div>${xs.map(x => _tdOpen === x.id ? tdCard(x) : tdRow(x, me)).join('')}</div>`).join('')
-            : (_tdNew ? '' : `<div class="td-empty">${_tdView === 'done' ? '還沒有完成的待辦' : _tdView === 'upcoming' ? '沒有即將到期的待辦' : '沒有待辦事項'}</div>`)}
-        <button class="td-fab" onclick="newTodo()" aria-label="新增待辦"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>`;
-    // 還原篩選的選取值
+        ${admin && Object.keys(byWho).length ? `<div class="td-side-card"><div class="td-side-hd">負責人</div>${Object.entries(byWho).sort((a, b) => b[1].n - a[1].n).map(([k, v]) => `<button class="td-side-row${_tdFilter.who === k ? ' on' : ''}" onclick="tdSetFilter('who','${esc(k)}')"><span class="td-av">${esc(asstAbbrMaybe(v.name))}</span><span>${esc(v.name)}</span><b>${v.n}</b></button>`).join('')}</div>` : ''}
+        ${Object.keys(byCat).length ? `<div class="td-side-card"><div class="td-side-hd">類別</div>${TODO_CATS.filter(c => byCat[c]).map(c => `<button class="td-side-row${_tdFilter.cat === c ? ' on' : ''}" onclick="tdSetFilter('cat','${c}')"><span class="td-cat">${c}</span><span></span><b>${byCat[c]}</b></button>`).join('')}</div>` : ''}
+    </aside>`;
+
+    el.innerHTML = `<div class="td-layout"><div class="td-maincol">
+        <div class="td-views">${TD_VIEWS.map(v => `<button class="${_tdView === v.key ? 'on' : ''}" style="--vc:${v.color}" onclick="setTodoView('${v.key}')">${tdSvg(v.icon, v.color, 14)}${v.label}${counts[v.key] ? `<span>${counts[v.key]}</span>` : ''}</button>`).join('')}</div>
+        <div class="td-filters">
+            <select onchange="tdSetFilter('who',this.value,true)">${whoOpts}</select>
+            ${admin ? `<select onchange="tdSetFilter('cat',this.value,true)"><option value="">所有類別</option>${TODO_CATS.map(c => `<option>${c}</option>`).join('')}</select>
+            <select onchange="tdSetFilter('urg',this.value,true)"><option value="">所有急迫性</option>${TODO_URG.map(u => `<option value="${u.key}">${u.label}</option>`).join('')}</select>` : ''}
+        </div>
+        ${_tdNew ? tdCard(null) : ''}
+        ${groups.length ? groups.map(([g, xs, c]) => `<div class="td-group"><div class="td-ghd" style="color:${c}">${_tdView === 'all' ? `<i style="background:${c}"></i>` : ''}${esc(g)}<span>${xs.length}</span></div>${xs.map(x => _tdOpen === x.id ? tdCard(x) : tdRow(x, me)).join('')}</div>`).join('')
+            : (_tdNew ? '' : `<div class="td-empty">${tdSvg(TD_VIEWS.find(v => v.key === _tdView).icon, '#C8CCD2', 34)}<div>${empty}</div></div>`)}
+        </div>${side}</div>
+        <button class="td-fab${_tdOpen || _tdNew ? ' editing' : ''}" onclick="newTodo()" aria-label="新增待辦"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>`;
+    _tdAnim = null;
     const sels = el.querySelectorAll('.td-filters select');
     sels[0].value = _tdFilter.who; if (sels[1]) sels[1].value = _tdFilter.cat; if (sels[2]) sels[2].value = _tdFilter.urg;
-    if (_tdNew) el.querySelector('.td-card .td-title-in')?.focus();
+}
+function asstAbbrMaybe(name) { return name === '院長' ? '長' : asstAbbr(name); }
+function tdSetFilter(k, v, fromSelect) {
+    _tdFilter[k] = (!fromSelect && _tdFilter[k] === v) ? '' : v;
+    renderTodo();
 }
 function tdRow(x, me) {
     const u = TODO_URG.find(k => k.key === x.urgency) || TODO_URG[3];
     const late = !x.done && x.due && x.due < tdToday();
     const unread = todoUnread(x, me);
-    return `<div class="td-item${x.done ? ' done' : ''}">
-        <button class="td-check${x.done ? ' on' : ''}" onclick="toggleTodoDone('${x.id}')" aria-label="${x.done ? '標為未完成' : '完成'}">${x.done ? TD_ICON.check : ''}</button>
+    const who = tdAssignees(x);
+    const cl = x.checklist || [], clDone = cl.filter(c => c.done).length;
+    const canDone = x.creatorKey === me.key;
+    return `<div class="td-item${x.done ? ' done' : ''}${_tdRecent.has(x.id) ? ' just' : ''}" data-row="${x.id}">
+        <button class="td-check${x.done ? ' on' : ''}${canDone ? '' : ' locked'}" ${canDone ? `onclick="toggleTodoDone('${x.id}')"` : 'title="只有建立人可以勾選完成"'} aria-label="${x.done ? '標為未完成' : '完成'}">${x.done ? TD_ICON.check : ''}</button>
         <div class="td-main" onclick="openTodo('${x.id}')">
-            <div class="td-title">${x.urgency === 'urgent' && !x.done ? '<span class="td-flag"></span>' : ''}${esc(x.title)}${unread ? '<span class="td-dot"></span>' : ''}</div>
+            <div class="td-title">${esc(x.title)}${unread ? '<span class="td-dot"></span>' : ''}</div>
             <div class="td-meta">
+                <span class="td-urg" style="color:${u.color}"><i style="background:${u.color}"></i>${u.label}</span>
                 <span class="td-cat">${esc(x.category || '其他')}</span>
-                ${x.urgency !== 'urgent' ? `<span style="color:${u.color}">${u.label}</span>` : ''}
                 ${x.due ? `<span class="td-due${late ? ' late' : ''}">${TD_ICON.cal}${tdDueLabel(x.due)}</span>` : ''}
-                <span>${TD_ICON.user}${esc(x.assigneeName || '—')}</span>
+                ${cl.length ? `<span>${TD_ICON.list}${clDone}/${cl.length}</span>` : ''}
+                ${who.length ? `<span>${TD_ICON.user}${esc(who.slice(0, 2).map(a => a.name).join('、'))}${who.length > 2 ? ` +${who.length - 2}` : ''}</span>` : ''}
                 ${(x.replies || []).length ? `<span>${TD_ICON.chat}${x.replies.length}</span>` : ''}
             </div>
         </div>
@@ -3259,123 +3351,228 @@ function tdRow(x, me) {
 }
 function tdCard(x) {
     const me = todoMe(), isNew = !x;
-    const v = x || { title: '', due: '', urgency: 'none', category: '其他', assigneeKey: me.key };
-    const canDelete = !isNew && (isTodoAdmin() || v.creatorKey === me.key);
-    const people = todoPeople();
-    if (!people.some(p => p.key === v.assigneeKey) && v.assigneeKey) people.push({ key: v.assigneeKey, name: v.assigneeName || '—' });
-    const fmt = iso => { const d = new Date(iso); return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+    const v = x || _tdNew;
     const id = isNew ? 'new' : v.id;
-    const upd = f => isNew ? '' : `onchange="updateTodo('${id}','${f}',this.value)"`;
-    return `<div class="td-card" data-id="${id}">
+    const canDone = !isNew && v.creatorKey === me.key;
+    const canDelete = !isNew && (isTodoAdmin() || v.creatorKey === me.key);
+    const who = isNew ? v.assignees : tdAssignees(v);
+    const fmt = iso => { const d = new Date(iso); return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+    const upd = f => isNew ? `onchange="_tdNew.${f}=this.value"` : `onchange="updateTodo('${id}','${f}',this.value)"`;
+    const cl = v.checklist || [];
+    const anim = _tdAnim === id ? ' anim' : '';
+    return `<div class="td-card${anim}" data-id="${id}">
         <div class="td-card-top">
-            ${isNew ? '<span class="td-check ghost"></span>' : `<button class="td-check${v.done ? ' on' : ''}" onclick="toggleTodoDone('${id}')">${v.done ? TD_ICON.check : ''}</button>`}
-            <input class="td-title-in" placeholder="新待辦" value="${esc(v.title)}" ${isNew ? `onkeydown="if(event.key==='Enter')createTodo()"` : `onchange="updateTodo('${id}','title',this.value)"`}>
+            ${isNew ? '<span class="td-check ghost"></span>' : `<button class="td-check${v.done ? ' on' : ''}${canDone ? '' : ' locked'}" ${canDone ? `onclick="toggleTodoDone('${id}')"` : 'title="只有建立人可以勾選完成"'}>${v.done ? TD_ICON.check : ''}</button>`}
+            <input class="td-title-in" placeholder="新待辦" value="${esc(v.title)}" ${isNew ? `oninput="_tdNew.title=this.value" onkeydown="if(tdEnter(event))createTodo()"` : `onchange="updateTodo('${id}','title',this.value)" onkeydown="if(tdEnter(event))this.blur()"`}>
         </div>
         <div class="td-fields">
-            <label><span>到期日</span><input type="date" class="td-in" data-f="due" value="${esc(v.due)}" ${upd('due')}></label>
-            <label><span>急迫性</span><select class="td-in" data-f="urgency" ${upd('urgency')}>${TODO_URG.map(u => `<option value="${u.key}" ${u.key === v.urgency ? 'selected' : ''}>${u.label}</option>`).join('')}</select></label>
-            <label><span>類別</span><select class="td-in" data-f="category" ${upd('category')}>${TODO_CATS.map(c => `<option ${c === v.category ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
-            <label><span>負責人</span><select class="td-in" data-f="assigneeKey" ${upd('assigneeKey')}>${people.map(p => `<option value="${esc(p.key)}" ${p.key === v.assigneeKey ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>
+            <label><span>到期日</span><input type="date" class="td-in td-date" value="${esc(v.due || '')}" ${upd('due')}></label>
+            <label><span>急迫性</span><select class="td-in" ${upd('urgency')}>${TODO_URG.map(u => `<option value="${u.key}" ${u.key === v.urgency ? 'selected' : ''}>${u.label}</option>`).join('')}</select></label>
+            <label><span>類別</span><select class="td-in" ${upd('category')}>${TODO_CATS.map(c => `<option ${c === v.category ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+            <div class="td-who-field"><span>負責人</span>
+                <div class="td-tags">${who.map(a => `<span class="td-tag">${esc(a.name)}<button onclick="tdRemoveWho('${id}','${esc(a.key)}')" aria-label="移除">${TD_ICON.x}</button></span>`).join('')}
+                    <button class="td-tag-add" onclick="tdPickWho(this,'${id}')" aria-label="新增負責人">+ 負責人</button></div>
+            </div>
+        </div>
+        <div class="td-cl">
+            ${cl.map(c => `<div class="td-cl-item${c.done ? ' done' : ''}">
+                <button class="td-cl-check${c.done ? ' on' : ''}" onclick="tdToggleCl('${id}','${c.id}')">${c.done ? TD_ICON.check : ''}</button>
+                <span>${esc(c.text)}</span>
+                <button class="td-cl-del" onclick="tdDelCl('${id}','${c.id}')" aria-label="刪除">${TD_ICON.x}</button></div>`).join('')}
+            <div class="td-cl-add"><span class="td-cl-check ghost"></span><input placeholder="新增清單項目" onkeydown="if(tdEnter(event))tdAddCl('${id}',this)"></div>
         </div>
         ${isNew ? `<div class="td-card-ft"><button class="btn btn-outline btn-sm" onclick="cancelNewTodo()">取消</button><button class="btn btn-primary btn-sm" onclick="createTodo()">建立</button></div>` : `
         <div class="td-creator">由 ${esc(v.creatorName)} 建立・${fmt(v.createdAt)}${v.done && v.doneByName ? `　${esc(v.doneByName)} 於 ${fmt(v.doneAt)} 完成` : ''}</div>
-        <div class="td-thread">${(v.replies || []).map(r => `<div class="td-msg${r.by === me.key ? ' me' : ''}"><div class="td-msg-hd">${esc(r.byName)}・${fmt(r.at)}</div><div class="td-msg-body">${esc(r.text)}</div></div>`).join('')}</div>
-        <div class="td-reply"><input placeholder="回覆…" id="td-reply-in" onkeydown="if(event.key==='Enter')replyTodo('${id}')"><button class="btn btn-primary btn-sm" onclick="replyTodo('${id}')">送出</button></div>
-        <div class="td-card-ft">${canDelete ? `<button class="btn btn-danger btn-sm" onclick="deleteTodo('${id}')">刪除</button>` : ''}<button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="openTodo(null)">收合</button></div>`}
+        ${(v.replies || []).length ? `<div class="td-thread">${v.replies.map(r => `<div class="td-msg${r.by === me.key ? ' me' : ''}"><div class="td-msg-hd">${esc(r.byName)}・${fmt(r.at)}</div><div class="td-msg-body">${esc(r.text)}</div></div>`).join('')}</div>` : ''}
+        <div class="td-reply"><input placeholder="回覆…" id="td-reply-in" onkeydown="if(tdEnter(event))replyTodo('${id}')"><button class="btn btn-primary btn-sm" onclick="replyTodo('${id}')">送出</button></div>
+        <div class="td-card-ft">${canDelete ? `<button class="btn btn-danger btn-sm" onclick="deleteTodo('${id}')">刪除</button>` : ''}<button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="closeTodoCard()">收合</button></div>`}
     </div>`;
 }
+// 中文輸入法選字時按 Enter 不算送出
+function tdEnter(e) { return e.key === 'Enter' && !e.isComposing && e.keyCode !== 229; }
+
+// ── 展開／收合（含動畫）──
 function setTodoView(v) { _tdView = v; _tdOpen = null; renderTodo(); }
 function openTodo(id) {
-    _tdOpen = _tdOpen === id ? null : id; _tdNew = false;
+    if (_tdOpen === id) { closeTodoCard(); return; }
     const t = todos.find(x => x.id === id);
-    if (t && _tdOpen) {
-        // 確保展開的項目在目前檢視內
-        const inView = tdGroups(tdList()).some(([, xs]) => xs.some(x => x.id === id));
-        if (!inView) _tdView = t.done ? 'done' : 'all';
-        todoMarkSeen(t);
-    }
-    renderTodo();
-    if (_tdOpen) requestAnimationFrame(() => document.querySelector(`.td-card[data-id="${id}"]`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }));
+    const go = () => {
+        _tdOpen = id; _tdNew = null; _tdAnim = id;
+        if (t) {
+            const inView = tdGroups(tdList()).some(([, xs]) => xs.some(x => x.id === id));
+            if (!inView) _tdView = t.done ? 'done' : 'all';
+            todoMarkSeen(t);
+        }
+        renderTodo();
+        requestAnimationFrame(() => document.querySelector(`.td-card[data-id="${id}"]`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }));
+    };
+    if (_tdOpen) closeTodoCard(go); else go();
 }
-function newTodo() { _tdNew = true; _tdOpen = null; renderTodo(); }
-function cancelNewTodo() { _tdNew = false; renderTodo(); }
+function closeTodoCard(after) {
+    const card = document.querySelector(`.td-card[data-id="${_tdNew ? 'new' : _tdOpen}"]`);
+    const done = () => { _tdOpen = null; if (typeof after !== 'function') _tdNew = null; renderTodo(); if (typeof after === 'function') after(); };
+    if (!card) { done(); return; }
+    card.classList.add('closing');
+    setTimeout(done, 170);
+}
+// 點卡片以外的地方收合
+document.addEventListener('pointerdown', e => {
+    if (currentPage !== 'todo' || (!_tdOpen && !_tdNew)) return;
+    const t = e.target;
+    if (t.closest('.td-card') || t.closest('.csel-menu') || t.closest('.td-who-menu') || t.closest('.modal-overlay') || t.closest('#nt-panel') || t.closest('.td-fab') || t.closest('.td-item')) return;
+    if (_tdNew && (_tdNew.title || '').trim()) return;   // 新待辦已輸入內容時不自動丟棄
+    closeTodoCard();
+}, true);
+
+// ── 新增 ──
+function newTodo() {
+    const me = todoMe();
+    _tdOpen = null;
+    _tdNew = { title: '', due: '', urgency: 'none', category: '其他', assignees: [{ key: me.key, name: me.name }], checklist: [] };
+    _tdAnim = 'new';
+    renderTodo();
+    requestAnimationFrame(() => document.querySelector('.td-card[data-id="new"] .td-title-in')?.focus());
+}
+function cancelNewTodo() { closeTodoCard(); }
 async function createTodo() {
-    const card = document.querySelector('.td-card[data-id="new"]'); if (!card) return;
-    const title = card.querySelector('.td-title-in').value.trim();
+    if (_tdBusy || !_tdNew) return;
+    const card = document.querySelector('.td-card[data-id="new"]');
+    const title = (card?.querySelector('.td-title-in').value || _tdNew.title || '').trim();
     if (!title) { toast('請輸入標題'); return; }
-    const f = k => card.querySelector(`[data-f="${k}"]`).value;
-    const me = todoMe(), now = new Date().toISOString();
-    const who = todoPeople().find(p => p.key === f('assigneeKey')) || me;
+    const me = todoMe(), now = new Date().toISOString(), n = _tdNew;
+    const who = n.assignees.length ? n.assignees : [{ key: me.key, name: me.name }];
+    _tdBusy = true;
     try {
         await db.collection(col('todos')).add({
-            title, due: f('due'), urgency: f('urgency'), category: f('category'),
-            assigneeKey: who.key, assigneeName: who.name, creatorKey: me.key, creatorName: me.name,
+            title, due: n.due || '', urgency: n.urgency, category: n.category,
+            assignees: who, assigneeKey: who[0].key, assigneeName: who[0].name,
+            creatorKey: me.key, creatorName: me.name, checklist: n.checklist || [],
             done: false, replies: [], createdAt: now, updatedAt: now,
-            lastEvent: { type: 'created', by: me.key, byName: me.name, at: now }, seen: { [me.key]: now },
+            lastEvent: { type: 'assigned', to: who.map(a => a.key), by: me.key, byName: me.name, at: now }, seen: { [me.key]: now },
         });
-        _tdNew = false; toast('已建立待辦');
+        _tdNew = null; renderTodo(); toast('已建立待辦');
     } catch (e) { toast(e.code === 'permission-denied' ? '建立被拒：請在 Firebase 安全性規則允許 todos 資料表' : '建立失敗：' + e.message); }
+    finally { _tdBusy = false; }
 }
-async function updateTodo(id, field, value) {
+
+// ── 修改 ──
+async function tdPatch(id, patch) {
+    try { await db.collection(col('todos')).doc(id).update({ ...patch, updatedAt: new Date().toISOString() }); }
+    catch (e) { toast('儲存失敗：' + e.message); }
+}
+function updateTodo(id, field, value) {
+    const t = todos.find(x => x.id === id); if (!t) return;
+    if (field === 'title') { if (!value.trim()) { toast('標題不可空白'); renderTodo(); return; } value = value.trim(); if (value === t.title) return; }
+    tdPatch(id, { [field]: value });
+}
+// 負責人標籤：新增（選單）／移除
+let _tdWhoMenu = null;
+function tdPickWho(btn, id) {
+    _tdWhoMenu?.remove();
+    const cur = id === 'new' ? _tdNew.assignees : tdAssignees(todos.find(x => x.id === id));
+    const opts = todoPeople().filter(p => !cur.some(a => a.key === p.key));
+    if (!opts.length) { toast('所有人都已是負責人'); return; }
+    const m = document.createElement('div');
+    m.className = 'csel-menu td-who-menu';
+    m.innerHTML = opts.map(p => `<button type="button" class="csel-opt" data-k="${esc(p.key)}">${esc(p.name)}</button>`).join('');
+    m.addEventListener('click', e => {
+        const b = e.target.closest('button[data-k]'); if (!b) return;
+        const p = opts.find(o => o.key === b.dataset.k);
+        m.remove(); _tdWhoMenu = null;
+        tdSetWho(id, [...cur, p], p);
+    });
+    document.body.appendChild(m);
+    const r = btn.getBoundingClientRect();
+    m.style.left = Math.max(8, Math.min(r.left, innerWidth - m.offsetWidth - 8)) + 'px';
+    const below = innerHeight - r.bottom - 12;
+    m.style.maxHeight = Math.max(160, Math.min(320, below > 200 ? below : r.top - 20)) + 'px';
+    m.style.top = (below > 200 ? r.bottom + 6 : Math.max(8, r.top - 6 - m.offsetHeight)) + 'px';
+    _tdWhoMenu = m;
+}
+document.addEventListener('pointerdown', e => { if (_tdWhoMenu && !_tdWhoMenu.contains(e.target) && !e.target.closest('.td-tag-add')) { _tdWhoMenu.remove(); _tdWhoMenu = null; } }, true);
+function tdRemoveWho(id, key) {
+    const cur = id === 'new' ? _tdNew.assignees : tdAssignees(todos.find(x => x.id === id));
+    if (cur.length <= 1) { toast('至少要有一位負責人'); return; }
+    tdSetWho(id, cur.filter(a => a.key !== key), null);
+}
+function tdSetWho(id, list, added) {
+    if (id === 'new') { _tdNew.assignees = list; renderTodo(); return; }
     const t = todos.find(x => x.id === id); if (!t) return;
     const me = todoMe(), now = new Date().toISOString();
-    const patch = { updatedAt: now };
-    if (field === 'title') { if (!value.trim()) { toast('標題不可空白'); renderTodo(); return; } patch.title = value.trim(); }
-    else if (field === 'assigneeKey') {
-        const who = todoPeople().find(p => p.key === value); if (!who) return;
-        patch.assigneeKey = who.key; patch.assigneeName = who.name;
-        patch.lastEvent = { type: 'created', by: me.key, byName: me.name, at: now };   // 通知新的負責人
-        patch.seen = { ...(t.seen || {}), [me.key]: now };
-    } else patch[field] = value;
-    try { await db.collection(col('todos')).doc(id).update(patch); } catch (e) { toast('儲存失敗：' + e.message); }
+    const patch = { assignees: list, assigneeKey: list[0].key, assigneeName: list[0].name };
+    if (added) { patch.lastEvent = { type: 'assigned', to: [added.key], by: me.key, byName: me.name, at: now }; patch.seen = { ...(t.seen || {}), [me.key]: now }; }
+    tdPatch(id, patch);
 }
+// 子清單
+function tdClId() { return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
+function tdAddCl(id, input) {
+    const text = input.value.trim(); if (!text) return;
+    input.value = '';
+    if (id === 'new') { _tdNew.checklist.push({ id: tdClId(), text, done: false }); renderTodo(); requestAnimationFrame(() => document.querySelector('.td-card[data-id="new"] .td-cl-add input')?.focus()); return; }
+    const t = todos.find(x => x.id === id); if (!t) return;
+    tdPatch(id, { checklist: [...(t.checklist || []), { id: tdClId(), text, done: false }] });
+}
+function tdToggleCl(id, cid) {
+    if (id === 'new') { const c = _tdNew.checklist.find(x => x.id === cid); if (c) c.done = !c.done; renderTodo(); return; }
+    const t = todos.find(x => x.id === id); if (!t) return;
+    tdPatch(id, { checklist: (t.checklist || []).map(c => c.id === cid ? { ...c, done: !c.done } : c) });
+}
+function tdDelCl(id, cid) {
+    if (id === 'new') { _tdNew.checklist = _tdNew.checklist.filter(x => x.id !== cid); renderTodo(); return; }
+    const t = todos.find(x => x.id === id); if (!t) return;
+    tdPatch(id, { checklist: (t.checklist || []).filter(c => c.id !== cid) });
+}
+// 完成（只有建立人）
 async function toggleTodoDone(id) {
     const t = todos.find(x => x.id === id); if (!t) return;
-    const me = todoMe(), now = new Date().toISOString(), done = !t.done;
+    const me = todoMe();
+    if (t.creatorKey !== me.key) { toast('只有建立人可以勾選完成'); return; }
+    const now = new Date().toISOString(), done = !t.done;
     if (done) {
         _tdRecent.add(id);
         setTimeout(() => {
             _tdRecent.delete(id);
-            if (_tdOpen === id) _tdView = 'done';   // 展開中的項目跟著移到已完成，保持展開
+            if (_tdOpen === id) _tdView = 'done';
             if (currentPage === 'todo') tdSafeRender();
         }, 1500);
     }
-    try {
-        await db.collection(col('todos')).doc(id).update({
-            done, doneAt: done ? now : '', doneByName: done ? me.name : '', updatedAt: now,
-            lastEvent: { type: done ? 'completed' : 'reopened', by: me.key, byName: me.name, at: now },
-            seen: { ...(t.seen || {}), [me.key]: now },
-        });
-    } catch (e) { toast('更新失敗：' + e.message); }
+    await tdPatch(id, {
+        done, doneAt: done ? now : '', doneByName: done ? me.name : '',
+        lastEvent: { type: done ? 'completed' : 'reopened', by: me.key, byName: me.name, at: now },
+        seen: { ...(t.seen || {}), [me.key]: now },
+    });
 }
+// 回覆（防重複送出）
 async function replyTodo(id) {
+    if (_tdBusy) return;
     const inp = document.getElementById('td-reply-in'); const text = inp?.value.trim(); if (!text) return;
     const t = todos.find(x => x.id === id); if (!t) return;
+    inp.value = '';
+    _tdBusy = true;
     const me = todoMe(), now = new Date().toISOString();
     try {
-        await db.collection(col('todos')).doc(id).update({
-            replies: [...(t.replies || []), { by: me.key, byName: me.name, text, at: now }], updatedAt: now,
+        await tdPatch(id, {
+            replies: [...(t.replies || []), { by: me.key, byName: me.name, text, at: now }],
             lastEvent: { type: 'reply', by: me.key, byName: me.name, text, at: now },
             seen: { ...(t.seen || {}), [me.key]: now },
         });
-    } catch (e) { toast('回覆失敗：' + e.message); }
+    } finally { _tdBusy = false; }
 }
 function deleteTodo(id) {
     confirm2('刪除這個待辦？', async () => {
         try { await db.collection(col('todos')).doc(id).delete(); _tdOpen = null; toast('已刪除'); } catch (e) { toast('刪除失敗：' + e.message); }
     });
 }
-
 // 使用者正在輸入時先不重畫，離開輸入框後再更新
 let _tdPending = false;
 function tdSafeRender() {
     const a = document.activeElement;
-    if (a && a.closest && a.closest('#todo-content') && /INPUT|TEXTAREA/.test(a.tagName)) { _tdPending = true; return; }
+    if (a && a.closest && a.closest('#todo-content') && /INPUT|TEXTAREA/.test(a.tagName) && a.value) { _tdPending = true; return; }
     renderTodo();
 }
 document.addEventListener('focusout', e => {
     if (_tdPending && e.target.closest && e.target.closest('#todo-content')) {
-        setTimeout(() => { if (_tdPending && !(document.activeElement?.closest?.('#todo-content') && /INPUT|TEXTAREA/.test(document.activeElement.tagName))) { _tdPending = false; renderTodo(); } }, 150);
+        setTimeout(() => { const a = document.activeElement; if (_tdPending && !(a?.closest?.('#todo-content') && /INPUT|TEXTAREA/.test(a.tagName) && a.value)) { _tdPending = false; renderTodo(); } }, 150);
     }
 });
 
