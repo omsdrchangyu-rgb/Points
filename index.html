@@ -512,6 +512,20 @@
         body.on-sched .main{min-width:0;}
         #sched-root{min-width:0;flex:1;display:flex;flex-direction:column;}
         #sched-root > div{min-width:0;}
+        /* 電腦版排班頁：側邊欄收合，按左上角選單鈕展開 */
+        @media(min-width:701px){
+            body.on-sched .sidebar{transform:translateX(-100%);transition:transform .22s ease;z-index:900;box-shadow:0 0 26px rgba(0,0,0,.18);}
+            body.on-sched.drawer-open .sidebar{transform:none;}
+            body.on-sched .sidebar-brand{padding-left:56px;}
+            body.on-sched .main{margin-left:0;}
+            body.on-sched .menu-btn{display:flex;color:#fff;width:44px;height:44px;background:#1e3566;}
+            body.on-sched .menu-btn svg{width:20px;height:20px;}
+            body.on-sched .menu-badge{top:9px;right:8px;width:8px;height:8px;border-width:1.5px;}
+            body.on-sched.drawer-open .menu-btn{color:var(--text-primary);width:52px;height:53px;background:none;}
+            body.on-sched.drawer-open .drawer-backdrop{display:block;}
+            body.on-sched #sched-root .topbar{padding-left:52px;}
+        }
+        @media(max-width:700px){ body.on-sched .menu-btn{color:#fff;width:44px;height:44px;background:#1e3566;} body.on-sched .menu-btn svg{width:20px;height:20px;} body.on-sched .menu-badge{top:9px;right:8px;width:8px;height:8px;border-width:1.5px;} body.on-sched.drawer-open .menu-btn{color:var(--text-primary);width:52px;height:53px;background:none;} }
         .sched-boot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:80px 20px;color:var(--text-muted);font-size:var(--fs-base);text-align:center;}
 
         /* iOS 風格開關 */
@@ -557,7 +571,24 @@
 #sched-root tbody td{padding:0;vertical-align:top}
 #sched-root button,#sched-root input,#sched-root select,#sched-root textarea{font-family:inherit}
 #sched-root .sched-table,#sched-root .stats-table,#sched-root .doc-pattern-table{width:100%}
-@media(max-width:700px){#sched-root .topbar{padding-left:56px;flex-wrap:wrap}}
+#sched-root .sched-table td.full-off{position:relative}
+#sched-root .sched-table td.full-off::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;background:#c0504d;pointer-events:none}
+#sched-root .sched-table tr.asst-row:hover > td{box-shadow:inset 0 1.5px 0 #a3a9b4,inset 0 -1.5px 0 #a3a9b4}
+#sched-root .sched-table tr.asst-row:hover > td.name-cell{box-shadow:inset 3px 0 0 #a3a9b4,inset 0 1.5px 0 #a3a9b4,inset 0 -1.5px 0 #a3a9b4}
+#sched-root .sched-table tr.asst-row .shift-block{transition:transform .12s,box-shadow .12s}
+#sched-root .sched-table tr.asst-row td:not(.full-off) .shift-block:hover{transform:scale(1.18);box-shadow:0 2px 8px rgba(0,0,0,.25);position:relative;z-index:2;filter:none}
+#sched-root .sched-table tr.asst-row td.full-off .shift-block:hover{filter:none}
+#sched-root .topbar{position:sticky;top:0;z-index:60;min-height:44px}
+#sched-root .sched-table .name-cell,#sched-root .sched-table thead tr:first-child > th:first-child,
+#sched-root .doc-pattern-table th:first-child,#sched-root .doc-pattern-table td:first-child,
+#sched-root .pos-table .pos-name{position:sticky;left:0;z-index:4}
+#sched-root .doc-pattern-table th:first-child{background:#eceef8}
+#sched-root .doc-pattern-table td:first-child{background:#f8f8fc}
+#sched-root .doc-pattern-table th:first-child,#sched-root .doc-pattern-table td:first-child{white-space:nowrap;min-width:60px}
+#sched-root .sched-table tr.asst-row .shift-block{transition:transform .12s,box-shadow .12s}
+#sched-root .sched-table tr.asst-row .shift-block:hover{transform:scale(1.18);box-shadow:0 2px 8px rgba(0,0,0,.25);position:relative;z-index:2;filter:none}
+#sched-root table.sched-table td{overflow:visible}
+@media(max-width:700px){#sched-root .topbar{padding-left:52px;flex-wrap:wrap}}
 #sched-root *{box-sizing:border-box}
 #sched-root{font-family:-apple-system,'PingFang TC','Microsoft JhengHei',Arial,sans-serif;font-size:13px;background:#eef0f5;color:#2d3142;line-height:normal;letter-spacing:normal}
 #sched-root .topbar{background:linear-gradient(135deg,#1e3566 0%,#2d508a 100%);color:#fff;display:flex;align-items:center;gap:8px;padding:7px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
@@ -2256,7 +2287,7 @@ function init() {
         if (e.target.closest('button')) closeDrawer();
     });
     // 轉成桌機寬度時強制收合，避免殘留狀態
-    window.addEventListener('resize', () => { if (window.innerWidth > 700) closeDrawer(); });
+    window.addEventListener('resize', () => { if (window.innerWidth > 700 && currentPage !== 'schedule') closeDrawer(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
     const saved = localStorage.getItem(CFG_KEY);
     if (saved) {
@@ -6851,6 +6882,24 @@ const LEAVE_COLORS = {
   '病假':'#9a88ad', '事假':'#b0916e', '生理假':'#c0939f', '喪假':'#8f8f8f',
   '婚假':'#c9a07f', '產假':'#a996b8', '工傷病假':'#9a88ad', '其他假':'#a0a0a0',
 };
+// 台灣國定假日（週日不列）；可在「備註」頁手動調整
+const TW_HOLIDAYS = {
+  '2026-01-01':'元旦', '2026-02-16':'除夕', '2026-02-17':'春節', '2026-02-18':'春節', '2026-02-19':'春節',
+  '2026-02-20':'春節補假', '2026-02-27':'和平紀念日補假', '2026-02-28':'和平紀念日', '2026-04-03':'兒童節補假',
+  '2026-04-04':'兒童節', '2026-04-06':'清明節補假', '2026-05-01':'勞動節', '2026-06-19':'端午節',
+  '2026-09-25':'中秋節', '2026-09-28':'教師節', '2026-10-09':'國慶日補假', '2026-10-10':'國慶日',
+  '2026-10-26':'光復節補假', '2026-12-25':'行憲紀念日',
+  '2027-01-01':'元旦', '2027-02-04':'小年夜', '2027-02-05':'除夕', '2027-02-06':'春節', '2027-02-08':'春節',
+  '2027-02-09':'春節補假', '2027-02-10':'春節補假', '2027-03-01':'和平紀念日補假', '2027-04-05':'清明節',
+  '2027-04-06':'兒童節補假', '2027-04-30':'勞動節補假', '2027-05-01':'勞動節', '2027-06-09':'端午節',
+  '2027-09-15':'中秋節', '2027-09-28':'教師節', '2027-10-11':'國慶日補假', '2027-10-25':'光復節',
+  '2027-12-24':'行憲紀念日補假', '2027-12-25':'行憲紀念日',
+};
+function getHolidays(data) {
+  const out = { ...TW_HOLIDAYS };
+  Object.entries(data.holidayOverrides || {}).forEach(([ds, name]) => { if (name) out[ds] = name; else delete out[ds]; });
+  return out;
+}
 const MORANDI_REST_RED = '#b5716a';
 const MORANDI_PINK = '#d4a4a8';
 const SHIFT_COLORS = { '早':'#7a9db8','午':'#6b8fab','晚':'#5c7a94' };
@@ -7685,6 +7734,7 @@ async function captureWeekBlock(weekBlockEl, filename) {
 
   // Remove screenshot-hidden elements from clone
   clone.querySelectorAll('.ss-hide').forEach(el => el.remove());
+  clone.querySelectorAll('.full-off').forEach(el => el.classList.remove('full-off'));
 
   // Force all text inside the table to black for legibility
   clone.querySelectorAll('.sched-table *').forEach(el => { el.style.color = '#1a1a1a'; });
@@ -7955,10 +8005,12 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
     setEditTarget(null);
   }
 
+  const holidays = getHolidays(data);
   function getDayHeaderStyle(ds) {
     const wd = weekday(ds);
     const info = doctorSched[ds] || {};
     if (wd === 0) return { background:'#eeeeee' };
+    if (holidays[ds]) return { background:'#fdecea' };
     if (wd === 6) return { background:'#fff9c4' };
     if (info._note === '國定假日') return { background:'#fef2f2' };
     if (info._note === '端午節') return { background:'#ffe0b2' };
@@ -8076,7 +8128,8 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
                             style={{...getDayHeaderStyle(ds),padding:'3px 4px',verticalAlign:'middle',textAlign:'center',border:'1px solid #d4d8ee',borderLeft:'2px solid #9098b8'}}>
                           <div style={{fontSize:12,fontWeight:700}}>{parseInt(mm)}/{parseInt(dd)}</div>
                           <div style={{fontSize:10,color:'#666'}}>{WDAY_LABELS[wd===0?6:wd-1]}</div>
-                          {info._note && <div style={{fontSize:9,color:'#b04040',fontWeight:600}}>{info._note}</div>}
+                          {holidays[ds] && <div style={{fontSize:9,color:'#c62828',fontWeight:700}}>{holidays[ds]}</div>}
+                          {info._note && info._note !== holidays[ds] && <div style={{fontSize:9,color:'#b04040',fontWeight:600}}>{info._note}</div>}
                         </th>
                       );
                     })}
@@ -8139,16 +8192,22 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
                 <tbody>
                   {data.assistants.map(asst => {
                     const ws = calcWeekStats(data, mk, wdates, asst.name);
+                    // 整天不用上班（任何假別）：平日早午晚、週六早午皆非上班
+                    const fullOffOf = ds => !asst.isPartTime && getShiftsForDate(ds).length > 0 &&
+                      getShiftsForDate(ds).every(sh => !isWorkValue(getCellValue(data, mk, ds, sh, asst.name)));
+                    // 本月累計至本週（第 1 週只算當週，第 2 週算第 1＋2 週…）
+                    const weekOff = weeks.slice(0, wi + 1).flat().filter(ds => ds && !isCrossMonth(ds, year, month) && fullOffOf(ds)).length;
                     const target = data.sessionTargets?.[mk]?.[asst.name];
                     const weeklyTarget = target ? Math.round(target / numWeeks) : null;
                     return (
-                      <tr key={asst.id}>
+                      <tr key={asst.id} className="asst-row">
                         <td className="name-cell">
                           <span className="color-bar" style={{background:asst.color}}/>
                           {asst.name}
-                          {weeklyTarget !== null && (
-                            <div className="ss-hide" style={{fontSize:9,color: ws.total > weeklyTarget+1 ? '#c62828' : ws.total < weeklyTarget-1 ? '#e65100' : '#2e7d32',marginTop:1}}>
-                              {ws.total}/{weeklyTarget}診
+                          {(weeklyTarget !== null || !asst.isPartTime) && (
+                            <div className="ss-hide" style={{fontSize:9,marginTop:1,whiteSpace:'nowrap'}}>
+                              {weeklyTarget !== null && <span style={{color: ws.total > weeklyTarget+1 ? '#c62828' : ws.total < weeklyTarget-1 ? '#e65100' : '#2e7d32'}}>{ws.total}/{weeklyTarget}診</span>}
+                              {!asst.isPartTime && <span style={{color:'#b0322e',fontWeight:700,marginLeft:weeklyTarget !== null ? 4 : 0}} title="本月累計整天休息天數（至本週）">休{weekOff}</span>}
                             </div>
                           )}
                         </td>
@@ -8172,6 +8231,7 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
                             : info._note==='整日無診'?'day-cell is-no-doctor'
                             : 'day-cell';
                           const validShifts = wd === 6 ? SAT_SHIFTS : SHIFTS;
+                          const offCls = fullOffOf(ds) ? ' full-off' : '';
                           const isFullRestDay = validShifts.every(sh => {
                             let v = getCellValue(data, mk, ds, sh, asst.name);
                             if (isNatHoliday && v === '休') v = '國定假日';
@@ -8179,12 +8239,12 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
                           });
                           return SHIFTS.map(sh => {
                             if (wd === 6 && sh === '晚') {
-                              return <td key={`${ds}${sh}`} style={{background:'#f0f2f8',border:'1px solid #e8eaf2'}}></td>;
+                              return <td key={`${ds}${sh}`} className={offCls.trim() || undefined} style={{background:'#f0f2f8',border:'1px solid #e8eaf2'}}></td>;
                             }
                             let v = getCellValue(data, mk, ds, sh, asst.name);
                             if (isNatHoliday && v === '休') v = '國定假日';
                             return (
-                              <td key={`${ds}${sh}`} className={baseCls} style={{padding:2, borderLeft:sh==='早'?'2px solid #9098b8':undefined}}>
+                              <td key={`${ds}${sh}`} className={baseCls + offCls} style={{padding:2, borderLeft:sh==='早'?'2px solid #9098b8':undefined}}>
                                 <ShiftBlock shift={sh} value={v} onClick={() => handleCellClick(asst, ds, sh)} noLabel locked={isLocked} fullRestDay={isFullRestDay} isPartTime={asst.isPartTime}/>
                               </td>
                             );
@@ -9336,157 +9396,12 @@ function monthsInRange(sy, sm, ey, em) {
 }
 
 function calcRangeStats(data, sy, sm, ey, em, asstName) {
-  const total = {早:0,午:0,晚:0,全天:0,週六:0,完整休息:0,特休:0,指休:0,國定假日:0,教育訓練:0};
+  const total = {早:0,午:0,晚:0,全天:0,週六:0,完整休息:0,特休:0,請假:0,指休:0,國定假日:0,教育訓練:0};
   monthsInRange(sy, sm, ey, em).forEach(({y, m}) => {
     const s = calcMonthStats(data, monthKey(y, m), asstName);
     Object.keys(total).forEach(k => total[k] += s[k]||0);
   });
   return total;
-}
-
-function Statistics({ data, year, month }) {
-  const [sy, setSy] = useState(year);
-  const [sm, setSm] = useState(month);
-  const [ey, setEy] = useState(year);
-  const [em, setEm] = useState(month);
-
-  const isRange = sy !== ey || sm !== em;
-  const rangeLabel = isRange
-    ? `${sy}年${sm}月 ～ ${ey}年${em}月`
-    : `${sy}年${sm}月`;
-
-  const stats = useMemo(() =>
-    data.assistants.filter(a => !a.isPartTime).map(a => ({ ...a, s: calcRangeStats(data, sy, sm, ey, em, a.name) })),
-    [data, sy, sm, ey, em]);
-
-  const totals = stats.reduce((acc, { s }) => {
-    Object.keys(s).forEach(k => acc[k] = (acc[k]||0) + s[k]);
-    return acc;
-  }, {});
-
-  const years = [2025, 2026, 2027];
-  const months = [1,2,3,4,5,6,7,8,9,10,11,12];
-
-  function clampEnd(ny, nm) {
-    // ensure end >= start
-    if (ny < sy || (ny === sy && nm < sm)) { setEy(sy); setEm(sm); }
-  }
-
-  return (
-    <div>
-      {/* Range selector */}
-      <div style={{background:'#fff',borderRadius:8,padding:'10px 14px',marginBottom:10,
-        boxShadow:'0 1px 3px rgba(0,0,0,0.07)',display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>
-        <span style={{fontSize:12,fontWeight:700,color:'#2d3f8a'}}>統計區間</span>
-        <select value={sy} onChange={e => { const v=+e.target.value; setSy(v); if(v>ey||(v===ey&&sm>em)){setEy(v);setEm(sm);} }}
-          style={{padding:'3px 6px',borderRadius:4,border:'1px solid #c8d0e8',fontSize:12}}>
-          {years.map(y => <option key={y} value={y}>{y}年</option>)}
-        </select>
-        <select value={sm} onChange={e => { const v=+e.target.value; setSm(v); if(sy>ey||(sy===ey&&v>em)){setEy(sy);setEm(v);} }}
-          style={{padding:'3px 6px',borderRadius:4,border:'1px solid #c8d0e8',fontSize:12}}>
-          {months.map(m => <option key={m} value={m}>{m}月</option>)}
-        </select>
-        <span style={{fontSize:12,color:'#666'}}>至</span>
-        <select value={ey} onChange={e => { const v=+e.target.value; setEy(v); clampEnd(v,em); }}
-          style={{padding:'3px 6px',borderRadius:4,border:'1px solid #c8d0e8',fontSize:12}}>
-          {years.map(y => <option key={y} value={y}>{y}年</option>)}
-        </select>
-        <select value={em} onChange={e => { const v=+e.target.value; setEm(v); clampEnd(ey,v); }}
-          style={{padding:'3px 6px',borderRadius:4,border:'1px solid #c8d0e8',fontSize:12}}>
-          {months.map(m => <option key={m} value={m}>{m}月</option>)}
-        </select>
-        {isRange && <span style={{fontSize:11,color:'#5568a8',fontWeight:600}}>跨 {monthsInRange(sy,sm,ey,em).length} 個月</span>}
-        <button onClick={() => { setSy(year); setSm(month); setEy(year); setEm(month); }}
-          style={{marginLeft:'auto',padding:'3px 10px',fontSize:11,background:'#f2f4fc',border:'1px solid #c0c8e8',
-            borderRadius:4,cursor:'pointer',color:'#3a52a0',fontWeight:600}}>
-          回到當月
-        </button>
-      </div>
-      <div className="section-card">
-        <h3>統計表 — {rangeLabel}</h3>
-        <div style={{overflowX:'auto'}}>
-          <table className="stats-table">
-            <thead>
-              <tr>
-                <th className="name-col">人員</th>
-                <th style={{background:'#deefd6'}}>早診數</th>
-                <th style={{background:'#d4e4f4'}}>午診數</th>
-                <th style={{background:'#f0e0d8'}}>晚診數</th>
-                <th>合計診次</th>
-                <th style={{background:'#fff3e0'}}>全天班</th>
-                <th>週六出勤</th>
-                <th style={{background:'#e8eaf6'}}>完整休息日</th>
-                <th style={{background:'#fff8e1'}}>特休</th>
-                <th>指休</th>
-                <th>國定假日</th>
-                <th style={{background:'#f3e5f5'}}>教育訓練</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.map(({ id, name, color, s }) => (
-                <tr key={id}>
-                  <td className="name-col">
-                    <span style={{display:'inline-block',width:4,height:12,borderRadius:2,background:color,marginRight:4,verticalAlign:'middle'}}/>
-                    {name}
-                  </td>
-                  <td><span className="s-badge" style={{background:SHIFT_COLORS['早']}}>{s.早}</span></td>
-                  <td><span className="s-badge" style={{background:SHIFT_COLORS['午']}}>{s.午}</span></td>
-                  <td><span className="s-badge" style={{background:SHIFT_COLORS['晚']}}>{s.晚}</span></td>
-                  <td style={{fontWeight:700}}>{s.早+s.午+s.晚}</td>
-                  <td style={{color:s.全天>0?'#e65100':'#ccc',fontWeight:s.全天>0?700:'normal'}}>{s.全天||'—'}</td>
-                  <td>{s.週六||'—'}</td>
-                  <td style={{fontWeight:700,color:'#1a3a6e'}}>{s.完整休息}</td>
-                  <td style={{color:s.特休>0?LEAVE_COLORS['特休']:'#ccc'}}>{s.特休||'—'}</td>
-                  <td style={{color:s.指休>0?LEAVE_COLORS['指休']:'#ccc'}}>{s.指休||'—'}</td>
-                  <td style={{color:s.國定假日>0?LEAVE_COLORS['國定假日']:'#ccc'}}>{s.國定假日||'—'}</td>
-                  <td style={{color:s.教育訓練>0?LEAVE_COLORS['教育訓練']:'#ccc'}}>{s.教育訓練||'—'}</td>
-                </tr>
-              ))}
-              {/* Totals row */}
-              <tr style={{background:'#e8eaf6',fontWeight:700}}>
-                <td className="name-col">合計</td>
-                <td>{totals.早||0}</td><td>{totals.午||0}</td><td>{totals.晚||0}</td>
-                <td>{(totals.早||0)+(totals.午||0)+(totals.晚||0)}</td>
-                <td>{totals.全天||0}</td><td>{totals.週六||0}</td>
-                <td>{totals.完整休息||0}</td>
-                <td>{totals.特休||0}</td><td>{totals.指休||0}</td>
-                <td>{totals.國定假日||0}</td><td>{totals.教育訓練||0}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        {/* Shift balance analysis */}
-        <div style={{marginTop:16}}>
-          <div style={{fontSize:13,fontWeight:700,color:'#1a3a6e',marginBottom:8}}>早午晚分配分析</div>
-          <div style={{display:'flex',gap:16,flexWrap:'wrap'}}>
-            {stats.map(({ id, name, color, s }) => {
-              const total = s.早+s.午+s.晚;
-              if (total === 0) return null;
-              return (
-                <div key={id} style={{minWidth:140}}>
-                  <div style={{fontSize:11,fontWeight:600,marginBottom:3}}>
-                    <span style={{display:'inline-block',width:8,height:8,borderRadius:2,background:color,marginRight:4}}/>
-                    {name}（共{total}診）
-                  </div>
-                  <div style={{display:'flex',height:14,borderRadius:2,overflow:'hidden'}}>
-                    {total > 0 && <>
-                      <div style={{width:`${s.早/total*100}%`,background:SHIFT_COLORS['早']}} title={`早:${s.早}`}/>
-                      <div style={{width:`${s.午/total*100}%`,background:SHIFT_COLORS['午']}} title={`午:${s.午}`}/>
-                      <div style={{width:`${s.晚/total*100}%`,background:SHIFT_COLORS['晚']}} title={`晚:${s.晚}`}/>
-                    </>}
-                  </div>
-                  <div style={{fontSize:10,color:'#666',marginTop:2}}>
-                    早{Math.round(s.早/total*100)}% 午{Math.round(s.午/total*100)}% 晚{Math.round(s.晚/total*100)}%
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 // ═══════════════════════════════════════════
@@ -9597,66 +9512,135 @@ function ClearScheduleModal({ defaultYear, defaultMonth, onConfirm, onClose }) {
 }
 
 // ═══════════════════════════════════════════
-// COMPONENT: PrevStatsModal
+// COMPONENT: StatsModal（統計浮動視窗：當月／近三個月）
 // ═══════════════════════════════════════════
-function PrevStatsModal({ data, year, month, onClose }) {
-  const label = `${year}年${month}月`;
-  const mk = monthKey(year, month);
-  const stats = data.assistants
-    .filter(a => !a.isPartTime)
-    .map(a => ({ ...a, s: calcMonthStats(data, mk, a.name) }));
+function StatsModal({ data, year, month, onClose }) {
+  const [range, setRange] = useState('month');
+  let sy = year, sm = month;
+  if (range === '3m') { sm = month - 2; if (sm < 1) { sm += 12; sy -= 1; } }
+  const label = range === '3m' ? `${sy}年${sm}月 ～ ${year}年${month}月` : `${year}年${month}月`;
 
+  const stats = useMemo(() =>
+    data.assistants
+      .filter(a => !a.isPartTime && monthsInRange(sy, sm, year, month).some(({y, m}) => isAsstActive(a, monthKey(y, m))))
+      .map(a => ({ ...a, s: calcRangeStats(data, sy, sm, year, month, a.name) })),
+    [data, sy, sm, year, month]);
+  const totals = stats.reduce((acc, { s }) => { Object.keys(s).forEach(k => acc[k] = (acc[k]||0) + s[k]); return acc; }, {});
+
+  useEffect(() => {
+    const onKey = e => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const dim = v => v ? v : <span style={{color:'#ccc'}}>-</span>;
   return (
     <div className="modal-bg" onClick={onClose}>
-      <div className="s-modal" style={{minWidth:680,maxWidth:'95vw',maxHeight:'85vh',overflow:'auto'}} onClick={e => e.stopPropagation()}>
-        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
-          <h3 style={{margin:0}}>前月統計 — {label}</h3>
-          <button onClick={onClose} style={{background:'none',border:'none',fontSize:18,cursor:'pointer',color:'#888',lineHeight:1,padding:'0 4px'}}>×</button>
+      <div className="s-modal" style={{width:880,maxWidth:'96vw',maxHeight:'88vh',overflow:'auto'}} onClick={e => e.stopPropagation()}>
+        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:12,flexWrap:'wrap'}}>
+          <h3 style={{margin:0,border:'none',padding:0}}>統計・{label}</h3>
+          <div className="subnav-toggle" style={{marginLeft:'auto'}}>
+            <button className={range==='month'?'active':''} onClick={() => setRange('month')}>當月</button>
+            <button className={range==='3m'?'active':''} onClick={() => setRange('3m')}>近三個月</button>
+          </div>
+          <button onClick={onClose} aria-label="關閉" style={{background:'none',border:'none',fontSize:20,cursor:'pointer',color:'#888',lineHeight:1,padding:'0 4px'}}>×</button>
         </div>
         <div style={{overflowX:'auto'}}>
           <table className="stats-table">
             <thead>
               <tr>
                 <th className="name-col">人員</th>
-                <th style={{background:'#deefd6'}}>早</th>
-                <th style={{background:'#d4e4f4'}}>午</th>
-                <th style={{background:'#f0e0d8'}}>晚</th>
-                <th>合計</th>
-                <th>全天班</th>
-                <th>週六</th>
-                <th style={{background:'#e8eaf6'}}>完整休息</th>
-                <th>特休</th>
-                <th>指休</th>
-                <th>國定</th>
-                <th>教育訓練</th>
+                <th>早</th><th>午</th><th>晚</th><th>合計</th>
+                <th>全天班</th><th>週六</th><th>完整休息</th>
+                <th>特休</th><th>請假</th><th>指休</th><th>國定</th><th>教育訓練</th>
               </tr>
             </thead>
             <tbody>
               {stats.map(({ id, name, color, s }) => (
                 <tr key={id}>
                   <td className="name-col">
-                    <span style={{display:'inline-block',width:4,height:12,borderRadius:2,background:color,marginRight:4,verticalAlign:'middle'}}/>
+                    <span style={{display:'inline-block',width:4,height:12,borderRadius:2,background:color,marginRight:5,verticalAlign:'middle'}}/>
                     {name}
                   </td>
-                  <td><span className="s-badge" style={{background:SHIFT_COLORS['早']}}>{s.早}</span></td>
-                  <td><span className="s-badge" style={{background:SHIFT_COLORS['午']}}>{s.午}</span></td>
-                  <td><span className="s-badge" style={{background:SHIFT_COLORS['晚']}}>{s.晚}</span></td>
+                  <td>{s.早}</td><td>{s.午}</td><td>{s.晚}</td>
                   <td style={{fontWeight:700}}>{s.早+s.午+s.晚}</td>
-                  <td style={{color:s.全天>0?'#e65100':'#ccc'}}>{s.全天||'—'}</td>
-                  <td>{s.週六||'—'}</td>
-                  <td style={{fontWeight:700,color:'#1a3a6e'}}>{s.完整休息}</td>
-                  <td style={{color:s.特休>0?LEAVE_COLORS['特休']:'#ccc'}}>{s.特休||'—'}</td>
-                  <td style={{color:s.指休>0?LEAVE_COLORS['指休']:'#ccc'}}>{s.指休||'—'}</td>
-                  <td style={{color:s.國定假日>0?LEAVE_COLORS['國定假日']:'#ccc'}}>{s.國定假日||'—'}</td>
-                  <td style={{color:s.教育訓練>0?LEAVE_COLORS['教育訓練']:'#ccc'}}>{s.教育訓練||'—'}</td>
+                  <td>{dim(s.全天)}</td><td>{dim(s.週六)}</td>
+                  <td style={{fontWeight:700}}>{s.完整休息}</td>
+                  <td>{dim(s.特休)}</td><td>{dim(s.請假)}</td><td>{dim(s.指休)}</td>
+                  <td>{dim(s.國定假日)}</td><td>{dim(s.教育訓練)}</td>
                 </tr>
               ))}
-              {stats.length === 0 && (
-                <tr><td colSpan={12} style={{textAlign:'center',color:'#aaa',padding:16}}>本月無資料</td></tr>
+              {stats.length === 0 && <tr><td colSpan={13} style={{textAlign:'center',color:'#aaa',padding:16}}>此區間無資料</td></tr>}
+              {stats.length > 0 && (
+                <tr style={{fontWeight:700,background:'#eef0f5'}}>
+                  <td className="name-col">合計</td>
+                  <td>{totals.早||0}</td><td>{totals.午||0}</td><td>{totals.晚||0}</td>
+                  <td>{(totals.早||0)+(totals.午||0)+(totals.晚||0)}</td>
+                  <td>{totals.全天||0}</td><td>{totals.週六||0}</td><td>{totals.完整休息||0}</td>
+                  <td>{totals.特休||0}</td><td>{totals.請假||0}</td><td>{totals.指休||0}</td>
+                  <td>{totals.國定假日||0}</td><td>{totals.教育訓練||0}</td>
+                </tr>
               )}
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: HolidayManager（國定假日：內建清單＋手動調整）
+// ═══════════════════════════════════════════
+function HolidayManager({ data, year, onUpdate }) {
+  const [newDate, setNewDate] = useState('');
+  const [newName, setNewName] = useState('');
+  const all = getHolidays(data);
+  const list = Object.entries(all).filter(([ds]) => ds.startsWith(String(year))).sort();
+  const hasOverride = Object.keys(data.holidayOverrides || {}).some(ds => ds.startsWith(String(year)));
+
+  function setOverride(ds, name) {
+    onUpdate(d => { d.holidayOverrides = { ...(d.holidayOverrides || {}), [ds]: name }; });
+  }
+  function add() {
+    if (!newDate || !newName.trim()) return;
+    setOverride(newDate, newName.trim());
+    setNewDate(''); setNewName('');
+  }
+  function resetYear() {
+    if (!confirm(`恢復 ${year} 年的內建國定假日？手動調整會被清除。`)) return;
+    onUpdate(d => {
+      const o = { ...(d.holidayOverrides || {}) };
+      Object.keys(o).forEach(ds => { if (ds.startsWith(String(year))) delete o[ds]; });
+      d.holidayOverrides = o;
+    });
+  }
+
+  return (
+    <div className="section-card">
+      <h3 style={{display:'flex',alignItems:'center',gap:8}}>
+        {year} 年國定假日
+        {hasOverride && <button className="s-btn s-btn-secondary" style={{marginLeft:'auto',padding:'2px 10px',fontSize:11}} onClick={resetYear}>恢復內建</button>}
+      </h3>
+      <div style={{display:'flex',flexWrap:'wrap',gap:6,marginBottom:10}}>
+        {list.length === 0 && <span style={{fontSize:12,color:'#999'}}>尚無資料，請手動新增。</span>}
+        {list.map(([ds, name]) => {
+          const wd = weekday(ds);
+          return (
+            <span key={ds} style={{display:'inline-flex',alignItems:'center',gap:6,padding:'3px 6px 3px 10px',borderRadius:12,background:'#fdecea',color:'#8c2f25',fontSize:12}}>
+              {parseInt(ds.slice(5,7))}/{parseInt(ds.slice(8))}（{WDAY_LABELS[wd===0?6:wd-1]}）{name}
+              <button onClick={() => setOverride(ds, '')} title="移除" style={{border:'none',background:'none',cursor:'pointer',color:'#b06a60',fontSize:13,lineHeight:1,padding:'0 2px'}}>×</button>
+            </span>
+          );
+        })}
+      </div>
+      <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap',fontSize:12}}>
+        <input type="date" value={newDate} onChange={e => setNewDate(e.target.value)}
+          style={{padding:'4px 6px',border:'1px solid #ccc',borderRadius:4,fontSize:12}}/>
+        <input value={newName} onChange={e => setNewName(e.target.value)} placeholder="名稱，例如：颱風假"
+          onKeyDown={e => { if (e.key === 'Enter') add(); }}
+          style={{padding:'4px 8px',border:'1px solid #ccc',borderRadius:4,fontSize:12,width:160}}/>
+        <button className="s-btn s-btn-primary" style={{padding:'4px 12px',fontSize:12}} onClick={add}>新增</button>
       </div>
     </div>
   );
@@ -9724,10 +9708,11 @@ function PreLeaveBoard({ data, year, month }) {
               <th style={{background:'#e8eaf6'}}>人員</th>
               {dates.map(ds => {
                 const wd = weekday(ds);
+                const hol = getHolidays(data)[ds];
                 return (
-                  <th key={ds} style={{background: wd === 6 ? '#fff9c4' : '#eceef8', padding:'3px 0', borderLeft: wd === 1 ? '2px solid #9098b8' : undefined}}>
-                    <div style={{fontSize:11,fontWeight:700}}>{parseInt(ds.slice(8))}</div>
-                    <div style={{fontSize:9,color:'#666'}}>{WDAY_LABELS[wd - 1]}</div>
+                  <th key={ds} title={hol || undefined} style={{background: hol ? '#fdecea' : wd === 6 ? '#fff9c4' : '#eceef8', padding:'3px 0', borderLeft: wd === 1 ? '2px solid #9098b8' : undefined}}>
+                    <div style={{fontSize:11,fontWeight:700,color: hol ? '#c62828' : undefined}}>{parseInt(ds.slice(8))}</div>
+                    <div style={{fontSize:9,color: hol ? '#c62828' : '#666'}}>{hol ? '假' : WDAY_LABELS[wd - 1]}</div>
                   </th>
                 );
               })}
@@ -9807,43 +9792,9 @@ function App() {
   const [showValidation, setShowValidation] = useState(false);
   const [showClearModal, setShowClearModal] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
-  const [showPrevStats, setShowPrevStats] = useState(false);
+  const [showStats, setShowStats] = useState(false);
   const backupInputRef = useRef(null);
 
-  const prevStatsYear = viewMonth === 1 ? viewYear - 1 : viewYear;
-  const prevStatsMonth = viewMonth === 1 ? 12 : viewMonth - 1;
-
-  function handleApplyRestDays() {
-    const mk = monthKey(viewYear, viewMonth);
-    // Pre-scan current data (synchronous) to count applicable entries
-    let toApply = 0;
-    const leaves = data.leaveRequests?.[mk] || {};
-    Object.entries(leaves).forEach(([asstName, leaveDates]) => {
-      Object.entries(leaveDates).forEach(([ds, lv]) => {
-        if (!lv || !lv.sessions || lv.type !== '指休') return;
-        lv.sessions.forEach(sh => {
-          const cur = data.schedule?.[mk]?.[ds]?.[sh]?.[asstName];
-          if (!isWorkValue(cur)) toApply++;
-        });
-      });
-    });
-    if (toApply === 0) { alert('本月無待套用的指休。'); return; }
-    onUpdate(draft => {
-      Object.entries(draft.leaveRequests?.[mk] || {}).forEach(([asstName, leaveDates]) => {
-        Object.entries(leaveDates).forEach(([ds, lv]) => {
-          if (!lv || !lv.sessions || lv.type !== '指休') return;
-          if (!draft.schedule[mk]) draft.schedule[mk] = {};
-          if (!draft.schedule[mk][ds]) draft.schedule[mk][ds] = {};
-          lv.sessions.forEach(sh => {
-            if (!draft.schedule[mk][ds][sh]) draft.schedule[mk][ds][sh] = {};
-            if (!isWorkValue(draft.schedule[mk][ds][sh][asstName]))
-              draft.schedule[mk][ds][sh][asstName] = '指休';
-          });
-        });
-      });
-    });
-    alert(`已套用 ${toApply} 個指休格至班表。`);
-  }
 
   function handleExportBackup() {
     const json = JSON.stringify(data, null, 2);
@@ -9976,7 +9927,7 @@ function App() {
         <button className={`tab-btn${page==='preleave'?' active':''}`} onClick={() => setPage('preleave')}>預假</button>
         <button className={`tab-btn${page==='doctor'?' active':''}`} onClick={() => setPage('doctor')}>醫師班表</button>
         <button className={`tab-btn${page==='manage'?' active':''}`} onClick={() => setPage('manage')}>助理管理</button>
-        <button className={`tab-btn${page==='stats'?' active':''}`} onClick={() => setPage('stats')}>統計</button>
+        <button className={`tab-btn${showStats?' active':''}`} onClick={() => setShowStats(true)}>統計</button>
         <button className={`tab-btn${page==='remarks'?' active':''}`} onClick={() => setPage('remarks')}>備註</button>
 
         {/* Month navigation */}
@@ -10022,14 +9973,6 @@ function App() {
           <span style={{fontSize:11,color:'#888'}}>上次修改：{data.lastModified}</span>
         )}
         <div style={{marginLeft:'auto',display:'flex',gap:6,alignItems:'center'}}>
-          <button className="btn-check" onClick={() => setShowPrevStats(true)}
-            title={`查看 ${prevStatsYear}年${prevStatsMonth}月 統計`}>
-            前月統計
-          </button>
-          <button className="btn-check" onClick={handleApplyRestDays}
-            title="將助理管理中設定的指休寫入本月班表">
-            套用指休
-          </button>
           <button className="btn-action" onClick={handleExportBackup} title="下載目前所有資料的 JSON 備份">備份匯出</button>
           <button className="btn-action" onClick={() => backupInputRef.current?.click()} title="從備份 JSON 檔案還原資料">備份匯入</button>
           <input ref={backupInputRef} type="file" accept=".json,application/json" style={{display:'none'}} onChange={handleImportBackup} />
@@ -10051,9 +9994,9 @@ function App() {
         />
       )}
 
-      {/* Previous month stats modal */}
-      {showPrevStats && (
-        <PrevStatsModal data={data} year={prevStatsYear} month={prevStatsMonth} onClose={() => setShowPrevStats(false)} />
+      {/* 統計浮動視窗 */}
+      {showStats && (
+        <StatsModal data={data} year={viewYear} month={viewMonth} onClose={() => setShowStats(false)} />
       )}
 
       {/* Content */}
@@ -10081,10 +10024,10 @@ function App() {
           </div>
         )}
         {page === 'remarks' && (
-          <RemarkManager data={data} year={viewYear} month={viewMonth} onUpdate={onUpdate} />
-        )}
-        {page === 'stats' && (
-          <Statistics data={data} year={viewYear} month={viewMonth} />
+          <>
+            <HolidayManager data={data} year={viewYear} onUpdate={onUpdate} />
+            <RemarkManager data={data} year={viewYear} month={viewMonth} onUpdate={onUpdate} />
+          </>
         )}
       </div>
     </div>
