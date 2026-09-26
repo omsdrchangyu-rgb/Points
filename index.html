@@ -591,6 +591,11 @@
             table.mt-two thead th.mt-col2{z-index:3;background:var(--surface-alt);}
         }
 
+        /* iOS 26 Safari 會取「貼在畫面上緣的固定／黏貼元素」的顏色替狀態列上色，找不到時就用毛玻璃模糊蓋住頂部；
+           手機版頁首改為黏在最上方（白底），讓 Safari 永遠取到實色、不再模糊（排班頁的頂列本來就是這樣，所以一直清楚） */
+        @media(max-width:700px){
+            .page.active > .page-header{position:sticky;top:0;z-index:40;}
+        }
         /* 手機頁首：標題讓出左上角選單鈕，其餘（分頁、按鈕）與內容同樣靠左並撐滿 */
         @media(max-width:700px){
             .page-header{padding:12px 14px!important;}
@@ -725,6 +730,7 @@
         .td-side-late{font-size:var(--fs-xs);color:var(--red);padding:4px 10px 8px;font-weight:700;}
         .td-av{width:22px;height:22px;border-radius:50%;background:var(--surface-alt);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:var(--fs-xs);font-weight:700;flex-shrink:0;}
         @media(max-width:1100px){ .td-side{display:none;} }
+        @media(min-width:1101px){ .td-layout .td-views{display:none;} }
         /* 檢視切換（帶顏色） */
         .td-views{display:flex;gap:4px;background:var(--surface-alt);border-radius:10px;padding:3px;margin-bottom:12px;}
         .td-views button{flex:1;border:none;background:none;border-radius:8px;padding:8px 4px;font-family:inherit;font-size:var(--fs-sm);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;transition:background .15s,color .15s;}
@@ -808,8 +814,8 @@
         .td-fab:active{transform:scale(.94);}
         @media(max-width:700px){ .td-fab.editing{display:none;} }
         @media(max-width:700px){
-            .td-views button{font-size:var(--fs-xs);gap:3px;padding:8px 2px;}
-            .td-views button svg{width:12px;height:12px;}
+            .td-views button{font-size:var(--fs-xs);gap:3px;padding:8px 1px;}
+            .td-views button svg{display:none;}
             .td-fab{right:16px;bottom:calc(16px + var(--mnav));}
         }
         /* 通知鈴鐺 */
@@ -866,7 +872,7 @@
         /* iPhone 安全區：內容不被狀態列／動態島擋住（沒有安全區的裝置數值為 0，不受影響） */
         body{padding-top:env(safe-area-inset-top,0px);}
         html{background:var(--bg);}
-        #top-safe{position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);min-height:1px;background:var(--surface);z-index:950;pointer-events:none;}
+        #top-safe{position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:var(--surface);z-index:950;pointer-events:none;}
         body.on-sched #top-safe{background:var(--surface);}
         .menu-btn{top:env(safe-area-inset-top,0px);}
         /* iPhone 點輸入框時會自動放大（字小於 16px），放大後登入畫面就被切邊：手機一律 16px */
@@ -3209,7 +3215,8 @@ function tdAssignees(t) { return t && t.assignees && t.assignees.length ? t.assi
 function tdIsAssignee(t, key) { return tdAssignees(t).some(a => a.key === key); }
 const TD_VIEWS = [
     { key: 'today', label: '今天', color: '#F5A200', icon: '<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>' },
-    { key: 'upcoming', label: '即將到來', color: '#E8380D', icon: '<rect x="4" y="5" width="16" height="15" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="9" y1="3" x2="9" y2="7"/><line x1="15" y1="3" x2="15" y2="7"/>' },
+    { key: 'late', label: '逾期', color: '#E8380D', icon: '<circle cx="12" cy="12" r="9"/><line x1="12" y1="7" x2="12" y2="13"/><line x1="12" y1="16.6" x2="12" y2="16.7"/>' },
+    { key: 'upcoming', label: '即將到來', color: '#6E5BD6', icon: '<rect x="4" y="5" width="16" height="15" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="9" y1="3" x2="9" y2="7"/><line x1="15" y1="3" x2="15" y2="7"/>' },
     { key: 'all', label: '全部', color: '#0068B7', icon: '<rect x="4" y="4" width="16" height="4" rx="1"/><rect x="4" y="10" width="16" height="4" rx="1"/><rect x="4" y="16" width="16" height="4" rx="1"/>' },
     { key: 'done', label: '已完成', color: '#009B6B', icon: '<rect x="4" y="4" width="16" height="16" rx="4"/><polyline points="8 12 11 15 16 9"/>' },
 ];
@@ -3241,7 +3248,7 @@ function tdList() {
 function tdCounts(all) {
     const t = tdToday();
     return {
-        today: all.filter(x => !x.done && ((x.due && x.due <= t) || x.urgency === 'urgent')).length,
+        today: all.filter(x => !x.done && !(x.due && x.due < t) && (x.due === t || x.urgency === 'urgent')).length,
         upcoming: all.filter(x => !x.done && x.due && x.due > t).length,
         all: all.filter(x => !x.done).length,
         done: all.filter(x => x.done).length,
@@ -3254,9 +3261,13 @@ function tdGroups(list) {
     const byDue = (a, b) => (a.due || '9999').localeCompare(b.due || '9999');
     const urgRank = k => TODO_URG.findIndex(u => u.key === k);
     if (_tdView === 'today') {
-        const late = open.filter(x => x.due && x.due < t).sort(byDue);
         const today = open.filter(x => !(x.due && x.due < t) && (x.due === t || x.urgency === 'urgent')).sort((a, b) => urgRank(a.urgency) - urgRank(b.urgency));
-        return [['逾期', late, '#E8380D'], ['今天', today, '#F5A200']];
+        return [['今天', today, '#F5A200']];
+    }
+    if (_tdView === 'late') {
+        const late = open.filter(x => x.due && x.due < t).sort(byDue);
+        const g = {}; late.forEach(x => { (g[x.due] = g[x.due] || []).push(x); });
+        return Object.entries(g).map(([d, xs]) => [`${tdDueLabel(d)} 到期`, xs, '#E8380D']);
     }
     if (_tdView === 'upcoming') {
         const fut = open.filter(x => x.due && x.due > t).sort(byDue);
@@ -3292,7 +3303,7 @@ function renderTodo() {
         ? `<option value="">所有人</option><option value="mine">指派給我</option><option value="created">我建立的</option>${people.map(p => `<option value="${esc(p.key)}">${esc(p.name)}</option>`).join('')}`
         : `<option value="">全部</option><option value="mine">指派給我</option><option value="created">我建立的</option>`;
     const groups = tdGroups(all).filter(([, xs]) => xs.length);
-    const empty = { today: '今天沒有待辦，好好休息', upcoming: '沒有即將到期的待辦', all: '沒有待辦事項', done: '還沒有完成的待辦' }[_tdView];
+    const empty = { today: '今天沒有待辦，好好休息', late: '沒有逾期的待辦', upcoming: '沒有即將到期的待辦', all: '沒有待辦事項', done: '還沒有完成的待辦' }[_tdView];
 
     // 右側概況（電腦版）
     const byWho = {}, byCat = {};
@@ -3300,7 +3311,6 @@ function renderTodo() {
     const side = `<aside class="td-side">
         <div class="td-side-card">
             ${TD_VIEWS.map(v => `<button class="td-side-row${_tdView === v.key ? ' on' : ''}" onclick="setTodoView('${v.key}')">${tdSvg(v.icon, v.color)}<span>${v.label}</span><b>${counts[v.key] || ''}</b></button>`).join('')}
-            ${counts.late ? `<div class="td-side-late">${counts.late} 項已逾期</div>` : ''}
         </div>
         ${admin && Object.keys(byWho).length ? `<div class="td-side-card"><div class="td-side-hd">負責人</div>${Object.entries(byWho).sort((a, b) => b[1].n - a[1].n).map(([k, v]) => `<button class="td-side-row${_tdFilter.who === k ? ' on' : ''}" onclick="tdSetFilter('who','${esc(k)}')"><span class="td-av">${esc(asstAbbrMaybe(v.name))}</span><span>${esc(v.name)}</span><b>${v.n}</b></button>`).join('')}</div>` : ''}
         ${Object.keys(byCat).length ? `<div class="td-side-card"><div class="td-side-hd">類別</div>${TODO_CATS.filter(c => byCat[c]).map(c => `<button class="td-side-row${_tdFilter.cat === c ? ' on' : ''}" onclick="tdSetFilter('cat','${c}')"><span class="td-cat">${c}</span><span></span><b>${byCat[c]}</b></button>`).join('')}</div>` : ''}
