@@ -522,6 +522,30 @@
         .ios-switch input:checked + .ios-slider{background:#34C759;}
         .ios-switch input:checked + .ios-slider::before{transform:translateX(18px);}
         .ios-switch input:focus-visible + .ios-slider{box-shadow:0 0 0 2px var(--accent-border);}
+
+        /* 助理預假 */
+        .nasst-pre{display:none!important}
+        body.assistant-mode .nasst-pre{display:flex!important}
+        .mnb-preleave{display:none!important}
+        body.assistant-mode .mnb-preleave{display:flex!important}
+        .pl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;max-width:560px;}
+        .pl-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;}
+        .pl-month{font-size:var(--fs-hd);font-weight:700;}
+        .pl-sub{font-size:var(--fs-cap);color:var(--text-muted);margin-top:2px;}
+        .pl-quota{font-size:var(--fs-cap);color:var(--text-muted);white-space:nowrap;}
+        .pl-quota b{font-size:var(--fs-disp);color:var(--text-primary);font-weight:700;margin-right:2px;}
+        .pl-quota.full b{color:var(--green);}
+        .pl-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
+        .pl-wd{text-align:center;font-size:var(--fs-sm);color:var(--text-muted);}
+        .pl-day{min-height:48px;border:1px solid var(--border);border-radius:6px;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-family:inherit;cursor:pointer;color:var(--text-primary);padding:4px 0;-webkit-tap-highlight-color:transparent;}
+        .pl-day .pl-num{font-size:var(--fs-sub);font-weight:600;line-height:1;}
+        .pl-day .pl-cnt{font-size:10px;color:var(--text-muted);line-height:1;min-height:10px;}
+        .pl-day.sel{background:var(--text-primary);border-color:var(--text-primary);color:#fff;}
+        .pl-day.sel .pl-cnt{color:rgba(255,255,255,.7);}
+        .pl-day:disabled{cursor:default;opacity:.5;}
+        .pl-day.sel:disabled{opacity:1;}
+        .pl-actions{display:flex;gap:8px;margin-top:16px;}
+        .pl-note{font-size:var(--fs-cap);color:var(--text-muted);margin-top:12px;line-height:1.6;}
         .mgr-sched{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:var(--fs-sm);color:var(--text-muted);white-space:nowrap;}
         /* ─── 排班系統（原樣式，限定於 #sched-root） ─── */
 
@@ -832,6 +856,9 @@ appId: "..."'></textarea>
         <div class="nav-sec-label nasst-lbl">個人</div>
         <button class="nav-item nasst" onclick="navigate('myview')">
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>個人點數
+        </button>
+        <button class="nav-item nasst-pre" onclick="navigate('preleave')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm7.707 7.707a1 1 0 00-1.414-1.414L9 11.586 7.707 10.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>預假
         </button>
         <!-- 加班系統 -->
         <div class="nav-sec-label not-lbl">加班系統</div>
@@ -1258,6 +1285,12 @@ appId: "..."'></textarea>
         </div>
     </div>
 
+    <!-- ── 助理預假 ── -->
+    <div id="page-preleave" class="page">
+        <div class="page-header"><h2>預假</h2><p>每月 10–20 日開放預約下個月的休假</p></div>
+        <div class="page-content" id="preleave-content"></div>
+    </div>
+
     <!-- ── 助理排班（排班系統） ── -->
     <div id="page-schedule" class="page">
         <div id="sched-root"></div>
@@ -1292,6 +1325,10 @@ appId: "..."'></textarea>
     <button class="mn-item mnb-otapply" onclick="navigate('overtime-apply')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="7" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="14"/></svg>
       加班請假
+    </button>
+    <button class="mn-item mnb-preleave" onclick="navigate('preleave')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg>
+      預假
     </button>
     <button class="mn-item mnb-otapprove" onclick="navigate('overtime-approve')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
@@ -1807,10 +1844,11 @@ function renderSchedulePage() {
     if (_schedBooting) return;
     const el = document.getElementById('sched-root');
     el.innerHTML = '<div class="sched-boot"><div class="spinner"></div><p>載入排班系統…</p></div>';
+    schedStartPreLeave();
     _schedBooting = Promise.all([schedBoot(), schedStore.start()])
         .then(() => {
             el.innerHTML = '';
-            window.SchedModule.mount(el, schedStore, schedCtx(), { backupUrl: SCHED_BACKUP_URL });
+            window.SchedModule.mount(el, schedStore, schedCtx(), { backupUrl: SCHED_BACKUP_URL, setPreLeave: schedSetPreLeave });
             _schedMounted = true;
         })
         .catch(e => {
@@ -1822,6 +1860,200 @@ function renderSchedulePage() {
                 <button class="btn btn-outline btn-sm" onclick="renderSchedulePage()">重試</button></div>`;
         })
         .finally(() => { _schedBooting = null; });
+}
+
+// ================================================================
+// 請假連動與預假
+// ================================================================
+// 點數系統假別 → 班表顯示名稱
+function schedLeaveLabel(r) {
+    const main = { annual: '特休', sick: '病假', personal: '事假' };
+    if (main[r.leaveType]) return main[r.leaveType];
+    const sub = { menstrual: '生理假', bereavement: '喪假', marriage: '婚假', maternity: '產假', workInjury: '工傷病假' };
+    return sub[r.leaveSubType] || '其他假';
+}
+// 每月預假上限＝該月擁有的週數（週一至週日為一週，跨月那週歸天數較多的月份，也就是該週週四所在的月份）
+function preLeaveQuota(y, m) {
+    let n = 0;
+    const days = new Date(y, m, 0).getDate();
+    for (let d = 1; d <= days; d++) if (new Date(y, m - 1, d).getDay() === 4) n++;
+    return n;
+}
+// 每月 10–20 日開放預約「下個月」
+function preLeaveTarget(now) {
+    now = now || new Date();
+    const y = now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear();
+    const m = now.getMonth() === 11 ? 1 : now.getMonth() + 2;
+    return { y, m, mk: `${y}-${String(m).padStart(2, '0')}` };
+}
+function preLeaveWindowOpen(now) { const d = (now || new Date()).getDate(); return d >= 10 && d <= 20; }
+
+let schedPreLeave = {}, _preUnsub = null, _preLoaded = false, _preErr = null;
+function schedStartPreLeave() {
+    if (_preUnsub) return;
+    const from = new Date(); from.setDate(1); from.setMonth(from.getMonth() - 3);
+    const fromMk = `${from.getFullYear()}-${String(from.getMonth() + 1).padStart(2, '0')}`;
+    _preErr = null;
+    _preUnsub = db.collection(col('preLeave')).where('month', '>=', fromMk).onSnapshot(snap => {
+        schedPreLeave = {};
+        snap.docs.forEach(d => { schedPreLeave[d.id] = d.data(); });
+        _preLoaded = true; _preErr = null;
+        schedOnExtChange();
+        if (currentPage === 'preleave') renderPreLeave();
+    }, e => {
+        console.error('preLeave', e);
+        _preUnsub = null; _preErr = e;
+        if (currentPage === 'preleave') renderPreLeave();
+    });
+}
+
+// 提供給排班表：已核准請假＋預假（依助理 id 對應目前姓名）
+schedStore.ext = function () {
+    const approved = [];
+    (state.leaveRequests || []).forEach(r => {
+        if (r.status !== 'approved') return;
+        const name = findA(r.assistantId)?.name || r.assistantName;
+        const type = schedLeaveLabel(r);
+        (r.dates || []).forEach(date => approved.push({ name, date, type, id: r.id }));
+    });
+    const pre = [];
+    Object.values(schedPreLeave).forEach(p => {
+        const name = findA(p.assistantId)?.name || p.assistantName;
+        (p.dates || []).forEach(date => pre.push({ name, date }));
+    });
+    return { approved, pre };
+};
+function schedOnExtChange() { if (_schedMounted) schedStore._notify(); }
+
+// 院長／管理者在班表上調整某人的預假
+async function schedSetPreLeave(name, ds, on) {
+    const a = state.assistants.find(x => x.name === name);
+    if (!a) { toast(`點數系統找不到助理「${name}」，無法修改預假`); return false; }
+    const mk = ds.slice(0, 7), id = `${mk}_${a.id}`;
+    const cur = new Set(schedPreLeave[id]?.dates || []);
+    if (on) cur.add(ds); else cur.delete(ds);
+    try {
+        await db.collection(col('preLeave')).doc(id).set({
+            assistantId: a.id, assistantName: a.name, month: mk, dates: [...cur].sort(),
+            updatedAt: new Date().toISOString(), updatedBy: currentOperator || '院長',
+        });
+        return true;
+    } catch (e) {
+        toast(e.code === 'permission-denied' ? '預假儲存被拒：請在 Firebase 安全性規則允許 preLeave 資料表' : '預假修改失敗：' + e.message);
+        return false;
+    }
+}
+
+// ── 助理：預假頁 ──
+let _preDraft = null, _preDraftFor = null, _preDirty = false, _preSaving = false;
+function _preSavedDoc() {
+    const asst = currentAssistantView; if (!asst) return null;
+    return schedPreLeave[`${preLeaveTarget().mk}_${asst.id}`] || null;
+}
+function renderPreLeave() {
+    const el = document.getElementById('preleave-content');
+    const asst = currentAssistantView;
+    if (!el || !asst) return;
+    schedStartPreLeave();
+    if (_preErr) {
+        el.innerHTML = `<div class="info-box">預假資料讀取失敗：${_preErr.code === 'permission-denied' ? '請院長在 Firebase 安全性規則允許 preLeave 資料表' : _preErr.message}</div>`;
+        return;
+    }
+    if (!_preLoaded) { el.innerHTML = '<div class="sched-boot"><div class="spinner"></div></div>'; return; }
+
+    const now = new Date();
+    const { y, m, mk } = preLeaveTarget(now);
+    const open = preLeaveWindowOpen(now);
+    const quota = preLeaveQuota(y, m);
+    const saved = _preSavedDoc();
+    const draftKey = mk + '_' + asst.id;
+    if (_preDraftFor !== draftKey || !_preDirty) {
+        _preDraft = new Set(saved?.dates || []);
+        _preDraftFor = draftKey; _preDirty = false;
+    }
+    // 其他人已預的天數（只顯示人數）
+    const others = {};
+    Object.values(schedPreLeave).forEach(p => {
+        if (p.month !== mk || p.assistantId === asst.id) return;
+        (p.dates || []).forEach(d => { others[d] = (others[d] || 0) + 1; });
+    });
+
+    const curMonth = now.getMonth() + 1;
+    const status = open ? `開放中，${curMonth}/20 截止`
+        : now.getDate() < 10 ? `${curMonth}/10 開放` : `已於 ${curMonth}/20 截止`;
+    const fmtT = iso => { const t = new Date(iso); return `${t.getMonth() + 1}/${t.getDate()} ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`; };
+    const savedLine = saved
+        ? `已送出，最後更新 ${fmtT(saved.updatedAt)}${saved.updatedBy && saved.updatedBy !== asst.name ? `（${saved.updatedBy}調整）` : ''}`
+        : '尚未送出';
+
+    // 月曆：週一至週六
+    const days = new Date(y, m, 0).getDate();
+    let cells = ['一', '二', '三', '四', '五', '六'].map(w => `<div class="pl-wd">${w}</div>`).join('');
+    const firstWd = new Date(y, m - 1, 1).getDay();
+    const lead = firstWd === 0 ? 0 : firstWd - 1;
+    for (let i = 0; i < lead; i++) cells += '<div></div>';
+    for (let d = 1; d <= days; d++) {
+        const wd = new Date(y, m - 1, d).getDay();
+        if (wd === 0) continue;
+        const ds = `${mk}-${String(d).padStart(2, '0')}`;
+        const sel = _preDraft.has(ds);
+        const cnt = others[ds] || 0;
+        cells += `<button class="pl-day${sel ? ' sel' : ''}" ${open ? '' : 'disabled'} onclick="togglePreLeaveDay('${ds}')">
+            <span class="pl-num">${d}</span><span class="pl-cnt">${cnt ? cnt + ' 人' : ''}</span></button>`;
+    }
+    const n = _preDraft.size;
+
+    // 本月已生效的預假（唯讀）
+    const thisMk = `${now.getFullYear()}-${String(curMonth).padStart(2, '0')}`;
+    const thisDoc = schedPreLeave[`${thisMk}_${asst.id}`];
+    const thisLine = thisDoc?.dates?.length
+        ? `<div class="pl-note">${curMonth} 月預假：${thisDoc.dates.map(d => `${+d.slice(5, 7)}/${+d.slice(8)}`).join('、')}</div>` : '';
+
+    el.innerHTML = `<div class="pl-card">
+        <div class="pl-head">
+            <div><div class="pl-month">${y} 年 ${m} 月</div><div class="pl-sub">${status}・${savedLine}</div></div>
+            <div class="pl-quota${n === quota ? ' full' : ''}"><b>${n}</b> / ${quota} 天</div>
+        </div>
+        <div class="pl-grid">${cells}</div>
+        <div class="pl-note">本月可預 ${quota} 天，不必用完。截止前都可以修改；日期下方數字為已預假人數。</div>
+        ${open ? `<div class="pl-actions">
+            <button class="btn btn-primary" onclick="submitPreLeave()" ${_preDirty && !_preSaving ? '' : 'disabled'}>${saved ? '更新預假' : '送出預假'}</button>
+            ${_preDirty ? '<button class="btn btn-outline" onclick="resetPreLeaveDraft()">還原</button>' : ''}
+        </div>` : ''}
+        ${thisLine}
+    </div>`;
+}
+function togglePreLeaveDay(ds) {
+    if (!preLeaveWindowOpen()) { toast('目前不在預假開放期間'); return; }
+    const { y, m } = preLeaveTarget();
+    const quota = preLeaveQuota(y, m);
+    if (_preDraft.has(ds)) _preDraft.delete(ds);
+    else {
+        if (_preDraft.size >= quota) { toast(`本月最多預 ${quota} 天`); return; }
+        _preDraft.add(ds);
+    }
+    _preDirty = true;
+    renderPreLeave();
+}
+function resetPreLeaveDraft() { _preDirty = false; renderPreLeave(); }
+async function submitPreLeave() {
+    const asst = currentAssistantView; if (!asst) return;
+    if (!preLeaveWindowOpen()) { toast('預假已截止'); return; }
+    const { y, m, mk } = preLeaveTarget();
+    const dates = [..._preDraft].filter(d => d.startsWith(mk)).sort();
+    if (dates.length > preLeaveQuota(y, m)) { toast('超過本月可預天數'); return; }
+    const isNew = !_preSavedDoc();
+    _preSaving = true; renderPreLeave();
+    try {
+        await db.collection(col('preLeave')).doc(`${mk}_${asst.id}`).set({
+            assistantId: asst.id, assistantName: asst.name, month: mk, dates,
+            updatedAt: new Date().toISOString(), updatedBy: asst.name,
+        });
+        _preDirty = false;
+        toast(isNew ? '預假已送出' : '預假已更新');
+    } catch (e) {
+        toast(e.code === 'permission-denied' ? '送出被拒：請院長在 Firebase 安全性規則允許 preLeave 資料表' : '送出失敗：' + e.message);
+    } finally { _preSaving = false; renderPreLeave(); }
 }
 </script>
 <script>
@@ -2164,6 +2396,7 @@ function subscribeData() {
           state.leaveRequests = snap.docs.map(d=>({id:d.id,...d.data()}));
           if (currentPage==='leave'||currentPage==='leave-approve') refreshPage();
           updateLeaveBadge();
+          schedOnExtChange();
           loaded.l = true; tryReady();
       }, e => { console.error('leaveRequests', e); loaded.l = true; tryReady(); });
 }
@@ -2464,7 +2697,7 @@ function navigate(p) {
     if (viewMode === 'viewer' && p !== 'overview') { showLoginScreen(); return; }
     if (viewMode === 'manager'   && !['overview','record','leave-approve'].concat(canUseSchedule()?['schedule']:[]).includes(p)) return;
     if (viewMode === 'doctor'    && !['overview','record','overtime-approve'].includes(p)) return;
-    if (viewMode === 'assistant' && !['overview','myview','overtime-apply'].includes(p)) return;
+    if (viewMode === 'assistant' && !['overview','myview','overtime-apply','preleave'].includes(p)) return;
     // principal can go anywhere
     const el = document.getElementById('page-'+p);
     if (!el) return;
@@ -2512,7 +2745,8 @@ function renderPage(p) {
       attendance:renderAttendance,
       leave:renderLeave,'leave-approve':renderLeaveApprove,
       'support-report':renderSupportReport,
-      schedule:renderSchedulePage})[p]?.();
+      schedule:renderSchedulePage,
+      preleave:renderPreLeave})[p]?.();
 }
 function refreshPage() { renderPage(currentPage); }
 
@@ -4925,7 +5159,7 @@ function applyViewMode() {
     if (isPrincipal) { if (!['record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report','leave','leave-approve','attendance','schedule'].includes(currentPage)) navigate('settlement'); else refreshPage(); return; }
     if (isManager)   { if (!['overview','record','leave-approve'].concat(canUseSchedule()?['schedule']:[]).includes(currentPage)) navigate('overview'); else refreshPage(); return; }
     if (isDoctor)    { if (!['record','overtime-approve'].includes(currentPage)) navigate('record'); else refreshPage(); return; }
-    if (isAsst)      { if (!['myview','overtime-apply'].includes(currentPage)) navigate('myview'); else refreshPage(); return; }
+    if (isAsst)      { if (!['myview','overtime-apply','preleave'].includes(currentPage)) navigate('myview'); else refreshPage(); return; }
     if (currentPage !== 'overview') navigate('overview'); else refreshPage();
 }
 
@@ -6596,6 +6830,8 @@ const SAT_SHIFTS = ['早','午'];
 const WDAY_LABELS = ['一','二','三','四','五','六','日'];
 const FIXED_POSITIONS = ['櫃檯','諮詢','流動','行政','打掃','教育訓練'];
 const LEAVE_TYPES = ['休','特休','指休','國定假日','—'];
+// 點數系統核准的請假（唯讀連動，不存入排班資料）
+const EXT_LEAVE_TYPES = ['特休','病假','事假','生理假','喪假','婚假','產假','工傷病假','其他假'];
 const REMARK_PRESETS = ['All on','月會','面談','備餐','手術','一樓','二樓','三樓','季醫師'];
 const STORAGE_KEY = 'clinic_sched_v1';
 
@@ -6612,6 +6848,8 @@ const POSITION_COLORS = {
 const LEAVE_COLORS = {
   '休':'#b8b8b4', '特休':'#b5716a', '指休':'#c49a93',
   '國定假日':'#a4625b', '教育訓練':'#c7885e', '—':'#b0b0ae',
+  '病假':'#9a88ad', '事假':'#b0916e', '生理假':'#c0939f', '喪假':'#8f8f8f',
+  '婚假':'#c9a07f', '產假':'#a996b8', '工傷病假':'#9a88ad', '其他假':'#a0a0a0',
 };
 const MORANDI_REST_RED = '#b5716a';
 const MORANDI_PINK = '#d4a4a8';
@@ -6639,7 +6877,8 @@ function cellBg(value, isFullRestDay) {
 // For 3-char Chinese names (doctors) use the middle char; 2-char positions use last char
 function abbrev1(name) {
   if (!name) return '';
-  const map = {'休':'休','特休':'特','指休':'指','國定假日':'國','教育訓練':'訓','—':'—'};
+  const map = {'休':'休','特休':'特','指休':'指','國定假日':'國','教育訓練':'訓','—':'—',
+    '病假':'病','事假':'事','生理假':'生','喪假':'喪','婚假':'婚','產假':'產','工傷病假':'傷','其他假':'假'};
   if (map[name] !== undefined) return map[name];
   return name.length >= 3 ? name[1] : name.slice(-1);
 }
@@ -6706,7 +6945,7 @@ function getEffectiveTarget(data, mk, name) {
   const lvs = data.leaveRequests?.[mk]?.[name] || {};
   let deductDays = 0;
   Object.values(lvs).forEach(lv => {
-    if (lv && (lv.type === '特休' || lv.type === '國定假日')) deductDays++;
+    if (lv && (EXT_LEAVE_TYPES.includes(lv.type) || lv.type === '國定假日')) deductDays++;
   });
   return Math.max(0, base - deductDays * LEAVE_SESSION_DEDUCT);
 }
@@ -6919,12 +7158,54 @@ function normalizeData(parsed) {
   };
 }
 
+// 外部假疊加：點數系統核准的請假（ext，唯讀）＋助理預假（pre，顯示為指休）
+// 疊加時保留原本的排班假於 orig，存檔前還原，外部假永遠不寫進排班資料
+function applyExt(data) {
+  const ext = _store.ext ? _store.ext() : { approved: [], pre: [] };
+  const lr = JSON.parse(JSON.stringify(data.leaveRequests || {}));
+  const put = (name, ds, entry) => {
+    const sessions = getShiftsForDate(ds);
+    if (!name || !sessions.length) return;
+    const mk = ds.slice(0, 7);
+    lr[mk] = lr[mk] || {};
+    lr[mk][name] = lr[mk][name] || {};
+    const cur = lr[mk][name][ds];
+    const orig = cur && (cur.ext || cur.pre) ? cur.orig : cur;
+    lr[mk][name][ds] = { ...entry, sessions: [...sessions], orig: orig || null };
+  };
+  ext.pre.forEach(p => put(p.name, p.date, { type: '指休', pre: true }));
+  ext.approved.forEach(a => put(a.name, a.date, { type: a.type, ext: true, extId: a.id })); // 核准請假優先
+  return { ...data, leaveRequests: lr };
+}
+function stripExt(data) {
+  const lr = JSON.parse(JSON.stringify(data.leaveRequests || {}));
+  Object.keys(lr).forEach(mk => {
+    Object.keys(lr[mk] || {}).forEach(name => {
+      const byDate = lr[mk][name] || {};
+      Object.keys(byDate).forEach(ds => {
+        const lv = byDate[ds];
+        if (lv && (lv.ext || lv.pre)) { if (lv.orig) byDate[ds] = lv.orig; else delete byDate[ds]; }
+      });
+      if (!Object.keys(byDate).length) delete lr[mk][name];
+    });
+    if (!Object.keys(lr[mk] || {}).length) delete lr[mk];
+  });
+  return { ...data, leaveRequests: lr };
+}
+
 function loadData() {
-  return normalizeData(_store.get());
+  return applyExt(normalizeData(_store.get()));
 }
 
 function saveData(data) {
-  _store.save(data);
+  _store.save(stripExt(data));
+}
+
+// 每月預假上限＝該月擁有的週數（跨月週歸給含週四的月份）
+function preLeaveQuota(y, m) {
+  let n = 0;
+  for (let d = 1; d <= daysInMonth(y, m); d++) if (weekday(fmtDate(y, m, d)) === 4) n++;
+  return n;
 }
 
 // ═══════════════════════════════════════════
@@ -6942,14 +7223,14 @@ function getCellValue(data, mk, dateStr, shift, asstName) {
 }
 
 function isWorkValue(v) {
-  return v && !LEAVE_TYPES.includes(v) && v !== '—';
+  return v && !LEAVE_TYPES.includes(v) && !EXT_LEAVE_TYPES.includes(v) && v !== '—';
 }
 
 // ═══════════════════════════════════════════
 // STATISTICS
 // ═══════════════════════════════════════════
 function calcMonthStats(data, mk, asstName) {
-  const stats = { 早:0,午:0,晚:0,全天:0,週六:0,完整休息:0,特休:0,指休:0,國定假日:0,教育訓練:0 };
+  const stats = { 早:0,午:0,晚:0,全天:0,週六:0,完整休息:0,特休:0,請假:0,指休:0,國定假日:0,教育訓練:0 };
   const y = parseInt(mk.slice(0,4)), m = parseInt(mk.slice(5,7));
   const total = daysInMonth(y, m);
   for (let d = 1; d <= total; d++) {
@@ -6963,6 +7244,7 @@ function calcMonthStats(data, mk, asstName) {
       const v = getCellValue(data, mk, ds, sh, asstName);
       if (isWorkValue(v)) { stats[sh]++; workCount++; allOff = false; }
       else if (v === '特休') { stats['特休']++; allOff = false; }   // 特休不計入完整休息日
+      else if (EXT_LEAVE_TYPES.includes(v)) { stats['請假']++; allOff = false; } // 病假、事假等不計入完整休息日
       else if (v === '指休') { stats['指休']++; }                   // 指休算完整休息日
       else if (v === '國定假日') { stats['國定假日']++; allOff = false; } // 國定不計入
       else if (v === '教育訓練') { stats['教育訓練']++; allOff = false; }
@@ -7620,19 +7902,40 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
 
   function handleCellClick(asst, ds, shift) {
     if (isLocked) return;
+    const lv = data.leaveRequests?.[mk]?.[asst.name]?.[ds];
+    if (lv?.ext) {
+      const [,mm,dd] = ds.split('-');
+      alert(`${asst.name} ${parseInt(mm)}/${parseInt(dd)} 已核准${lv.type}（假勤管理），班表無法直接修改。`);
+      return;
+    }
     const current = getCellValue(data, mk, ds, shift, asst.name);
     setEditTarget({ asst, dateStr: ds, shift, currentValue: current });
   }
 
   function handleSave(valueOrMap, applyAllDay) {
     const { asst, dateStr, shift } = editTarget;
+    const preLv = data.leaveRequests?.[mk]?.[asst.name]?.[dateStr];
+    let dropPre = false;
+    if (preLv?.pre) {
+      const vals = valueOrMap && typeof valueOrMap === 'object' ? Object.values(valueOrMap) : [valueOrMap];
+      if (vals.every(v => v === '指休')) { setEditTarget(null); return; }
+      const [,mm,dd] = dateStr.split('-');
+      if (!confirm(`${parseInt(mm)}/${parseInt(dd)} 是 ${asst.name} 的預假。\n確定改排？這一天會從預假中移除。`)) return;
+      dropPre = true;
+      _opts.setPreLeave(asst.name, dateStr, false);
+    }
     onUpdate(draft => {
+      if (dropPre) {
+        const byDate = draft.leaveRequests[mk][asst.name];
+        if (byDate[dateStr].orig) byDate[dateStr] = byDate[dateStr].orig; else delete byDate[dateStr];
+      }
       if (!draft.schedule[mk]) draft.schedule[mk] = {};
       if (!draft.schedule[mk][dateStr]) draft.schedule[mk][dateStr] = {};
       const pairs = (valueOrMap && typeof valueOrMap === 'object' && !LEAVE_TYPES.includes(valueOrMap) && typeof valueOrMap !== 'string')
         ? Object.entries(valueOrMap)
         : (applyAllDay ? getShiftsForDate(dateStr) : [shift]).map(sh => [sh, valueOrMap]);
-      pairs.forEach(([sh, value]) => {
+      pairs.forEach(([sh, value0]) => {
+        const value = dropPre && value0 === '指休' ? '休' : value0;
         const isLeave = LEAVE_TYPES.includes(value) || value === '—';
         if (isLeave) {
           if (!draft.leaveRequests[mk]) draft.leaveRequests[mk] = {};
@@ -7928,7 +8231,7 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
                 <th className="name-col">人員</th>
                 <th>早診</th><th>午診</th><th>晚診</th>
                 <th>全天班</th><th>週六出勤</th><th>完整休息日</th>
-                <th>特休</th><th>指休</th><th>國定</th><th>教育訓練</th>
+                <th>特休</th><th>請假</th><th>指休</th><th>國定</th><th>教育訓練</th>
               </tr>
             </thead>
             <tbody>
@@ -7944,6 +8247,7 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
                     <td>{s.週六}</td>
                     <td style={{fontWeight:700,color:'#1a3a6e'}}>{s.完整休息}</td>
                     <td style={{color:s.特休>0?LEAVE_COLORS['特休']:'#ccc'}}>{s.特休||'-'}</td>
+                    <td style={{color:s.請假>0?LEAVE_COLORS['病假']:'#ccc'}}>{s.請假||'-'}</td>
                     <td style={{color:s.指休>0?LEAVE_COLORS['指休']:'#ccc'}}>{s.指休||'-'}</td>
                     <td style={{color:s.國定假日>0?LEAVE_COLORS['國定假日']:'#ccc'}}>{s.國定假日||'-'}</td>
                     <td style={{color:s.教育訓練>0?LEAVE_COLORS['教育訓練']:'#ccc'}}>{s.教育訓練||'-'}</td>
@@ -8849,7 +9153,9 @@ function AssistantManager({ data, year, month, onUpdate }) {
                     return (
                       <span key={ds} style={{display:'inline-flex',alignItems:'center',gap:4,padding:'2px 8px',borderRadius:12,background:LEAVE_COLORS[lv.type]||'#9e9e9e',color:'#fff',fontSize:11}}>
                         {parseInt(mm)}/{parseInt(dd)} {lv.type} ({lv.sessions.join('')})
-                        <span style={{cursor:'pointer',fontWeight:700,marginLeft:2}} onClick={() => removeLeave(asst.name, ds)}>×</span>
+                        {lv.ext ? <span style={{opacity:.85,fontSize:10}}>假勤核准</span>
+                          : lv.pre ? <span style={{opacity:.85,fontSize:10}}>預假</span>
+                          : <span style={{cursor:'pointer',fontWeight:700,marginLeft:2}} onClick={() => removeLeave(asst.name, ds)}>×</span>}
                       </span>
                     );
                   })}
@@ -9357,6 +9663,139 @@ function PrevStatsModal({ data, year, month, onClose }) {
 }
 
 // ═══════════════════════════════════════════
+// COMPONENT: PreLeaveBoard（預假總覽：院長／管理者調整預假，避免同一天太多人休）
+// ═══════════════════════════════════════════
+function PreLeaveBoard({ data, year, month }) {
+  const mk = monthKey(year, month);
+  const quota = preLeaveQuota(year, month);
+  const [busy, setBusy] = useState(null);
+  const doctorSched = data.doctorSchedule?.[mk] || {};
+
+  const dates = [];
+  for (let d = 1; d <= daysInMonth(year, month); d++) {
+    const ds = fmtDate(year, month, d);
+    if (weekday(ds) !== 0) dates.push(ds);
+  }
+  const roster = data.assistants.filter(a => isAsstActive(a, mk));
+  const fullTime = roster.filter(a => !a.isPartTime);
+  const lvOf = (name, ds) => data.leaveRequests?.[mk]?.[name]?.[ds];
+  const fullDayOff = (name, ds) => {
+    const lv = lvOf(name, ds);
+    return !!lv && getShiftsForDate(ds).every(sh => lv.sessions.includes(sh) || lv.sessions.includes('全'));
+  };
+  // 當天最忙診次需要的人力
+  const needOf = ds => Math.max(0, ...getShiftsForDate(ds).map(sh => {
+    const docs = doctorSched[ds]?.[sh] || [];
+    return docs.length ? getRequiredStaff(docs.length).total : 0;
+  }));
+
+  async function toggle(name, ds) {
+    if (busy) return;
+    const lv = lvOf(name, ds);
+    const [,mm,dd] = ds.split('-');
+    if (lv?.ext) { alert(`${name} ${parseInt(mm)}/${parseInt(dd)} 已核准${lv.type}（假勤管理），無法在此修改。`); return; }
+    const on = !lv?.pre;
+    if (on) {
+      const cnt = dates.filter(d => lvOf(name, d)?.pre).length;
+      if (cnt >= quota && !confirm(`${name} 本月已預 ${cnt} 天（上限 ${quota} 天），仍要新增？`)) return;
+    } else if (!confirm(`取消 ${name} ${parseInt(mm)}/${parseInt(dd)} 的預假？`)) return;
+    setBusy(name + ds);
+    await _opts.setPreLeave(name, ds, on);
+    setBusy(null);
+  }
+
+  const cellStyle = { padding:0, height:26, textAlign:'center', verticalAlign:'middle', fontSize:11, cursor:'pointer', border:'1px solid #e8e8ec' };
+
+  return (
+    <div className="week-block">
+      <div className="week-header-row">
+        <span>{year}年{month}月 預假總覽</span>
+        <span className="week-header-right">每人上限 {quota} 天・點格子新增或取消預假</span>
+      </div>
+      <div style={{overflowX:'auto'}}>
+        <table className="sched-table" style={{minWidth: 110 + dates.length * 28}}>
+          <colgroup>
+            <col style={{width:64}}/>
+            {dates.map(ds => <col key={ds}/>)}
+            <col style={{width:46}}/>
+          </colgroup>
+          <thead>
+            <tr>
+              <th style={{background:'#e8eaf6'}}>人員</th>
+              {dates.map(ds => {
+                const wd = weekday(ds);
+                return (
+                  <th key={ds} style={{background: wd === 6 ? '#fff9c4' : '#eceef8', padding:'3px 0', borderLeft: wd === 1 ? '2px solid #9098b8' : undefined}}>
+                    <div style={{fontSize:11,fontWeight:700}}>{parseInt(ds.slice(8))}</div>
+                    <div style={{fontSize:9,color:'#666'}}>{WDAY_LABELS[wd - 1]}</div>
+                  </th>
+                );
+              })}
+              <th style={{background:'#e8eaf6',fontSize:10}}>天數</th>
+            </tr>
+          </thead>
+          <tbody>
+            {roster.map(a => {
+              const cnt = dates.filter(ds => lvOf(a.name, ds)?.pre).length;
+              return (
+                <tr key={a.id}>
+                  <td className="name-cell"><span className="color-bar" style={{background:a.color}}/>{a.name}</td>
+                  {dates.map(ds => {
+                    const lv = lvOf(a.name, ds);
+                    const wd = weekday(ds);
+                    const base = { ...cellStyle, borderLeft: wd === 1 ? '2px solid #9098b8' : cellStyle.border };
+                    if (busy === a.name + ds) return <td key={ds} style={{...base, color:'#aaa'}}>…</td>;
+                    if (lv?.pre) return (
+                      <td key={ds} title="預假（點擊取消）" onClick={() => toggle(a.name, ds)}
+                        style={{...base, background:LEAVE_COLORS['休'], color:'#b0322e', fontWeight:700, boxShadow:'inset 0 0 0 1.5px #c0504d'}}>預</td>
+                    );
+                    if (lv?.ext) return (
+                      <td key={ds} title={`已核准${lv.type}`} onClick={() => toggle(a.name, ds)}
+                        style={{...base, background:LEAVE_COLORS[lv.type] || '#a0a0a0', color:'#fff', cursor:'not-allowed'}}>{abbrev1(lv.type)}</td>
+                    );
+                    if (fullDayOff(a.name, ds)) return (
+                      <td key={ds} title={lv.type} onClick={() => toggle(a.name, ds)}
+                        style={{...base, background:'#f3f3f5', color:'#999'}}>{abbrev1(lv.type)}</td>
+                    );
+                    return <td key={ds} onClick={() => toggle(a.name, ds)} style={base}></td>;
+                  })}
+                  <td className="stat-cell" style={{fontWeight:700, color: cnt > quota ? '#c62828' : cnt === quota ? '#2e7d32' : '#555'}}>{cnt}/{quota}</td>
+                </tr>
+              );
+            })}
+            <tr>
+              <td className="name-cell" style={{fontSize:11}}>休假人數</td>
+              {dates.map(ds => {
+                const off = roster.filter(a => fullDayOff(a.name, ds)).length;
+                return <td key={ds} style={{...cellStyle, cursor:'default', fontWeight:700, color: off ? '#2d3142' : '#ccc', background:'#fafafa'}}>{off || '-'}</td>;
+              })}
+              <td style={{background:'#fafafa'}}></td>
+            </tr>
+            <tr>
+              <td className="name-cell" style={{fontSize:11}} title="全職可上班人數／當天最忙診次所需人力">可上班</td>
+              {dates.map(ds => {
+                const avail = fullTime.filter(a => !fullDayOff(a.name, ds)).length;
+                const need = needOf(ds);
+                const short = need > 0 && avail < need, tight = need > 0 && avail === need;
+                return (
+                  <td key={ds} title={need ? `可上班 ${avail} 人，最忙診次需 ${need} 人` : '無醫師出診'}
+                    style={{...cellStyle, cursor:'default', fontWeight:700,
+                      background: short ? '#f6d5d2' : tight ? '#fbecc8' : '#fafafa',
+                      color: short ? '#b3261e' : tight ? '#8a6100' : '#555'}}>
+                    {avail}{need ? <span style={{fontWeight:400,fontSize:9,color:'#888'}}>/{need}</span> : null}
+                  </td>
+                );
+              })}
+              <td style={{background:'#fafafa'}}></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
 // COMPONENT: App (Root)
 // ═══════════════════════════════════════════
 function App() {
@@ -9435,7 +9874,7 @@ function App() {
         }
         if (!confirm(`確定要匯入備份「${file.name}」？\n\n目前所有資料將被覆蓋，此操作無法復原。`)) return;
         _store.replaceAll(imported)
-          .then(() => { setDataRaw(normalizeData(_store.get())); alert('備份匯入成功！'); })
+          .then(() => { setDataRaw(applyExt(normalizeData(_store.get()))); alert('備份匯入成功！'); })
           .catch(err => alert('匯入失敗：' + err.message));
       } catch {
         alert('讀取備份檔案失敗，請確認檔案格式為 JSON。');
@@ -9449,7 +9888,7 @@ function App() {
     [data, viewYear, viewMonth]);
 
   // 其他裝置的修改即時同步進來
-  useEffect(() => _store.subscribe(remote => { if (!_store.isEmpty()) setDataRaw(normalizeData(remote)); }), []);
+  useEffect(() => _store.subscribe(remote => { if (!_store.isEmpty()) setDataRaw(applyExt(normalizeData(remote))); }), []);
 
   // Auto-save to Firestore on every change
   useEffect(() => { saveData(data); }, [data]);
@@ -9534,6 +9973,7 @@ function App() {
       <div className="topbar">
         <span className="topbar-title">立馥助理排班系統</span>
         <button className={`tab-btn${page==='schedule'?' active':''}`} onClick={() => setPage('schedule')}>助理班表</button>
+        <button className={`tab-btn${page==='preleave'?' active':''}`} onClick={() => setPage('preleave')}>預假</button>
         <button className={`tab-btn${page==='doctor'?' active':''}`} onClick={() => setPage('doctor')}>醫師班表</button>
         <button className={`tab-btn${page==='manage'?' active':''}`} onClick={() => setPage('manage')}>助理管理</button>
         <button className={`tab-btn${page==='stats'?' active':''}`} onClick={() => setPage('stats')}>統計</button>
@@ -9628,6 +10068,9 @@ function App() {
         )}
         {page === 'schedule' && schedView === 'pos' && (
           <PositionView data={data} year={viewYear} month={viewMonth} onUpdate={onUpdate} isLocked={isLocked} />
+        )}
+        {page === 'preleave' && (
+          <PreLeaveBoard data={data} year={viewYear} month={viewMonth} />
         )}
         {page === 'doctor' && (
           <DoctorScheduleView data={data} year={viewYear} month={viewMonth} onUpdate={onUpdate} />
