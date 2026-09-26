@@ -560,6 +560,42 @@
         .pl-day.sel:disabled{opacity:1;}
         .pl-actions{display:flex;gap:8px;margin-top:16px;}
         .pl-note{font-size:var(--fs-cap);color:var(--text-muted);margin-top:12px;line-height:1.6;}
+
+        /* 院長總覽 */
+        .nprin{display:none!important}
+        body.principal-mode .nprin{display:flex!important}
+        .mnb-dashboard{display:none!important}
+        body.principal-mode .mnb-dashboard{display:flex!important}
+        .tab-btn-group .tbb:disabled{opacity:.4;cursor:default;}
+        .dash-unit{font-size:var(--fs-base);font-weight:500;color:var(--text-muted);margin-left:4px;}
+        .dash-link{cursor:pointer;transition:border-color .15s;}
+        .dash-link:hover{border-color:var(--border-strong);}
+        .dash-pie-wrap{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;}
+        .dash-pie{width:260px;max-width:100%;flex-shrink:0;margin:0 auto;}
+        .dash-legend{flex:1;min-width:220px;}
+        .dash-legend thead th{padding:8px 10px;}
+        .dash-legend tbody td{padding:8px 10px;}
+        .dash-legend .num{text-align:right;font-variant-numeric:tabular-nums;}
+        .dash-legend .muted{color:var(--text-muted);}
+        .dash-chip{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;margin-right:8px;vertical-align:middle;}
+
+        /* 年假概況：特休／病假／生理假 */
+        .annual-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
+        .annual-card .ac-bars{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 6px;}
+
+        /* 手機一打開就完整顯示：內容不得撐寬頁面（寬表格改在自己的區塊內滑動） */
+        .main,.page,.page-content{min-width:0;}
+
+        /* 手機選單：圓角浮動卡片 */
+        @media(max-width:700px){
+            .sidebar{top:calc(8px + env(safe-area-inset-top,0px));bottom:calc(8px + env(safe-area-inset-bottom,0px));left:8px;height:auto;
+                     border-radius:16px;overflow:hidden;transform:translateX(calc(-100% - 16px));}
+            body.drawer-open .sidebar{transform:none;}
+            .sidebar-brand{border-bottom:1px solid var(--border);padding-top:18px;}
+            body.drawer-open .menu-btn{top:calc(12px + env(safe-area-inset-top,0px));left:12px;width:44px;height:44px;border-radius:10px;}
+            body.drawer-open .menu-badge{display:none;}
+            .sidebar-brand{padding-left:60px;}
+        }
         .mgr-sched{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:var(--fs-sm);color:var(--text-muted);white-space:nowrap;}
         /* ─── 排班系統（原樣式，限定於 #sched-root） ─── */
 
@@ -866,6 +902,9 @@ appId: "..."'></textarea>
     </div>
     <div class="sidebar-nav">
         <div class="nav-sec-label n-overview-lbl">概覽</div>
+        <button class="nav-item nprin" onclick="navigate('dashboard')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/></svg>總覽
+        </button>
         <button class="nav-item n-overview active" onclick="navigate('overview')">
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>本月總覽
         </button>
@@ -1316,6 +1355,18 @@ appId: "..."'></textarea>
         </div>
     </div>
 
+    <!-- ── 院長總覽 ── -->
+    <div id="page-dashboard" class="page">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <div><h2>總覽</h2><p id="dash-month-label">—</p></div>
+            <div class="tab-btn-group">
+                <button class="tbb" onclick="setDashMonth(-1)">上個月</button>
+                <button class="tbb" id="dash-next" onclick="setDashMonth(1)">下個月</button>
+            </div>
+        </div>
+        <div class="page-content" id="dash-content"></div>
+    </div>
+
     <!-- ── 助理預假 ── -->
     <div id="page-preleave" class="page">
         <div class="page-header"><h2>預假</h2><p>每月 10–20 日開放預約下個月的休假</p></div>
@@ -1340,6 +1391,10 @@ appId: "..."'></textarea>
     <button class="mn-item mnb-record" onclick="navigate('record')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
       記錄點數
+    </button>
+    <button class="mn-item mnb-dashboard" onclick="navigate('dashboard')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+      總覽
     </button>
     <button class="mn-item mnb-settlement" onclick="navigate('settlement')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
@@ -2086,6 +2141,148 @@ async function submitPreLeave() {
         toast(e.code === 'permission-denied' ? '送出被拒：請院長在 Firebase 安全性規則允許 preLeave 資料表' : '送出失敗：' + e.message);
     } finally { _preSaving = false; renderPreLeave(); }
 }
+
+// ================================================================
+// 院長總覽（Dashboard）：本月加班時數與各助理占比
+// ================================================================
+// 已驗證的 8 色類別色盤（依序套用，不循環；超過 8 人併入「其他」）
+const DASH_PALETTE = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#4a3aa7', '#e34948'];
+const DASH_OTHER = '#9a9a9a';
+let _dashMonth = null, _dashChart = null;
+
+// 每位助理用一個字代表：三字姓名取中間字，兩字取末字；撞字時改用末字
+function dashShortNames(list) {
+    const pick = n => !n ? '?' : n.length >= 3 ? n[1] : n.slice(-1);
+    const used = new Set(), out = {};
+    list.forEach(a => {
+        let c = pick(a.name);
+        if (used.has(c)) c = a.name.slice(-1);
+        if (used.has(c)) c = a.name[0];
+        used.add(c); out[a.id] = c;
+    });
+    return out;
+}
+function setDashMonth(delta) {
+    const [y, m] = (_dashMonth || currentMonth()).split('-').map(Number);
+    const d = new Date(y, m - 1 + delta, 1);
+    _dashMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    renderDashboard();
+}
+function renderDashboard() {
+    const el = document.getElementById('dash-content'); if (!el) return;
+    const mk = _dashMonth || currentMonth();
+    document.getElementById('dash-month-label').textContent = monthLabel(mk);
+    document.getElementById('dash-next').disabled = mk >= currentMonth();
+
+    const recs = (state.overtime || []).filter(r => (r.date || '').startsWith(mk));
+    const approved = recs.filter(r => r.status === 'approved');
+    const pendingOT = (state.overtime || []).filter(r => r.status === 'pending').length;
+    const pendingLV = (state.leaveRequests || []).filter(r => r.status === 'pending_principal').length;
+    const totalMin = approved.reduce((s, r) => s + (r.overtimeMinutes || 0), 0);
+    const hrs = v => (Math.round(v / 60 * 10) / 10).toFixed(1);
+
+    // 依時數排序；前 7 位各一色，其餘併入「其他」
+    const byA = {};
+    approved.forEach(r => { byA[r.assistantId] = (byA[r.assistantId] || 0) + (r.overtimeMinutes || 0); });
+    const rows = Object.entries(byA).map(([id, min]) => {
+        const a = findA(id) || { id, name: approved.find(r => r.assistantId === id)?.assistantName || '未知' };
+        return { id, name: a.name, min };
+    }).sort((x, y) => y.min - x.min);
+    const short = dashShortNames(rows);
+    const MAXC = DASH_PALETTE.length;
+    const shown = rows.length > MAXC ? rows.slice(0, MAXC - 1) : rows;
+    const rest = rows.length > MAXC ? rows.slice(MAXC - 1) : [];
+    const slices = shown.map((r, i) => ({ label: short[r.id], name: r.name, min: r.min, color: DASH_PALETTE[i] }));
+    if (rest.length) slices.push({ label: '他', name: '其他 ' + rest.length + ' 人', min: rest.reduce((s, r) => s + r.min, 0), color: DASH_OTHER });
+
+    const legend = rows.map((r, i) => {
+        const inRest = i >= shown.length;
+        const color = inRest ? DASH_OTHER : DASH_PALETTE[i];
+        const pct = totalMin ? (r.min / totalMin * 100).toFixed(1) : '0.0';
+        return `<tr><td><span class="dash-chip" style="background:${color};color:${dashInk(color)}">${inRest ? '他' : short[r.id]}</span>${r.name}</td>
+            <td class="num">${hrs(r.min)} h</td><td class="num muted">${pct}%</td></tr>`;
+    }).join('');
+
+    el.innerHTML = `
+        <div class="grid-3 section">
+            <div class="stat-card"><div class="lb">本月加班總時數</div><div class="val">${hrs(totalMin)}<span class="dash-unit">小時</span></div><div class="sub">已核准 ${approved.length} 筆</div></div>
+            <div class="stat-card dash-link" onclick="navigate('attendance')"><div class="lb">待簽核加班</div><div class="val">${pendingOT}</div><div class="sub">前往假勤管理</div></div>
+            <div class="stat-card dash-link" onclick="navigate('attendance')"><div class="lb">待簽核請假</div><div class="val">${pendingLV}</div><div class="sub">前往假勤管理</div></div>
+        </div>
+        <div class="card">
+            <div class="card-title">加班時數分布</div>
+            ${totalMin ? `<div class="dash-pie-wrap">
+                <div class="dash-pie"><canvas id="dash-pie" aria-label="各助理加班時數占比圓餅圖" role="img"></canvas></div>
+                <table class="dash-legend"><thead><tr><th>助理</th><th class="num">時數</th><th class="num">占比</th></tr></thead><tbody>${legend}</tbody></table>
+            </div>` : '<div class="empty-state"><p>本月尚無已核准的加班</p></div>'}
+        </div>`;
+
+    if (_dashChart) { _dashChart.destroy(); _dashChart = null; }
+    const canvas = document.getElementById('dash-pie');
+    if (!canvas || !window.Chart) return;
+    // 在扇形上直接標一個字（深色扇形用白字，淺色用深字）
+    const sliceLabels = {
+        id: 'sliceLabels',
+        afterDatasetsDraw(chart) {
+            const { ctx } = chart;
+            const meta = chart.getDatasetMeta(0);
+            const total = slices.reduce((s, x) => s + x.min, 0);
+            meta.data.forEach((arc, i) => {
+                if (slices[i].min / total < 0.035) return;
+                const p = arc.tooltipPosition();
+                const hex = slices[i].color.slice(1);
+                const [r, g, b] = [0, 2, 4].map(k => parseInt(hex.slice(k, k + 2), 16));
+                const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+                ctx.save();
+                ctx.fillStyle = lum > 0.62 ? '#1a1a1a' : '#ffffff';
+                ctx.font = '700 15px "Noto Sans JP", sans-serif';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(slices[i].label, p.x, p.y);
+                ctx.restore();
+            });
+        },
+    };
+    _dashChart = new Chart(canvas, {
+        type: 'pie',
+        data: { labels: slices.map(s => s.name), datasets: [{ data: slices.map(s => Math.round(s.min / 6) / 10), backgroundColor: slices.map(s => s.color), borderColor: '#ffffff', borderWidth: 2, hoverOffset: 6 }] },
+        options: {
+            responsive: true, maintainAspectRatio: true, animation: { duration: 300 },
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.label}：${c.parsed.toFixed(1)} 小時（${(slices[c.dataIndex].min / totalMin * 100).toFixed(1)}%）` } } },
+        },
+        plugins: [sliceLabels],
+    });
+}
+
+// 年假概況卡片（假勤管理、請假頁共用）：特休、病假、生理假、總請假
+function calcLeaveDaysWhere(asstId, year, pred) {
+    return state.leaveRequests.filter(r => r.assistantId === asstId && r.status === 'approved' && pred(r))
+        .reduce((sum, r) => sum + (r.dates || []).filter(d => d.startsWith(String(year))).length, 0);
+}
+function annualLeaveCardHTML(a, year, hoverable) {
+    const entitled = calcAnnualLeaveEntitlement(a, year);
+    const used = calcAnnualLeaveUsed(a.id, year);
+    const remaining = Math.max(0, entitled - used);
+    const totalDays = calcTotalLeaveDays(a.id, year);
+    const sick = calcLeaveDaysWhere(a.id, year, r => r.leaveType === 'sick');
+    const menstrual = calcLeaveDaysWhere(a.id, year, r => r.leaveType === 'other' && r.leaveSubType === 'menstrual');
+    const hover = hoverable ? ` onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='var(--surface-alt)'"` : '';
+    return `<div class="annual-card">
+        <div class="ac-name">${a.name}</div>
+        <div class="ac-bars">
+            <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--accent)">${entitled}</div><div class="ac-bar-lbl">特休總天數</div></div>
+            <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--green)">${remaining}</div><div class="ac-bar-lbl">特休剩餘</div></div>
+            <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--text-secondary)">${totalDays}</div><div class="ac-bar-lbl">總請假天數</div></div>
+            <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--text-secondary)">${sick}</div><div class="ac-bar-lbl">病假</div></div>
+            <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--text-secondary)">${menstrual}</div><div class="ac-bar-lbl">生理假</div></div>
+        </div>
+        <button onclick="adjustAnnualLeave('${a.id}','${a.name}',${year},${entitled})" style="margin-top:10px;width:100%;display:flex;align-items:center;justify-content:center;gap:5px;padding:5px 0;font-size:var(--fs-sm);border:1px solid var(--border);border-radius:4px;background:var(--surface-alt);cursor:pointer;font-family:inherit;color:var(--text-secondary);transition:background .15s"${hover}>${PENCIL_ICON} 調整天數</button>
+    </div>`;
+}
+
+function dashInk(hex) {
+    const [r, g, b] = [1, 3, 5].map(k => parseInt(hex.slice(k, k + 2), 16));
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.62 ? '#1a1a1a' : '#ffffff';
+}
 </script>
 <script>
 // ================================================================
@@ -2408,7 +2605,7 @@ function subscribeData() {
     db.collection(col('overtime')).orderBy('date','desc').limit(200)
       .onSnapshot(snap => {
           state.overtime = snap.docs.map(d=>({id:d.id,...d.data()}));
-          if (currentPage==='overtime-apply'||currentPage==='overtime-approve'||currentPage==='attendance') refreshPage();
+          if (currentPage==='overtime-apply'||currentPage==='overtime-approve'||currentPage==='attendance'||currentPage==='dashboard') refreshPage();
           if (_otHistAsstId && !document.getElementById('modal-ot-history')?.classList.contains('hidden')) renderOTHistoryModal();
           updateDocBadge();
       }, e => console.error('overtime', e));
@@ -2428,6 +2625,7 @@ function subscribeData() {
           if (currentPage==='leave'||currentPage==='leave-approve') refreshPage();
           updateLeaveBadge();
           schedOnExtChange();
+          if (currentPage==='dashboard') renderDashboard();
           loaded.l = true; tryReady();
       }, e => { console.error('leaveRequests', e); loaded.l = true; tryReady(); });
 }
@@ -2724,7 +2922,7 @@ const DOC_PAGES  = ['overtime-approve'];
 const ASST_PAGES = ['myview','overtime-apply'];
 
 function navigate(p) {
-    if (p === 'overview' && viewMode === 'principal') p = 'settlement';
+    if (p === 'overview' && viewMode === 'principal') p = 'dashboard';
     if (viewMode === 'viewer' && p !== 'overview') { showLoginScreen(); return; }
     if (viewMode === 'manager'   && !['overview','record','leave-approve'].concat(canUseSchedule()?['schedule']:[]).includes(p)) return;
     if (viewMode === 'doctor'    && !['overview','record','overtime-approve'].includes(p)) return;
@@ -2777,7 +2975,8 @@ function renderPage(p) {
       leave:renderLeave,'leave-approve':renderLeaveApprove,
       'support-report':renderSupportReport,
       schedule:renderSchedulePage,
-      preleave:renderPreLeave})[p]?.();
+      preleave:renderPreLeave,
+      dashboard:renderDashboard})[p]?.();
 }
 function refreshPage() { renderPage(currentPage); }
 
@@ -5187,7 +5386,7 @@ function applyViewMode() {
         chip.className = 'mode-chip' + (isPrincipal||isManager?' admin':isAsst||isDoctor?' assistant':'');
     }
 
-    if (isPrincipal) { if (!['record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report','leave','leave-approve','attendance','schedule'].includes(currentPage)) navigate('settlement'); else refreshPage(); return; }
+    if (isPrincipal) { if (!['record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report','leave','leave-approve','attendance','schedule','dashboard'].includes(currentPage)) navigate('dashboard'); else refreshPage(); return; }
     if (isManager)   { if (!['overview','record','leave-approve'].concat(canUseSchedule()?['schedule']:[]).includes(currentPage)) navigate('overview'); else refreshPage(); return; }
     if (isDoctor)    { if (!['record','overtime-approve'].includes(currentPage)) navigate('record'); else refreshPage(); return; }
     if (isAsst)      { if (!['myview','overtime-apply','preleave'].includes(currentPage)) navigate('myview'); else refreshPage(); return; }
@@ -5997,21 +6196,7 @@ function renderAttendanceLeaveMgmt() {
     const increment = ls.annualLeaveIncrement ?? 1;
     const activeAsts = state.assistants.filter(a=>a.active).sort((a,b)=>a.name.localeCompare(b.name,'zh-TW'));
 
-    const annualCards = activeAsts.map(a => {
-        const entitled = calcAnnualLeaveEntitlement(a, year);
-        const used     = calcAnnualLeaveUsed(a.id, year);
-        const remaining = Math.max(0, entitled - used);
-        const totalDays = calcTotalLeaveDays(a.id, year);
-        return `<div class="annual-card">
-            <div class="ac-name">${a.name}</div>
-            <div class="ac-bars">
-                <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--accent)">${entitled}</div><div class="ac-bar-lbl">特休總天數</div></div>
-                <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--green)">${remaining}</div><div class="ac-bar-lbl">特休剩餘</div></div>
-                <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--text-secondary)">${totalDays}</div><div class="ac-bar-lbl">總請假天數</div></div>
-            </div>
-            <button onclick="adjustAnnualLeave('${a.id}','${a.name}',${year},${entitled})" style="margin-top:10px;width:100%;display:flex;align-items:center;justify-content:center;gap:5px;padding:5px 0;font-size:var(--fs-sm);border:1px solid var(--border);border-radius:4px;background:var(--surface-alt);cursor:pointer;font-family:inherit;color:var(--text-secondary)">${PENCIL_ICON} 調整天數</button>
-        </div>`;
-    }).join('');
+    const annualCards = activeAsts.map(a => annualLeaveCardHTML(a, year, false)).join('');
 
     const lp = settings.leavePolicy || {};
     const bp = lp.baseParams || {};
@@ -6441,21 +6626,7 @@ function renderLeavePrincipal(el, year) {
     const increment = ls.annualLeaveIncrement ?? 1;
     const activeAsts = state.assistants.filter(a=>a.active).sort((a,b)=>a.name.localeCompare(b.name,'zh-TW'));
 
-    const annualCards = activeAsts.map(a => {
-        const entitled = calcAnnualLeaveEntitlement(a, year);
-        const used     = calcAnnualLeaveUsed(a.id, year);
-        const remaining = Math.max(0, entitled - used);
-        const totalDays = calcTotalLeaveDays(a.id, year);
-        return `<div class="annual-card">
-            <div class="ac-name">${a.name}</div>
-            <div class="ac-bars">
-                <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--accent)">${entitled}</div><div class="ac-bar-lbl">特休總天數</div></div>
-                <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--green)">${remaining}</div><div class="ac-bar-lbl">特休剩餘</div></div>
-                <div class="ac-bar-item"><div class="ac-bar-val" style="color:var(--text-secondary)">${totalDays}</div><div class="ac-bar-lbl">總請假天數</div></div>
-            </div>
-            <button onclick="adjustAnnualLeave('${a.id}','${a.name}',${year},${entitled})" style="margin-top:10px;width:100%;display:flex;align-items:center;justify-content:center;gap:5px;padding:5px 0;font-size:var(--fs-sm);border:1px solid var(--border);border-radius:4px;background:var(--surface-alt);cursor:pointer;font-family:inherit;color:var(--text-secondary);transition:background .15s" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='var(--surface-alt)'">${PENCIL_ICON} 調整天數</button>
-        </div>`;
-    }).join('');
+    const annualCards = activeAsts.map(a => annualLeaveCardHTML(a, year, true)).join('');
 
     const sortedReqs = [...state.leaveRequests].sort((a,b)=>(b.dates?.[0]||'')>(a.dates?.[0]||'')?1:-1);
     const pending  = sortedReqs.filter(r => r.status === 'pending_principal');
