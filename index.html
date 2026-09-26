@@ -545,7 +545,9 @@
         .pl-quota{font-size:var(--fs-cap);color:var(--text-muted);white-space:nowrap;}
         .pl-quota b{font-size:var(--fs-disp);color:var(--text-primary);font-weight:700;margin-right:2px;}
         .pl-quota.full b{color:var(--green);}
-        .pl-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
+        .pl-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+        .pl-day.sun{background:var(--surface-alt);border-color:var(--surface-alt);cursor:default;color:var(--text-muted);}
+        .pl-day.sun .pl-num{color:#b8b8b8;}
         .pl-wd{text-align:center;font-size:var(--fs-sm);color:var(--text-muted);}
         .pl-day{min-height:48px;border:1px solid var(--border);border-radius:6px;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-family:inherit;cursor:pointer;color:var(--text-primary);padding:4px 0;-webkit-tap-highlight-color:transparent;}
         .pl-day .pl-num{font-size:var(--fs-sub);font-weight:600;line-height:1;}
@@ -574,27 +576,129 @@
         @media(max-width:700px){ .csel-opt{padding:11px 12px;font-size:var(--fs-sub);} }
 
 
-        /* 手機版寬表格：凍結表頭與第一欄＋方向鍵 */
-        .mt-bar{display:none;}
+        /* 手機版寬表格：凍結第一欄，欄寬統一（依助理管理表格的留白） */
         @media(max-width:700px){
             .page-content table thead th{white-space:nowrap;}
-            .mt-bar{display:flex;align-items:center;gap:6px;margin:0 0 8px;}
-            .mt-bar button{width:38px;height:34px;border:1px solid var(--border);background:var(--surface);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--text-primary);cursor:pointer;padding:0;flex-shrink:0;}
-            .mt-bar button:disabled{opacity:.3;cursor:default;}
-            .mt-bar button[data-d="up"]{margin-left:6px;}
-            .mt-bar .mt-pos{flex:1;text-align:center;font-size:var(--fs-sm);color:var(--text-muted);white-space:nowrap;}
-            .mt-wrap{max-height:62vh;overflow:auto!important;scroll-snap-type:x proximity;overscroll-behavior:contain;}
-            table.mt thead th{position:sticky;top:0;z-index:3;background:var(--surface-alt);scroll-snap-align:start;}
+            .mt-wrap{overflow-x:auto!important;overscroll-behavior-x:contain;}
+            table.mt td,table.mt th{white-space:nowrap;padding:11px 14px!important;}
+            table.mt .prog-wrap{width:44px!important;min-width:44px;}
             table.mt .mt-first{position:sticky;left:0;z-index:2;background:var(--surface);box-shadow:1px 0 0 var(--border);}
             table.mt tbody tr:nth-child(even) > td.mt-first{background:var(--surface-alt);}
-            table.mt thead th.mt-first{z-index:4;background:var(--surface-alt);scroll-snap-align:none;}
-            table.mt td,table.mt th{white-space:nowrap;}
-            table.mt .prog-wrap{min-width:72px;}
+            table.mt thead th.mt-first{z-index:3;background:var(--surface-alt);}
             table.mt-two .mt-first{box-shadow:none;}
             table.mt-two .mt-col2{position:sticky;left:var(--mt-l2,0px);z-index:2;background:var(--surface);box-shadow:1px 0 0 var(--border);}
             table.mt-two tbody tr:nth-child(even) > td.mt-col2{background:var(--surface-alt);}
-            table.mt-two thead th.mt-col2{z-index:4;background:var(--surface-alt);scroll-snap-align:none;}
+            table.mt-two thead th.mt-col2{z-index:3;background:var(--surface-alt);}
         }
+
+        /* 手機頁首：標題讓出左上角選單鈕，其餘（分頁、按鈕）與內容同樣靠左並撐滿 */
+        @media(max-width:700px){
+            .page-header{padding:12px 14px!important;}
+            .page-header > h2,.page-header > p,.page-header > div:first-child{padding-left:42px;}
+            .page-header > .tab-btn-group,.page-header > div:not(:first-child) .tab-btn-group{width:100%;margin-top:10px;}
+            .page-header .tab-btn-group .tbb{flex:1;text-align:center;}
+            .page-header > div:not(:first-child){width:100%;}
+            .ot-type-toggle{max-width:none!important;}
+        }
+
+        /* 助理：我的班表 */
+        .mnb-myshift{display:none!important}
+        body.assistant-mode .mnb-myshift{display:flex!important}
+        .ms-top{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+        .ms-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;display:flex;flex-direction:column;gap:2px;}
+        .ms-stat b{font-size:var(--fs-hd);font-weight:700;line-height:1.1;}
+        .ms-stat span{font-size:var(--fs-xs);color:var(--text-muted);}
+        .ms-hint{font-size:var(--fs-sm);color:var(--text-muted);margin:4px 2px 0;}
+        .ms-week{font-size:var(--fs-xs);font-weight:700;color:var(--text-muted);margin:16px 2px 6px;letter-spacing:.06em;}
+        .ms-day{display:flex;align-items:stretch;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:6px;margin-bottom:6px;}
+        .ms-day.today{border-color:var(--text-primary);box-shadow:inset 3px 0 0 var(--text-primary);}
+        .ms-day.past{opacity:.5;}
+        .ms-date{width:44px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2;}
+        .ms-date b{font-size:var(--fs-hd);font-weight:700;}
+        .ms-date b.red,.ms-date .hol{color:var(--red);}
+        .ms-date span{font-size:var(--fs-xs);color:var(--text-muted);}
+        .ms-date .hol{font-weight:700;}
+        .ms-cells{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;min-width:0;}
+        .ms-cell{min-height:48px;border:1px solid var(--border);border-radius:6px;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-family:inherit;cursor:pointer;padding:3px 2px;color:var(--text-primary);min-width:0;-webkit-tap-highlight-color:transparent;}
+        .ms-cell:active:not(:disabled){background:var(--surface-alt);}
+        .ms-cell .sh{font-size:var(--fs-xs);color:var(--text-muted);}
+        .ms-cell .pos{font-size:var(--fs-cap);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+        .ms-cell .px{font-size:var(--fs-xs);color:var(--text-secondary);font-weight:700;}
+        .ms-cell.rest{background:#EDEDED;border-color:#EDEDED;}
+        .ms-cell.rest .pos{font-weight:400;color:var(--text-muted);}
+        .ms-cell.pre{background:#EDEDED;border-color:transparent;box-shadow:inset 0 0 0 1.5px #c0504d;}
+        .ms-cell.pre .pos{color:#b0322e;font-weight:700;}
+        .ms-cell.leave{background:var(--red-light);border-color:var(--red-border);}
+        .ms-cell.leave .pos{color:var(--red);}
+        .ms-cell.pending{box-shadow:inset 0 0 0 1.5px var(--gold);}
+        .ms-cell.pending .sh{color:#996600;font-weight:700;}
+        .ms-cell:disabled{cursor:default;}
+        .ms-cell.empty{visibility:hidden;}
+        .ms-req{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:var(--fs-sm);}
+        .ms-req:last-child{border-bottom:none;}
+        .ms-req-sub{color:var(--text-muted);font-size:var(--fs-xs);margin-top:2px;}
+        .ms-req-empty{font-size:var(--fs-sm);color:var(--text-muted);}
+        .ms-sheet-bd{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1200;display:flex;align-items:flex-end;justify-content:center;}
+        .ms-sheet{background:var(--surface);width:100%;max-width:480px;border-radius:14px 14px 0 0;padding:18px 16px calc(16px + env(safe-area-inset-bottom,0px));max-height:82vh;display:flex;flex-direction:column;}
+        .ms-sheet h3{font-size:var(--fs-sub);font-weight:700;margin-bottom:2px;}
+        .ms-sheet .sub{font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:12px;}
+        .ms-opts{overflow-y:auto;border:1px solid var(--border);border-radius:10px;padding:6px;flex:1;min-height:0;}
+        .ms-opt{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;padding:11px 12px;border:none;background:none;border-radius:6px;font-family:inherit;font-size:var(--fs-base);cursor:pointer;color:var(--text-primary);text-align:left;}
+        .ms-opt .v{color:var(--text-muted);font-size:var(--fs-sm);white-space:nowrap;}
+        .ms-opt:hover:not(:disabled){background:var(--surface-alt);}
+        .ms-opt.on{background:var(--surface-alt);font-weight:700;box-shadow:inset 3px 0 0 var(--text-primary);}
+        .ms-opt:disabled{color:#bbb;cursor:default;}
+        .ms-opt:disabled .v{color:#ccc;}
+        .ms-sheet-ft{display:flex;gap:8px;margin-top:12px;}
+        .ms-sheet-ft .btn{flex:1;justify-content:center;}
+        @media(min-width:701px){ .ms-sheet-bd{align-items:center;} .ms-sheet{border-radius:10px;} }
+        /* 預假月曆：國定假日 */
+        .pl-day.hol .pl-num{color:var(--red);}
+        .pl-day .pl-hol{font-size:10px;color:var(--red);line-height:1;font-weight:700;}
+        .pl-day.sel .pl-hol{color:#ffb4a4;}
+        /* 排班：調班通知 */
+        #sched-root .bell-btn{position:relative;width:34px;height:34px;border:1px solid var(--border);background:var(--surface);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--text-primary);cursor:pointer;margin-left:auto;}
+        #sched-root .bell-btn:hover,#sched-root .bell-btn.open{background:var(--surface-alt);}
+        #sched-root .bell-count{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:var(--fs-xs);font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);}
+        #sched-root .dd-menu.bell-menu{left:auto;right:0;width:320px;max-width:calc(100vw - 24px);max-height:70vh;overflow-y:auto;padding:8px;}
+        #sched-root .bell-hd{font-size:var(--fs-cap);font-weight:700;padding:4px 6px 8px;border-bottom:1px solid var(--border);margin-bottom:6px;}
+        #sched-root .bell-empty{font-size:var(--fs-sm);color:var(--text-muted);padding:14px 6px;text-align:center;}
+        #sched-root .bell-item{padding:10px 6px;border-bottom:1px solid var(--border);}
+        #sched-root .bell-item:last-child{border-bottom:none;}
+        #sched-root .bell-remind{background:var(--gold-light);border:1px solid var(--gold-border);border-radius:6px;margin-bottom:6px;padding:10px;}
+        #sched-root .hm-status{font-size:var(--fs-xs);font-weight:700;padding:2px 8px;border-radius:10px;}
+        #sched-root .hm-status.ok{background:var(--green-light);color:var(--green);}
+        #sched-root .hm-status.no{background:var(--gold-light);color:#996600;}
+        #sched-root .bell-title{font-size:var(--fs-cap);font-weight:700;margin-bottom:4px;}
+        #sched-root .bell-body{font-size:var(--fs-sm);color:var(--text-secondary);line-height:1.7;}
+        #sched-root .bell-body b{color:var(--text-primary);}
+        #sched-root .bell-warn{font-size:var(--fs-xs);color:#996600;background:var(--gold-light);border:1px solid var(--gold-border);border-radius:4px;padding:3px 8px;margin-top:6px;}
+        #sched-root .bell-actions{display:flex;gap:6px;margin-top:8px;justify-content:flex-end;}
+        #sched-root .dd-menu .bell-actions button{display:inline-flex;width:auto;justify-content:center;align-items:center;padding:7px 16px;border-radius:4px;font-size:var(--fs-sm);font-weight:500;}
+        #sched-root .dd-menu .bell-actions .s-btn-primary{background:var(--text-primary);color:#fff;border:1px solid var(--text-primary);}
+        #sched-root .dd-menu .bell-actions .s-btn-primary:hover{background:#333;}
+        #sched-root .dd-menu .bell-actions .s-btn-secondary{background:var(--surface);color:var(--text-primary);border:1px solid var(--border-strong);}
+        #sched-root .dd-menu .bell-actions .s-btn-secondary:hover{background:var(--surface-alt);}
+        #sched-root .topbar .month-nav{margin-left:8px;}
+        #sched-root .topbar > .dd-wrap:has(.bell-btn){margin-left:auto;}
+        #sched-root .t-short{display:none;}
+        @media(max-width:700px){
+            #sched-root .week-header-right{display:none;}
+            #sched-root .topbar-title{margin-right:0;}
+            #sched-root .t-full{display:none;} #sched-root .t-short{display:inline;}
+            #sched-root .topbar .dd-wrap:has(.bell-btn){order:1;margin-left:auto;}
+            #sched-root .topbar .month-nav{order:2;margin-left:6px;}
+            #sched-root .bell-btn{margin-left:0;}
+            #sched-root .dd-menu.bell-menu{position:fixed;top:calc(env(safe-area-inset-top,0px) + 50px);left:12px;right:12px;width:auto;max-width:none;}
+        }
+
+        /* 助理代號 */
+        .abbr-name{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;border:none;background:none;padding:0;font-family:inherit;font-size:inherit;font-weight:600;color:var(--text-primary);cursor:pointer;}
+        .abbr-name:hover{text-decoration:underline;text-underline-offset:3px;}
+        .abbr-chip{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 4px;border-radius:4px;background:var(--surface-alt);border:1px solid var(--border);font-size:var(--fs-xs);font-weight:700;color:var(--text-secondary);}
+        .abbr-menu{min-width:140px;}
+        .abbr-menu .csel-opt[data-c]:not([data-c=""]){font-size:var(--fs-sub);}
+
         /* 院長總覽 */
         .nprin{display:none!important}
         body.principal-mode .nprin{display:flex!important}
@@ -901,6 +1005,11 @@
 #sched-root .m-days .m-dwd{color:var(--text-muted)}
 #sched-root .m-days button.on{background:var(--text-primary);border-color:var(--text-primary);color:#fff}
 @media(max-width:700px){
+#sched-root .s-modal .stats-table{font-size:var(--fs-xs)}
+#sched-root .s-modal .stats-table th,#sched-root .s-modal .stats-table td{white-space:nowrap;padding:6px 7px}
+#sched-root .s-modal .stats-table .name-col{position:sticky;left:0;background:var(--surface);z-index:1;min-width:0;box-shadow:1px 0 0 var(--border)}
+#sched-root .s-modal .stats-table tr:nth-child(even) .name-col{background:#FAFAFA}
+#sched-root .s-modal{padding:16px 14px}
 #sched-root .topbar{padding:6px 12px}
 #sched-root .subnav{padding:6px 12px}
 #sched-root .content{padding:12px}
@@ -1109,6 +1218,9 @@ appId: "..."'></textarea>
         <button class="nav-item nasst" onclick="navigate('myview')">
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>個人點數
         </button>
+        <button class="nav-item nasst-pre" onclick="navigate('myshift')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h4v4H5V5zm6 0h4v4h-4V5zm-6 6h4v4H5v-4zm6 0h4v4h-4v-4z" clip-rule="evenodd"/></svg>我的班表
+        </button>
         <button class="nav-item nasst-pre" onclick="navigate('preleave')">
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm7.707 7.707a1 1 0 00-1.414-1.414L9 11.586 7.707 10.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>預假
         </button>
@@ -1137,8 +1249,11 @@ appId: "..."'></textarea>
             <span id="leave-pending-badge" class="hidden" style="background:var(--red);color:#fff;border-radius:999px;font-size:var(--fs-xs);font-weight:700;padding:1px 7px;min-width:18px;text-align:center"></span>
         </button>
         <div class="nav-sec-label nsched-lbl">排班系統</div>
-        <button class="nav-item nsched" onclick="navigate('schedule')">
-            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h4v4H5V5zm6 0h4v4h-4V5zm-6 6h4v4H5v-4zm6 0h4v4h-4v-4z" clip-rule="evenodd"/></svg>助理排班
+        <button class="nav-item nsched" onclick="navigate('schedule')" style="justify-content:space-between">
+            <span style="display:flex;align-items:center;gap:9px">
+                <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h4v4H5V5zm6 0h4v4h-4V5zm-6 6h4v4H5v-4zm6 0h4v4h-4v-4z" clip-rule="evenodd"/></svg>助理排班
+            </span>
+            <span id="sched-swap-badge" class="hidden" style="background:var(--red);color:#fff;border-radius:999px;font-size:var(--fs-xs);font-weight:700;padding:1px 7px;min-width:18px;text-align:center"></span>
         </button>
         <div class="nav-sec-label nfull-lbl">報備</div>
         <button class="nav-item nfull" onclick="navigate('support-report')">
@@ -1445,7 +1560,7 @@ appId: "..."'></textarea>
                     <div class="form-label" style="margin-bottom:10px">加班班次</div>
                     <div class="ot-shift-row" id="ot-ot-shift-btns"></div>
                     <!-- 加班類型切換 -->
-                    <div style="display:flex;gap:0;margin-top:14px;border:1px solid var(--border);border-radius:4px;overflow:hidden;max-width:320px">
+                    <div class="ot-type-toggle" style="display:flex;gap:0;margin-top:14px;border:1px solid var(--border);border-radius:4px;overflow:hidden;max-width:320px">
                         <button id="ot-type-late" onclick="setOTType('late')"
                             style="flex:1;padding:8px 0;border:none;font-size:var(--fs-sm);font-family:inherit;cursor:pointer;background:var(--accent);color:#fff;font-weight:700">延後結束</button>
                         <button id="ot-type-early" onclick="setOTType('early')"
@@ -1545,6 +1660,19 @@ appId: "..."'></textarea>
         <div class="page-content" id="dash-content"></div>
     </div>
 
+    <!-- ── 助理：我的班表 ── -->
+    <div id="page-myshift" class="page">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <div><h2>我的班表</h2><p id="myshift-month">—</p></div>
+            <div class="tab-btn-group">
+                <button class="tbb" onclick="setMyShiftMonth(-1)">上個月</button>
+                <button class="tbb" onclick="_msMonth=null;renderMyShift()">本月</button>
+                <button class="tbb" onclick="setMyShiftMonth(1)">下個月</button>
+            </div>
+        </div>
+        <div class="page-content" id="myshift-content"></div>
+    </div>
+
     <!-- ── 助理預假 ── -->
     <div id="page-preleave" class="page">
         <div class="page-header"><h2>預假</h2><p>每月 10–20 日開放預約下個月的休假</p></div>
@@ -1585,6 +1713,10 @@ appId: "..."'></textarea>
     <button class="mn-item mnb-myview" onclick="navigate('myview')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       個人點數
+    </button>
+    <button class="mn-item mnb-myshift" onclick="navigate('myshift')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="10" x2="9" y2="21"/><line x1="15" y1="10" x2="15" y2="21"/></svg>
+      班表
     </button>
     <button class="mn-item mnb-otapply" onclick="navigate('overtime-apply')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="7" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="14"/></svg>
@@ -1918,6 +2050,8 @@ function canUseSchedule() {
 // 設定變更（例如院長關閉權限）時即時套用
 function onSchedAccessChanged() {
     document.body.classList.toggle('sched-access', canUseSchedule());
+    if (canUseSchedule()) { schedStartSwaps(); msEnsureSched(); }
+    updateSwapBadge();
     if (currentPage === 'schedule' && !canUseSchedule()) navigate('overview');
 }
 
@@ -2108,11 +2242,11 @@ function renderSchedulePage() {
     if (_schedBooting) return;
     const el = document.getElementById('sched-root');
     el.innerHTML = '<div class="sched-boot"><div class="spinner"></div><p>載入排班系統…</p></div>';
-    schedStartPreLeave();
+    schedStartPreLeave(); schedStartSwaps();
     _schedBooting = Promise.all([schedBoot(), schedStore.start()])
         .then(() => {
             el.innerHTML = '';
-            window.SchedModule.mount(el, schedStore, schedCtx(), { backupUrl: SCHED_BACKUP_URL, setPreLeave: schedSetPreLeave });
+            window.SchedModule.mount(el, schedStore, schedCtx(), { backupUrl: SCHED_BACKUP_URL, setPreLeave: schedSetPreLeave, swaps: () => schedSwaps, resolveSwap: schedResolveSwap, abbr: asstAbbr, setAbbr: setAsstAbbr });
             _schedMounted = true;
         })
         .catch(e => {
@@ -2178,7 +2312,8 @@ schedStore.ext = function () {
         if (r.status !== 'approved') return;
         const name = findA(r.assistantId)?.name || r.assistantName;
         const type = schedLeaveLabel(r);
-        (r.dates || []).forEach(date => approved.push({ name, date, type, id: r.id }));
+        const proxy = schedValidProxy(r);
+        (r.dates || []).forEach(date => approved.push({ name, date, type, id: r.id, proxy }));
     });
     const pre = [];
     Object.values(schedPreLeave).forEach(p => {
@@ -2187,7 +2322,18 @@ schedStore.ext = function () {
     });
     return { approved, pre };
 };
-function schedOnExtChange() { if (_schedMounted) schedStore._notify(); }
+// 請假紀錄的代理人（沒選代理人時存的是「—」或「— 請選擇 —」，一律視為沒有）
+function schedValidProxy(r) {
+    const n = (r.proxyName || '').trim();
+    return r.proxyId && n && !n.startsWith('—') ? n : '';
+}
+function schedDayScheduled(data, mk, ds) {
+    return Object.values(data.schedule?.[mk]?.[ds] || {}).some(s => s && Object.keys(s).length);
+}
+function schedOnExtChange() {
+    if (_schedMounted) schedStore._notify();
+    if (currentPage === 'myshift') renderMyShift();
+}
 
 // 院長／管理者在班表上調整某人的預假
 async function schedSetPreLeave(name, ds, on) {
@@ -2218,7 +2364,7 @@ function renderPreLeave() {
     const el = document.getElementById('preleave-content');
     const asst = currentAssistantView;
     if (!el || !asst) return;
-    schedStartPreLeave();
+    schedStartPreLeave(); msEnsureSched();
     if (_preErr) {
         el.innerHTML = `<div class="info-box">預假資料讀取失敗：${_preErr.code === 'permission-denied' ? '請院長在 Firebase 安全性規則允許 preLeave 資料表' : _preErr.message}</div>`;
         return;
@@ -2250,20 +2396,21 @@ function renderPreLeave() {
         ? `已送出，最後更新 ${fmtT(saved.updatedAt)}${saved.updatedBy && saved.updatedBy !== asst.name ? `（${saved.updatedBy}調整）` : ''}`
         : '尚未送出';
 
-    // 月曆：週一至週六
+    // 月曆：週一至週日（週日休診，只顯示不可選）
     const days = new Date(y, m, 0).getDate();
-    let cells = ['一', '二', '三', '四', '五', '六'].map(w => `<div class="pl-wd">${w}</div>`).join('');
+    let cells = ['一', '二', '三', '四', '五', '六', '日'].map(w => `<div class="pl-wd">${w}</div>`).join('');
     const firstWd = new Date(y, m - 1, 1).getDay();
-    const lead = firstWd === 0 ? 0 : firstWd - 1;
+    const lead = (firstWd + 6) % 7;
     for (let i = 0; i < lead; i++) cells += '<div></div>';
     for (let d = 1; d <= days; d++) {
         const wd = new Date(y, m - 1, d).getDay();
-        if (wd === 0) continue;
         const ds = `${mk}-${String(d).padStart(2, '0')}`;
+        if (wd === 0) { cells += `<div class="pl-day sun"><span class="pl-num">${d}</span><span class="pl-cnt">休診</span></div>`; continue; }
         const sel = _preDraft.has(ds);
         const cnt = others[ds] || 0;
-        cells += `<button class="pl-day${sel ? ' sel' : ''}" ${open ? '' : 'disabled'} onclick="togglePreLeaveDay('${ds}')">
-            <span class="pl-num">${d}</span><span class="pl-cnt">${cnt ? cnt + ' 人' : ''}</span></button>`;
+        const hol = hostHolidays()[ds];
+        cells += `<button class="pl-day${sel ? ' sel' : ''}${hol ? ' hol' : ''}" ${open ? '' : 'disabled'} onclick="togglePreLeaveDay('${ds}')" ${hol ? `title="${hol}"` : ''}>
+            <span class="pl-num">${d}</span>${hol ? `<span class="pl-hol">${hol.slice(0, 2)}</span>` : ''}<span class="pl-cnt">${cnt ? cnt + ' 人' : ''}</span></button>`;
     }
     const n = _preDraft.size;
 
@@ -2390,10 +2537,16 @@ async function submitPreLeave() {
         m.style.minWidth = w + 'px';
         const mw = m.offsetWidth;
         m.style.left = Math.max(8, Math.min(r.left, innerWidth - mw - 8)) + 'px';
-        const below = innerHeight - r.bottom - 12, above = r.top - 12;
+        // 手機底部功能列與頂部安全區會擋住選單，放不下時改往上開
+        const nav = document.querySelector('.mobile-nav');
+        const navH = nav && getComputedStyle(nav).display !== 'none' ? nav.getBoundingClientRect().height : 0;
+        const topInset = document.getElementById('top-safe')?.getBoundingClientRect().height || 0;
+        const below = innerHeight - navH - r.bottom - 10, above = r.top - topInset - 10;
         const h = Math.min(m.scrollHeight, 320);
-        if (below >= Math.min(h, 200) || below >= above) { m.style.top = (r.bottom + 6) + 'px'; m.style.maxHeight = Math.max(120, below) + 'px'; }
-        else { m.style.maxHeight = Math.max(120, above) + 'px'; m.style.top = Math.max(8, r.top - 6 - Math.min(h, above)) + 'px'; }
+        const down = h <= below || (h > above && below >= above);
+        const room = Math.max(120, Math.min(h, down ? below : above));
+        m.style.maxHeight = room + 'px';
+        m.style.top = (down ? r.bottom + 6 : r.top - 6 - room) + 'px';
         m.querySelector('.csel-opt.on')?.scrollIntoView({ block: 'nearest' });
         btn.classList.add('open');
         cur = { menu: m, sel, btn };
@@ -2427,55 +2580,284 @@ async function submitPreLeave() {
     scan(document.body);
 })();
 
+
 // ================================================================
-// 手機版寬表格：凍結表頭與第一欄，方向鍵上下左右翻頁（只在手機、只對超出螢幕的表格）
+// 第 6 步：國定假日（排班與助理頁共用）、助理「我的班表」、調班申請
+// ================================================================
+// 台灣國定假日（週日不列）：2026 依人事總處公告、2027 依已公布行事曆；排班「備註」頁可手動調整
+window.TW_HOLIDAYS = {
+    '2026-01-01':'元旦', '2026-02-16':'除夕', '2026-02-17':'春節', '2026-02-18':'春節', '2026-02-19':'春節',
+    '2026-02-20':'春節補假', '2026-02-27':'和平紀念日補假', '2026-02-28':'和平紀念日', '2026-04-03':'兒童節補假',
+    '2026-04-04':'兒童節', '2026-04-06':'清明節補假', '2026-05-01':'勞動節', '2026-06-19':'端午節',
+    '2026-09-25':'中秋節', '2026-09-28':'教師節', '2026-10-09':'國慶日補假', '2026-10-10':'國慶日',
+    '2026-10-26':'光復節補假', '2026-12-25':'行憲紀念日',
+    '2027-01-01':'元旦', '2027-02-04':'小年夜', '2027-02-05':'除夕', '2027-02-06':'春節', '2027-02-08':'春節',
+    '2027-02-09':'春節補假', '2027-02-10':'春節補假', '2027-03-01':'和平紀念日補假', '2027-04-05':'清明節',
+    '2027-04-06':'兒童節補假', '2027-04-30':'勞動節補假', '2027-05-01':'勞動節', '2027-06-09':'端午節',
+    '2027-09-15':'中秋節', '2027-09-28':'教師節', '2027-10-11':'國慶日補假', '2027-10-25':'光復節',
+    '2027-12-24':'行憲紀念日補假', '2027-12-25':'行憲紀念日',
+};
+// 與排班系統相同：只顯示院長設定過的國定假日
+function hostHolidays() {
+    const out = {};
+    Object.entries(schedStore.docs.meta?.holidayOverrides || {}).forEach(([d, n]) => { if (n) out[d] = n; });
+    Object.entries(schedStore.docs).forEach(([id, doc]) => {
+        if (!id.startsWith('m_')) return;
+        Object.entries(doc.doctorSchedule || {}).forEach(([ds, info]) => {
+            if (info && info._note === '國定假日' && !out[ds]) out[ds] = window.TW_HOLIDAYS[ds] || '國定假日';
+        });
+    });
+    return out;
+}
+function hostHolidayReminder() {
+    if (!schedStore.docs.meta) return null;
+    const now = new Date();
+    const d = new Date(now.getFullYear(), now.getMonth() + (now.getDate() <= 20 ? 1 : 2), 1);
+    const mk = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    return schedStore.docs.meta.holidayConfirmed?.[mk] ? null : mk;
+}
+
+// 助理端讀取排班資料（唯讀；只有排班頁的 React 會寫入）
+let _msLoaded = false, _msErr = null, _msSubscribed = false;
+function msEnsureSched() {
+    if (!_msSubscribed) {
+        _msSubscribed = true;
+        schedStore.subscribe(() => { if (currentPage === 'myshift') renderMyShift(); if (currentPage === 'preleave') renderPreLeave(); updateSwapBadge(); });
+    }
+    if (_msLoaded || _msErr) return;
+    schedStore.start().then(() => { _msLoaded = true; schedOnExtChange(); })
+        .catch(e => { _msErr = e; if (currentPage === 'myshift') renderMyShift(); });
+}
+
+// 調班申請（助理送出 → 排班人員在排班頁的通知確認）
+let schedSwaps = [], _swUnsub = null;
+function schedStartSwaps() {
+    if (_swUnsub) return;
+    const from = new Date(Date.now() - 60 * 864e5).toISOString();
+    _swUnsub = db.collection(col('swapRequests')).where('createdAt', '>=', from).onSnapshot(snap => {
+        schedSwaps = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+        updateSwapBadge();
+        schedOnExtChange();
+    }, e => { console.error('swapRequests', e); _swUnsub = null; });
+}
+function updateSwapBadge() {
+    const b = document.getElementById('sched-swap-badge'); if (!b) return;
+    const n = schedSwaps.filter(r => r.status === 'pending').length + (canUseSchedule() && hostHolidayReminder() ? 1 : 0);
+    b.textContent = n;
+    b.classList.toggle('hidden', !n || !canUseSchedule());
+    updateMenuBadge();
+}
+async function schedResolveSwap(id, status) {
+    try {
+        await db.collection(col('swapRequests')).doc(id).update({ status, resolvedBy: currentOperator || '院長', resolvedAt: new Date().toISOString() });
+    } catch (e) { toast('更新調班申請失敗：' + e.message); }
+}
+
+// ── 班表格子狀態（與排班系統的判斷一致：核准請假 > 預假 > 排班假 > 崗位 > 休）──
+const MS_LEAVE = ['休', '特休', '指休', '國定假日', '—'];
+function msShifts(ds) { const wd = new Date(ds + 'T00:00:00').getDay(); return wd === 0 ? [] : wd === 6 ? ['早', '午'] : ['早', '午', '晚']; }
+function msAbbr(n) { return !n ? '' : n.length >= 3 ? n[1] : n.slice(-1); }
+function msIsWork(v) { return !!v && !MS_LEAVE.includes(v) && !['病假','事假','生理假','喪假','婚假','產假','工傷病假','其他假'].includes(v); }
+function msCell(data, mk, ds, sh, name, pid) {
+    const assigned = data.schedule?.[mk]?.[ds]?.[sh]?.[name];
+    const ap = (state.leaveRequests || []).find(r => r.status === 'approved' && (r.dates || []).includes(ds)
+        && (pid ? r.assistantId === pid : r.assistantName === name));
+    if (ap) { const px = schedValidProxy(ap); return { kind: 'leave', text: schedLeaveLabel(ap), proxy: px && schedDayScheduled(data, mk, ds) ? asstAbbr(px) + '代' : '' }; }
+    if (pid && schedPreLeave[`${mk}_${pid}`]?.dates?.includes(ds)) return { kind: 'pre', text: '指休' };
+    const lv = data.leaveRequests?.[mk]?.[name]?.[ds];
+    if (lv && (lv.sessions || []).some(s => s === sh || s === '全')) return { kind: lv.type === '休' ? 'rest' : lv.type === '指休' ? 'pre' : 'leave', text: lv.type || '休' };
+    if (msIsWork(assigned)) return { kind: 'work', text: assigned };
+    return { kind: 'rest', text: '休' };
+}
+
+// ── 助理：我的班表 ──
+let _msMonth = null, _msSheet = null;
+function setMyShiftMonth(delta) {
+    const [y, m] = (_msMonth || currentMonth()).split('-').map(Number);
+    const d = new Date(y, m - 1 + delta, 1);
+    _msMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    renderMyShift();
+}
+function msToday() { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; }
+function renderMyShift() {
+    const el = document.getElementById('myshift-content'); const asst = currentAssistantView;
+    if (!el || !asst) return;
+    msEnsureSched(); schedStartPreLeave(); schedStartSwaps();
+    const mk = _msMonth || currentMonth();
+    document.getElementById('myshift-month').textContent = monthLabel(mk);
+    if (_msErr) { el.innerHTML = `<div class="info-box">班表讀取失敗：${_msErr.code === 'permission-denied' ? '請院長在 Firebase 安全性規則允許 schedule 資料表' : _msErr.message}</div>`; return; }
+    if (!_msLoaded) { el.innerHTML = '<div class="sched-boot"><div class="spinner"></div></div>'; return; }
+    const data = schedStore.get();
+    if (!data.schedule?.[mk] && !Object.keys(data.schedule || {}).length) { el.innerHTML = '<div class="empty-state"><p>尚無班表</p></div>'; return; }
+
+    const [y, m] = mk.split('-').map(Number);
+    const days = new Date(y, m, 0).getDate();
+    const today = msToday();
+    const hol = hostHolidays();
+    const WD = ['日', '一', '二', '三', '四', '五', '六'];
+    const myPending = schedSwaps.filter(r => r.requesterId === asst.id && r.status === 'pending');
+    let sessions = 0, fullOff = 0, weekNo = 0, html = '';
+    for (let d = 1; d <= days; d++) {
+        const ds = `${mk}-${String(d).padStart(2, '0')}`;
+        const wd = new Date(y, m - 1, d).getDay();
+        if (wd === 0) continue;
+        if (wd === 1 || weekNo === 0) { weekNo++; html += `<div class="ms-week">第 ${weekNo} 週</div>`; }
+        const shs = msShifts(ds);
+        const cells = shs.map(sh => ({ sh, ...msCell(data, mk, ds, sh, asst.name, asst.id) }));
+        cells.forEach(c => { if (c.kind === 'work') sessions++; });
+        if (cells.every(c => c.kind !== 'work')) fullOff++;
+        const past = ds < today;
+        const cellHtml = cells.map(c => {
+            const pend = myPending.some(r => r.date === ds && r.shift === c.sh);
+            const canSwap = !past && (c.kind === 'work' || c.kind === 'rest') && !pend;
+            return `<button type="button" class="ms-cell ${c.kind}${pend ? ' pending' : ''}" ${canSwap ? `onclick="openSwapSheet('${ds}','${c.sh}')"` : 'disabled'}>
+                <span class="sh">${c.sh}${pend ? '・調班中' : ''}</span><span class="pos">${c.text}</span>${c.proxy ? `<span class="px">${c.proxy}</span>` : ''}</button>`;
+        }).join('') + (shs.length === 2 ? '<span class="ms-cell empty"></span>' : '');
+        html += `<div class="ms-day${ds === today ? ' today' : ''}${past ? ' past' : ''}">
+            <div class="ms-date"><b${hol[ds] ? ' class="red"' : ''}>${d}</b><span>週${WD[wd]}</span>${hol[ds] ? `<span class="hol">${hol[ds].slice(0, 2)}</span>` : ''}</div>
+            <div class="ms-cells">${cellHtml}</div></div>`;
+    }
+    const mine = schedSwaps.filter(r => r.requesterId === asst.id).slice(0, 10);
+    const stLabel = { pending: ['待確認', 'bgo'], approved: ['已對調', 'bg'], rejected: ['已退回', 'br'], cancelled: ['已取消', 'bgr'] };
+    const md = ds => `${+ds.slice(5, 7)}/${+ds.slice(8)}`;
+    const reqHtml = mine.length ? mine.map(r => `<div class="ms-req">
+            <div><div><b>${md(r.date)} ${r.shift}診</b>　與 ${r.targetName} 對調</div>
+            <div class="ms-req-sub">${r.requesterPos} ↔ ${r.targetPos}</div></div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="badge ${stLabel[r.status]?.[1] || 'bgr'}">${stLabel[r.status]?.[0] || r.status}</span>
+            ${r.status === 'pending' ? `<button class="btn btn-outline btn-sm" onclick="cancelSwap('${r.id}')">取消</button>` : ''}</div></div>`).join('')
+        : '<div class="ms-req-empty">尚無調班申請</div>';
+    el.innerHTML = `
+        <div class="ms-top">
+            <div class="ms-stat"><b>${sessions}</b><span>本月診次</span></div>
+            <div class="ms-stat"><b>${fullOff}</b><span>整天休息</span></div>
+            <div class="ms-stat"><b>${myPending.length}</b><span>調班待確認</span></div>
+        </div>
+        <div class="ms-hint">點任一格可申請與其他助理調班</div>
+        ${html}
+        <div class="card" style="margin-top:16px"><div class="card-title">我的調班申請</div>${reqHtml}</div>`;
+    // 第一次打開本月時，捲到今天
+    if (!_msScrolled && mk === currentMonth()) {
+        _msScrolled = true;
+        requestAnimationFrame(() => el.querySelector('.ms-day.today')?.scrollIntoView({ block: 'center' }));
+    }
+}
+let _msScrolled = false;
+
+// ── 調班申請：選擇對象 ──
+function openSwapSheet(ds, sh) {
+    const asst = currentAssistantView; if (!asst) return;
+    const mk = ds.slice(0, 7);
+    const data = schedStore.get();
+    const me = msCell(data, mk, ds, sh, asst.name, asst.id);
+    const roster = (data.assistants || []).filter(a => a.name !== asst.name
+        && (!a.activeFrom || mk >= a.activeFrom) && (!a.activeTo || mk <= a.activeTo));
+    const opts = roster.map(a => {
+        const p = state.assistants.find(x => x.name === a.name);
+        const c = msCell(data, mk, ds, sh, a.name, p?.id);
+        const blocked = c.kind === 'leave' || c.kind === 'pre';
+        const same = c.kind === me.kind && c.text === me.text;
+        return { name: a.name, text: c.text, disabled: blocked || same, why: blocked ? '請假中' : same ? '相同' : '' };
+    });
+    _msSheet = { ds, sh, me: me.text, opts, pick: null };
+    const wd = ['日', '一', '二', '三', '四', '五', '六'][new Date(ds + 'T00:00:00').getDay()];
+    const wrap = document.createElement('div');
+    wrap.className = 'ms-sheet-bd'; wrap.id = 'ms-sheet';
+    wrap.addEventListener('click', e => { if (e.target === wrap) closeSwapSheet(); });
+    wrap.innerHTML = `<div class="ms-sheet" role="dialog" aria-label="申請調班">
+        <h3>申請調班</h3>
+        <div class="sub">${+ds.slice(5, 7)}/${+ds.slice(8)}（${wd}）${sh}診・我目前：${me.text}</div>
+        <div class="ms-opts">${opts.map((o, i) => `<button type="button" class="ms-opt" data-i="${i}" ${o.disabled ? 'disabled' : ''} onclick="pickSwap(${i})">
+            <span>${o.name}</span><span class="v">${o.why ? o.why + '・' : ''}${o.text}</span></button>`).join('')}</div>
+        <div class="ms-sheet-ft">
+            <button class="btn btn-outline" onclick="closeSwapSheet()">取消</button>
+            <button class="btn btn-primary" id="ms-submit" disabled onclick="submitSwap()">送出申請</button>
+        </div></div>`;
+    document.body.appendChild(wrap);
+}
+function pickSwap(i) {
+    if (!_msSheet) return;
+    _msSheet.pick = i;
+    document.querySelectorAll('#ms-sheet .ms-opt').forEach(b => b.classList.toggle('on', +b.dataset.i === i));
+    const o = _msSheet.opts[i];
+    const btn = document.getElementById('ms-submit');
+    btn.disabled = false; btn.textContent = `與 ${o.name} 對調`;
+}
+function closeSwapSheet() { document.getElementById('ms-sheet')?.remove(); _msSheet = null; }
+async function submitSwap() {
+    const asst = currentAssistantView; const s = _msSheet;
+    if (!asst || !s || s.pick === null) return;
+    const o = s.opts[s.pick];
+    const btn = document.getElementById('ms-submit'); btn.disabled = true;
+    try {
+        await db.collection(col('swapRequests')).add({
+            month: s.ds.slice(0, 7), date: s.ds, shift: s.sh,
+            requesterId: asst.id, requesterName: asst.name, requesterPos: s.me,
+            targetName: o.name, targetPos: o.text,
+            status: 'pending', createdAt: new Date().toISOString(),
+        });
+        closeSwapSheet();
+        toast('調班申請已送出，等待排班人員確認');
+    } catch (e) {
+        btn.disabled = false;
+        toast(e.code === 'permission-denied' ? '送出被拒：請院長在 Firebase 安全性規則允許 swapRequests 資料表' : '送出失敗：' + e.message);
+    }
+}
+async function cancelSwap(id) {
+    try { await db.collection(col('swapRequests')).doc(id).update({ status: 'cancelled', resolvedAt: new Date().toISOString() }); toast('已取消申請'); }
+    catch (e) { toast('取消失敗：' + e.message); }
+}
+
+// ================================================================
+// 助理縮寫代號（總覽圓餅圖、請假代理「X代」共用）：助理管理點姓名設定，存在助理資料 abbr
+// ================================================================
+function asstAbbrDefault(n) { return !n ? '' : n.length >= 3 ? n[1] : n.slice(-1); }
+function asstAbbr(name) {
+    const a = (state.assistants || []).find(x => x.name === name);
+    return (a && a.abbr) || asstAbbrDefault(name);
+}
+async function setAsstAbbr(name, ch) {
+    const a = (state.assistants || []).find(x => x.name === name);
+    if (!a) { toast(`點數系統找不到助理「${name}」`); return false; }
+    try {
+        await db.collection(col('assistants')).doc(a.id).update({ abbr: ch || '' });
+        toast(ch ? `${name} 的代號設為「${ch}」` : `${name} 的代號已恢復預設`);
+        return true;
+    } catch (e) { toast('儲存失敗：' + e.message); return false; }
+}
+let _abbrMenu = null;
+function closeAbbrPicker() { _abbrMenu?.remove(); _abbrMenu = null; }
+function openAbbrPicker(btn, id) {
+    const a = state.assistants.find(x => x.id === id); if (!a) return;
+    if (_abbrMenu && _abbrMenu._for === id) { closeAbbrPicker(); return; }
+    closeAbbrPicker();
+    const cur = asstAbbr(a.name);
+    const m = document.createElement('div');
+    m.className = 'csel-menu abbr-menu'; m._for = id;
+    m.innerHTML = `<div class="csel-group">${a.name} 的代號</div>` +
+        [...new Set([...a.name])].map(c => `<button type="button" class="csel-opt${c === cur ? ' on' : ''}" data-c="${c}">${c}</button>`).join('') +
+        (a.abbr ? `<button type="button" class="csel-opt" data-c="">恢復預設（${asstAbbrDefault(a.name)}）</button>` : '');
+    m.addEventListener('click', async e => {
+        const b = e.target.closest('button[data-c]'); if (!b) return;
+        closeAbbrPicker();
+        await setAsstAbbr(a.name, b.dataset.c);
+    });
+    document.body.appendChild(m);
+    const r = btn.getBoundingClientRect();
+    m.style.left = Math.max(8, Math.min(r.left, innerWidth - m.offsetWidth - 8)) + 'px';
+    const below = innerHeight - r.bottom - 12;
+    m.style.top = (m.offsetHeight <= below ? r.bottom + 6 : Math.max(8, r.top - 6 - m.offsetHeight)) + 'px';
+    _abbrMenu = m;
+}
+document.addEventListener('pointerdown', e => {
+    if (_abbrMenu && !_abbrMenu.contains(e.target) && !e.target.closest('.abbr-name')) closeAbbrPicker();
+}, true);
+// ================================================================
+// 手機版寬表格：凍結第一欄（姓名），其餘欄位左右自由滑動；只在手機、只對超出螢幕的表格
 // ================================================================
 (function () {
     const MQ = window.matchMedia('(max-width: 700px)');
-    const ICON = {
-        left: '<polyline points="15 6 9 12 15 18"/>', right: '<polyline points="9 6 15 12 9 18"/>',
-        up: '<polyline points="6 15 12 9 18 15"/>', down: '<polyline points="6 9 12 15 18 9"/>',
-    };
-    const svg = d => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${ICON[d]}</svg>`;
-
-    // 凍結區寬度（第一欄；第一欄很窄時連同第二欄）
-    function firstColW(t) { if (t._mtFrozenW) return t._mtFrozenW; const c = t.rows[0]?.cells[0]; return c ? c.getBoundingClientRect().width : 0; }
-    function headCells(t) { const r = t.tHead?.rows[t.tHead.rows.length - 1] || t.rows[0]; return r ? [...r.cells] : []; }
-
-    function update(t) {
-        const w = t._mtWrap, bar = t._mtBar; if (!w || !bar) return;
-        const fc = firstColW(t);
-        const left = w.getBoundingClientRect().left + fc, right = w.getBoundingClientRect().right;
-        const cells = headCells(t).slice(t._mtSkip || 1);
-        const vis = cells.map((c, i) => { const r = c.getBoundingClientRect(); return (r.right - 4 > left && r.left + 4 < right) ? i : -1; }).filter(i => i >= 0);
-        bar.querySelector('.mt-pos').textContent = cells.length && vis.length
-            ? `第 ${vis[0] + 1}–${vis[vis.length - 1] + 1} 欄 / 共 ${cells.length} 欄` : '';
-        const b = d => bar.querySelector(`[data-d="${d}"]`);
-        b('left').disabled = w.scrollLeft <= 1;
-        b('right').disabled = w.scrollLeft + w.clientWidth >= w.scrollWidth - 1;
-        b('up').disabled = w.scrollTop <= 1;
-        b('down').disabled = w.scrollTop + w.clientHeight >= w.scrollHeight - 1;
-    }
-    function move(t, d) {
-        const w = t._mtWrap; const fc = firstColW(t);
-        const headH = t.tHead ? t.tHead.getBoundingClientRect().height : 0;
-        if (d === 'left' || d === 'right') {
-            // 以欄位邊界為單位翻一頁
-            const page = w.clientWidth - fc;
-            const cells = headCells(t).slice(t._mtSkip || 1);
-            const base = w.getBoundingClientRect().left + fc;
-            let target = w.scrollLeft + (d === 'right' ? page : -page);
-            const edges = cells.map(c => c.getBoundingClientRect().left - base + w.scrollLeft);
-            if (d === 'right') { const e = edges.filter(x => x <= target + 1).pop(); if (e !== undefined && e > w.scrollLeft + 1) target = e; }
-            else { const e = edges.find(x => x >= target - 1); if (e !== undefined && e < w.scrollLeft - 1) target = e; }
-            w.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
-        } else {
-            const page = Math.max(40, w.clientHeight - headH - 8);
-            w.scrollBy({ top: d === 'down' ? page : -page, behavior: 'smooth' });
-        }
-    }
     function enhance(t) {
-        if (t._mtWrap && t._mtWrap.isConnected && t._mtBar?.isConnected) { update(t); return; }
+        if (t.classList.contains('mt')) return;
         let w = t.parentElement;
         if (!w) return;
         if (getComputedStyle(w).overflowX === 'visible') {
@@ -2483,7 +2865,7 @@ async function submitPreLeave() {
         }
         if (t.scrollWidth <= w.clientWidth + 2) return;
         w.classList.add('mt-wrap'); t.classList.add('mt');
-        // 只凍結真正位於第一欄的格子（有跨列的姓名格時，下一列的第一格其實是第二欄）
+        // 依表格結構找出第一欄（有跨列的姓名格時，下一列的第一格其實是第二欄）
         const occ = [];
         [...t.rows].forEach((r, ri) => {
             const busy = occ[ri] || new Set(); let col = 0;
@@ -2495,33 +2877,13 @@ async function submitPreLeave() {
                 col += c.colSpan;
             });
         });
-        const bar = document.createElement('div');
-        bar.className = 'mt-bar';
-        bar.innerHTML = `<button type="button" data-d="left" aria-label="往左">${svg('left')}</button>
-            <span class="mt-pos"></span>
-            <button type="button" data-d="right" aria-label="往右">${svg('right')}</button>
-            <button type="button" data-d="up" aria-label="往上">${svg('up')}</button>
-            <button type="button" data-d="down" aria-label="往下">${svg('down')}</button>`;
-        w.parentElement.insertBefore(bar, w);
-        bar.addEventListener('click', e => { const b = e.target.closest('button[data-d]'); if (b) move(t, b.dataset.d); });
         // 第一欄很窄（排名、勾選框）時，第二欄（通常是姓名）也一起凍結
         const b0 = t.tBodies[0]?.rows[0]?.cells[0];
         const w0 = b0 ? b0.getBoundingClientRect().width : 0;
-        let frozenCols = 1;
         if (w0 && w0 < 56 && b0.parentElement.cells.length > 2) {
-            frozenCols = 2;
             t.classList.add('mt-two');
             t.style.setProperty('--mt-l2', w0 + 'px');
-            t._mtFrozenW = w0 + b0.parentElement.cells[1].getBoundingClientRect().width;
         }
-        // 表頭中屬於凍結區的格數（表頭可能把兩欄合併成一格）
-        let span = 0; t._mtSkip = 0;
-        for (const c of headCells(t)) { if (span >= frozenCols) break; span += c.colSpan; t._mtSkip++; }
-        w.style.scrollPaddingLeft = firstColW(t) + 'px';
-        let raf = 0;
-        w.addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => update(t)); }, { passive: true });
-        t._mtWrap = w; t._mtBar = bar;
-        update(t);
     }
     function scan() {
         if (!MQ.matches) return;
@@ -2534,7 +2896,7 @@ async function submitPreLeave() {
     let timer = 0;
     const later = () => { clearTimeout(timer); timer = setTimeout(scan, 120); };
     new MutationObserver(muts => {
-        if (muts.some(m => m.target.closest && !m.target.closest('#sched-root') && !m.target.closest('.mt-bar'))) later();
+        if (muts.some(m => m.target.closest && !m.target.closest('#sched-root'))) later();
     }).observe(document.querySelector('.main') || document.body, { childList: true, subtree: true });
     MQ.addEventListener('change', later);
     window.addEventListener('resize', later);
@@ -2562,11 +2924,12 @@ function dashAsstColors() {
 
 // 每位助理用一個字代表：三字姓名取中間字，兩字取末字；撞字時改用末字
 function dashShortNames(list) {
-    const pick = n => !n ? '?' : n.length >= 3 ? n[1] : n.slice(-1);
+    const pick = n => asstAbbr(n) || '?';
     const used = new Set(), out = {};
     list.forEach(a => {
         let c = pick(a.name);
-        if (used.has(c)) c = a.name.slice(-1);
+        const fixed = (state.assistants || []).some(x => x.name === a.name && x.abbr);
+        if (used.has(c) && !fixed) c = a.name.slice(-1);
         if (used.has(c)) c = a.name[0];
         used.add(c); out[a.id] = c;
     });
@@ -2964,7 +3327,7 @@ function subscribeData() {
     const sixAgoStr = `${sixAgo.getFullYear()}-${String(sixAgo.getMonth()+1).padStart(2,'0')}-01`;
 
     db.collection(col('assistants')).orderBy('createdAt')
-      .onSnapshot(snap => { state.assistants = snap.docs.map(d=>({id:d.id,...d.data()})); loaded.a=true; tryReady(); },
+      .onSnapshot(snap => { state.assistants = snap.docs.map(d=>({id:d.id,...d.data()})); loaded.a=true; tryReady(); schedOnExtChange(); },
         e => { console.error(e); setConn('error','連線錯誤'); });
 
     db.collection(col('rules')).orderBy('createdAt')
@@ -3341,7 +3704,7 @@ function navigate(p) {
     if (viewMode === 'viewer' && p !== 'overview') { showLoginScreen(); return; }
     if (viewMode === 'manager'   && !['overview','record','leave-approve'].concat(canUseSchedule()?['schedule']:[]).includes(p)) return;
     if (viewMode === 'doctor'    && !['overview','record','overtime-approve'].includes(p)) return;
-    if (viewMode === 'assistant' && !['overview','myview','overtime-apply','preleave'].includes(p)) return;
+    if (viewMode === 'assistant' && !['overview','myview','overtime-apply','preleave','myshift'].includes(p)) return;
     // principal can go anywhere
     const el = document.getElementById('page-'+p);
     if (!el) return;
@@ -3373,7 +3736,7 @@ function toggleDrawer() {
 function updateMenuBadge() {
     const dot = document.getElementById('menu-badge');
     if (!dot) return;
-    const has = ['doc-pending-badge','att-pending-badge','leave-pending-badge'].some(id => {
+    const has = ['doc-pending-badge','att-pending-badge','leave-pending-badge','sched-swap-badge'].some(id => {
         const b = document.getElementById(id);
         if (!b || b.classList.contains('hidden')) return false;
         const item = b.closest('.nav-item');
@@ -3392,6 +3755,7 @@ function renderPage(p) {
       'support-report':renderSupportReport,
       schedule:renderSchedulePage,
       preleave:renderPreLeave,
+      myshift:renderMyShift,
       dashboard:renderDashboard})[p]?.();
 }
 function refreshPage() { renderPage(currentPage); }
@@ -4751,7 +5115,7 @@ function renderAssistants() {
         const gradeText = grade ? `${a.laborInsuranceGrade}（員工 ${grade.totalEmp.toLocaleString()}）` : '— 未設定';
         return `<tr>
             <td>
-                <div style="font-weight:600">${a.name}</div>
+                <button type="button" class="abbr-name" onclick="openAbbrPicker(this,'${a.id}')" title="點選設定代號">${a.name}<span class="abbr-chip">${asstAbbr(a.name)}</span></button>
                 <div style="font-size:var(--fs-sm);color:var(--text-muted);margin-top:2px">到職：${a.hireDate||'—'}</div>
             </td>
             <td><span class="badge ${a.active?'bg':'bgr'}">${a.active?'啟用':'停用'}</span></td>
@@ -5790,6 +6154,8 @@ function applyViewMode() {
     document.body.className = document.body.className.replace(/\b(principal|manager|doctor|assistant|viewer)-mode\b/g, '').trim();
     document.body.classList.add(viewMode + '-mode');
     document.body.classList.toggle('sched-access', canUseSchedule());
+    if (canUseSchedule()) { schedStartSwaps(); msEnsureSched(); }
+    updateSwapBadge();
 
     document.getElementById('btn-settings').classList.toggle('hidden', !isPrincipal);
     document.getElementById('btn-logout').classList.toggle('hidden', !loggedIn);
@@ -5809,7 +6175,7 @@ function applyViewMode() {
     if (isPrincipal) { if (!['record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report','leave','leave-approve','attendance','schedule','dashboard'].includes(currentPage)) navigate('dashboard'); else refreshPage(); return; }
     if (isManager)   { if (!['overview','record','leave-approve'].concat(canUseSchedule()?['schedule']:[]).includes(currentPage)) navigate('overview'); else refreshPage(); return; }
     if (isDoctor)    { if (!['record','overtime-approve'].includes(currentPage)) navigate('record'); else refreshPage(); return; }
-    if (isAsst)      { if (!['myview','overtime-apply','preleave'].includes(currentPage)) navigate('myview'); else refreshPage(); return; }
+    if (isAsst)      { if (!['myview','overtime-apply','preleave','myshift'].includes(currentPage)) navigate('myview'); else refreshPage(); return; }
     if (currentPage !== 'overview') navigate('overview'); else refreshPage();
 }
 
@@ -7481,22 +7847,22 @@ const LEAVE_COLORS = {
   '婚假':'#c9a07f', '產假':'#a996b8', '工傷病假':'#9a88ad', '其他假':'#a0a0a0',
 };
 // 台灣國定假日（週日不列）；可在「備註」頁手動調整
-const TW_HOLIDAYS = {
-  '2026-01-01':'元旦', '2026-02-16':'除夕', '2026-02-17':'春節', '2026-02-18':'春節', '2026-02-19':'春節',
-  '2026-02-20':'春節補假', '2026-02-27':'和平紀念日補假', '2026-02-28':'和平紀念日', '2026-04-03':'兒童節補假',
-  '2026-04-04':'兒童節', '2026-04-06':'清明節補假', '2026-05-01':'勞動節', '2026-06-19':'端午節',
-  '2026-09-25':'中秋節', '2026-09-28':'教師節', '2026-10-09':'國慶日補假', '2026-10-10':'國慶日',
-  '2026-10-26':'光復節補假', '2026-12-25':'行憲紀念日',
-  '2027-01-01':'元旦', '2027-02-04':'小年夜', '2027-02-05':'除夕', '2027-02-06':'春節', '2027-02-08':'春節',
-  '2027-02-09':'春節補假', '2027-02-10':'春節補假', '2027-03-01':'和平紀念日補假', '2027-04-05':'清明節',
-  '2027-04-06':'兒童節補假', '2027-04-30':'勞動節補假', '2027-05-01':'勞動節', '2027-06-09':'端午節',
-  '2027-09-15':'中秋節', '2027-09-28':'教師節', '2027-10-11':'國慶日補假', '2027-10-25':'光復節',
-  '2027-12-24':'行憲紀念日補假', '2027-12-25':'行憲紀念日',
-};
+const TW_HOLIDAYS = window.TW_HOLIDAYS || {};   // 與點數系統共用（助理預假月曆、我的班表也會用到）
+// 國定假日＝院長設定過的日子：備註頁新增的（holidayOverrides）＋醫師班表特殊日標「國定」的
+// 行政院日曆（TW_HOLIDAYS）只作為建議清單，不會自動生效
 function getHolidays(data) {
-  const out = { ...TW_HOLIDAYS };
-  Object.entries(data.holidayOverrides || {}).forEach(([ds, name]) => { if (name) out[ds] = name; else delete out[ds]; });
+  const out = {};
+  Object.entries(data.holidayOverrides || {}).forEach(([ds, name]) => { if (name) out[ds] = name; });
+  Object.values(data.doctorSchedule || {}).forEach(days => Object.entries(days || {}).forEach(([ds, info]) => {
+    if (info && info._note === '國定假日' && !out[ds]) out[ds] = TW_HOLIDAYS[ds] || '國定假日';
+  }));
   return out;
+}
+// 需要提醒設定國定假日的月份：每月 10–20 日助理預約「下個月」，所以 20 日前提醒下個月、之後提醒下下個月
+function holidayReminderMonth(now) {
+  now = now || new Date();
+  const d = new Date(now.getFullYear(), now.getMonth() + (now.getDate() <= 20 ? 1 : 2), 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 const MORANDI_REST_RED = '#b5716a';
 const MORANDI_PINK = '#d4a4a8';
@@ -7821,7 +8187,7 @@ function applyExt(data) {
     lr[mk][name][ds] = { ...entry, sessions: [...sessions], orig: orig || null };
   };
   ext.pre.forEach(p => put(p.name, p.date, { type: '指休', pre: true }));
-  ext.approved.forEach(a => put(a.name, a.date, { type: a.type, ext: true, extId: a.id })); // 核准請假優先
+  ext.approved.forEach(a => put(a.name, a.date, { type: a.type, ext: true, extId: a.id, proxy: a.proxy || '' })); // 核准請假優先
   return { ...data, leaveRequests: lr };
 }
 function stripExt(data) {
@@ -8381,13 +8747,13 @@ function useIsMobile() {
   return m;
 }
 
-function ShiftBlock({ shift, value, onClick, noLabel, locked, fullRestDay, isPartTime, full }) {
+function ShiftBlock({ shift, value, onClick, noLabel, locked, fullRestDay, isPartTime, full, label }) {
   const isEmpty = isPartTime && (!value || value === '休');
   const bg = isEmpty ? '#f5f5f7' : cellBg(value, fullRestDay);
   const isWhite = bg === '#ffffff';
   const isNationalHoliday = value === '國定假日';
   const isZhixiu = value === '指休';
-  const display = isEmpty ? '' : full ? (value || '休') : (noLabel ? abbrev1(value) : (value || '休'));
+  const display = isEmpty ? '' : label ? label : full ? (value || '休') : (noLabel ? abbrev1(value) : (value || '休'));
   const ring = isZhixiu ? 'inset 0 0 0 1.5px #c0504d' : undefined;
   return (
     <div className="shift-block"
@@ -8713,10 +9079,12 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
                       <th key={ds + sh} style={{background:'#F5F5F5',padding:'2px',borderLeft: sh === '早' ? '2px solid #C4C4C4' : undefined}}>
                         <div style={{fontSize:'var(--fs-xs)',fontWeight:700,color:'#555555'}}>{sh}</div>
                         {status && status.length > 0 && (
-                          <div style={{display:'flex',flexWrap:'nowrap',justifyContent:'center',gap:'0 2px',fontSize:'var(--fs-micro)',lineHeight:1.4,overflow:'hidden',whiteSpace:'nowrap'}}>
+                          <div style={{display:'flex',flexWrap:'nowrap',justifyContent:'center',gap:'0 3px',overflow:'hidden',whiteSpace:'nowrap'}}>
                             {status.map(({label, full, filled, extra}, k) => (
-                              <span key={k} title={full} style={{fontWeight: filled ? 700 : 400, color: filled ? SHIFT_COLORS[sh] : '#c4c6d0'}}>
-                                {label}{extra > 0 && <sup style={{color:'#c04040',fontSize:'var(--fs-micro)'}}>{extra}</sup>}
+                              // 每個崗位一格：人數在上、崗位字在下，全部同高排成一列
+                              <span key={k} title={full} style={{display:'inline-flex',flexDirection:'column',alignItems:'center',lineHeight:1.15}}>
+                                <span style={{fontSize:9,height:10,color:'#c04040',fontWeight:700}}>{extra > 0 ? extra : ''}</span>
+                                <span style={{fontSize:'var(--fs-micro)',fontWeight: filled ? 700 : 400, color: filled ? SHIFT_COLORS[sh] : '#c4c6d0'}}>{label}</span>
                               </span>
                             ))}
                           </div>
@@ -8744,7 +9112,7 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
                           if (isNatHoliday && v === '休') v = '國定假日';
                           return (
                             <td key={ds + sh} className={off} style={{padding:0, borderLeft: sh === '早' ? '2px solid #C4C4C4' : undefined}}>
-                              <ShiftBlock shift={sh} value={v} full onClick={() => handleCellClick(asst, ds, sh)} noLabel locked={isLocked} isPartTime={asst.isPartTime}/>
+                              <ShiftBlock shift={sh} value={v} full onClick={() => handleCellClick(asst, ds, sh)} noLabel locked={isLocked} isPartTime={asst.isPartTime} label={(() => { const p = proxyLabel(data, mk, ds, sh, asst.name); return p ? `${v}・${p}` : null; })()}/>
                             </td>
                           );
                         });
@@ -8992,7 +9360,7 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
                             if (isNatHoliday && v === '休') v = '國定假日';
                             return (
                               <td key={`${ds}${sh}`} className={baseCls + offCls} style={{padding:0, borderLeft:sh==='早'?'2px solid #C4C4C4':undefined}}>
-                                <ShiftBlock shift={sh} value={v} onClick={() => handleCellClick(asst, ds, sh)} noLabel locked={isLocked} fullRestDay={isFullRestDay} isPartTime={asst.isPartTime}/>
+                                <ShiftBlock shift={sh} value={v} onClick={() => handleCellClick(asst, ds, sh)} noLabel locked={isLocked} fullRestDay={isFullRestDay} isPartTime={asst.isPartTime} label={proxyLabel(data, mk, ds, sh, asst.name)}/>
                               </td>
                             );
                           });
@@ -9381,7 +9749,7 @@ function PositionView({ data, year, month, onUpdate, isLocked }) {
                                   color: SHIFT_COLORS[sh],
                                   fontWeight:700,
                                   fontSize:'var(--fs-xs)',
-                                }}>{assignedNames.join('、')}</span>
+                                }}>{assignedNames.map(n => { const p = proxyOf(data, mk, ds, sh, n); return p ? `${p}代` : n; }).join('、')}</span>
                               : <span className="pos-cell-empty" style={{color:'#ccc',fontSize:16,lineHeight:'1'}}>+</span>
                           }
                         </td>
@@ -9583,7 +9951,7 @@ function DoctorScheduleView({ data, year, month, onUpdate }) {
       {tab === 'calendar' && (
         <div>
           <div className="alert alert-warn" style={{marginBottom:10}}>
-            點擊醫師名稱可切換出診/不出診。修改後不影響規律，只影響本月。
+            點格子切換出診，只影響本月。
           </div>
           {weeks.map((wdates, wi) => {
             const validDates = wdates.filter(Boolean);
@@ -9685,6 +10053,14 @@ function AssistantManager({ data, year, month, onUpdate }) {
   const [editingNameId, setEditingNameId] = useState(null);
   const [tempName, setTempName] = useState('');
   const [dragIdx, setDragIdx] = useState(null);
+  const [abbrFor, setAbbrFor] = useState(null);
+  const abbrRef = useRef(null);
+  useEffect(() => {
+    if (!abbrFor) return;
+    const close = e => { if (abbrRef.current && !abbrRef.current.contains(e.target)) setAbbrFor(null); };
+    document.addEventListener('pointerdown', close);
+    return () => document.removeEventListener('pointerdown', close);
+  }, [abbrFor]);
 
   const allPositions = [...FIXED_POSITIONS, ...data.doctors];
   const numWeeks = getMonthWeeks(year, month).length;
@@ -9837,7 +10213,21 @@ function AssistantManager({ data, year, month, onUpdate }) {
                 />
               ) : (
                 <>
-                  {asst.name}
+                  <span className="dd-wrap" style={{display:'inline-block'}} ref={abbrFor === asst.id ? abbrRef : undefined}>
+                    <button className="abbr-name" title="點選設定代號" onClick={() => setAbbrFor(abbrFor === asst.id ? null : asst.id)}>
+                      {asst.name}<span className="abbr-chip">{_opts.abbr ? _opts.abbr(asst.name) : ''}</span>
+                    </button>
+                    {abbrFor === asst.id && (
+                      <div className="dd-menu" style={{minWidth:150}}>
+                        <div style={{fontSize:'var(--fs-xs)',color:'#999',padding:'4px 12px 6px'}}>{asst.name} 的代號（總覽、代班共用）</div>
+                        {[...new Set([...asst.name])].map(c => (
+                          <button key={c} className={_opts.abbr && _opts.abbr(asst.name) === c ? 'on' : ''}
+                            style={{fontSize:'var(--fs-sub)'}}
+                            onClick={async () => { setAbbrFor(null); if (_opts.setAbbr) await _opts.setAbbr(asst.name, c); }}>{c}</button>
+                        ))}
+                      </div>
+                    )}
+                  </span>
                   <button onClick={() => { setEditingNameId(asst.id); setTempName(asst.name); }}
                     style={{background:'none',border:'none',cursor:'pointer',fontSize:'var(--fs-sm)',color:'#888',marginLeft:5,padding:'0 2px'}}
                     title="編輯姓名" aria-label="編輯姓名"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
@@ -10287,56 +10677,88 @@ function StatsModal({ data, year, month, onClose }) {
 // ═══════════════════════════════════════════
 // COMPONENT: HolidayManager（國定假日：內建清單＋手動調整）
 // ═══════════════════════════════════════════
-function HolidayManager({ data, year, onUpdate }) {
+function HolidayManager({ data, year, month, onUpdate }) {
+  const mk = monthKey(year, month);
   const [newDate, setNewDate] = useState('');
   const [newName, setNewName] = useState('');
   const all = getHolidays(data);
-  const list = Object.entries(all).filter(([ds]) => ds.startsWith(String(year))).sort();
-  const hasOverride = Object.keys(data.holidayOverrides || {}).some(ds => ds.startsWith(String(year)));
+  const list = Object.entries(all).filter(([ds]) => ds.startsWith(mk)).sort();
+  // 行政院日曆的建議（尚未設定的）
+  const suggest = Object.entries(TW_HOLIDAYS).filter(([ds]) => ds.startsWith(mk) && !all[ds]).sort();
+  const confirmed = !!data.holidayConfirmed?.[mk];
+  const md = ds => `${parseInt(ds.slice(5, 7))}/${parseInt(ds.slice(8))}（${WDAY_LABELS[(weekday(ds) + 6) % 7]}）`;
 
-  function setOverride(ds, name) {
-    onUpdate(d => { d.holidayOverrides = { ...(d.holidayOverrides || {}), [ds]: name }; });
+  // 設定為國定假日：記錄名稱，並同步醫師班表特殊日「國定」（班表格子會顯示國定假日）
+  function addHoliday(ds, name) {
+    onUpdate(d => {
+      d.holidayOverrides = { ...(d.holidayOverrides || {}), [ds]: name };
+      const dm = ds.slice(0, 7);
+      const day = d.doctorSchedule?.[dm]?.[ds];
+      if (day && !day._note) day._note = '國定假日';
+    });
+  }
+  function removeHoliday(ds) {
+    onUpdate(d => {
+      const o = { ...(d.holidayOverrides || {}) }; delete o[ds]; d.holidayOverrides = o;
+      const day = d.doctorSchedule?.[ds.slice(0, 7)]?.[ds];
+      if (day && day._note === '國定假日') delete day._note;
+    });
   }
   function add() {
     if (!newDate || !newName.trim()) return;
-    setOverride(newDate, newName.trim());
+    addHoliday(newDate, newName.trim());
     setNewDate(''); setNewName('');
   }
-  function resetYear() {
-    if (!confirm(`恢復 ${year} 年的內建國定假日？手動調整會被清除。`)) return;
+  function toggleConfirm() {
     onUpdate(d => {
-      const o = { ...(d.holidayOverrides || {}) };
-      Object.keys(o).forEach(ds => { if (ds.startsWith(String(year))) delete o[ds]; });
-      d.holidayOverrides = o;
+      const c = { ...(d.holidayConfirmed || {}) };
+      if (c[mk]) delete c[mk]; else c[mk] = true;
+      d.holidayConfirmed = c;
     });
   }
 
   return (
     <div className="section-card">
-      <h3 style={{display:'flex',alignItems:'center',gap:8}}>
-        {year} 年國定假日
-        {hasOverride && <button className="s-btn s-btn-secondary" style={{marginLeft:'auto',padding:'2px 10px',fontSize:'var(--fs-xs)'}} onClick={resetYear}>恢復內建</button>}
+      <h3 style={{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>
+        {year} 年 {month} 月國定假日
+        <span className={`hm-status ${confirmed ? 'ok' : 'no'}`}>{confirmed ? '已確認' : '尚未確認'}</span>
+        <button className={`s-btn ${confirmed ? 's-btn-secondary' : 's-btn-primary'}`} style={{marginLeft:'auto',padding:'4px 12px',fontSize:'var(--fs-sm)'}} onClick={toggleConfirm}>
+          {confirmed ? '取消確認' : '確認本月設定'}
+        </button>
       </h3>
       <div style={{display:'flex',flexWrap:'wrap',gap:6,marginBottom:10}}>
-        {list.length === 0 && <span style={{fontSize:'var(--fs-sm)',color:'#999'}}>尚無資料，請手動新增。</span>}
-        {list.map(([ds, name]) => {
-          const wd = weekday(ds);
-          return (
-            <span key={ds} style={{display:'inline-flex',alignItems:'center',gap:6,padding:'3px 6px 3px 10px',borderRadius:12,background:'#fdecea',color:'#8c2f25',fontSize:'var(--fs-sm)'}}>
-              {parseInt(ds.slice(5,7))}/{parseInt(ds.slice(8))}（{WDAY_LABELS[wd===0?6:wd-1]}）{name}
-              <button onClick={() => setOverride(ds, '')} title="移除" style={{border:'none',background:'none',cursor:'pointer',color:'#b06a60',fontSize:'var(--fs-cap)',lineHeight:1,padding:'0 2px'}}>×</button>
-            </span>
-          );
-        })}
+        {list.length === 0 && <span style={{fontSize:'var(--fs-sm)',color:'#999'}}>本月尚未設定國定假日。</span>}
+        {list.map(([ds, name]) => (
+          <span key={ds} style={{display:'inline-flex',alignItems:'center',gap:6,padding:'3px 6px 3px 10px',borderRadius:12,background:'#FEF0EC',color:'#8c2f25',fontSize:'var(--fs-sm)'}}>
+            {md(ds)} {name}
+            <button onClick={() => removeHoliday(ds)} title="移除" aria-label="移除" style={{border:'none',background:'none',cursor:'pointer',color:'#b06a60',lineHeight:1,padding:'0 2px',display:'flex'}}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+            </button>
+          </span>
+        ))}
       </div>
+      {suggest.length > 0 && (
+        <div style={{marginBottom:12}}>
+          <div style={{fontSize:'var(--fs-xs)',color:'#888',marginBottom:5}}>行政院日曆建議（點一下加入）</div>
+          <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+            {suggest.map(([ds, name]) => (
+              <button key={ds} onClick={() => addHoliday(ds, name)} style={{padding:'3px 10px',borderRadius:12,border:'1px dashed #d9a79d',background:'#fff',color:'#8c2f25',fontSize:'var(--fs-sm)',cursor:'pointer'}}>
+                + {md(ds)} {name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap',fontSize:'var(--fs-sm)'}}>
         <input type="date" value={newDate} onChange={e => setNewDate(e.target.value)}
+          min={`${mk}-01`} max={`${mk}-${String(daysInMonth(year, month)).padStart(2, '0')}`}
           style={{padding:'4px 6px',border:'1px solid #ccc',borderRadius:4,fontSize:'var(--fs-sm)'}}/>
         <input value={newName} onChange={e => setNewName(e.target.value)} placeholder="名稱，例如：颱風假"
           onKeyDown={e => { if (e.key === 'Enter') add(); }}
           style={{padding:'4px 8px',border:'1px solid #ccc',borderRadius:4,fontSize:'var(--fs-sm)',width:160}}/>
         <button className="s-btn s-btn-primary" style={{padding:'4px 12px',fontSize:'var(--fs-sm)'}} onClick={add}>新增</button>
       </div>
+      <div style={{fontSize:'var(--fs-xs)',color:'#888',marginTop:10}}>設定完成後按「確認本月設定」，提醒就會消失；助理預假月曆與班表只會顯示這裡設定的假日。</div>
     </div>
   );
 }
@@ -10471,6 +10893,124 @@ function PreLeaveBoard({ data, year, month }) {
           </tbody>
         </table>
       </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// 請假代理：已排班的時段被核准請假時，顯示「代理人縮寫＋代」
+// ═══════════════════════════════════════════
+function proxyOf(data, mk, ds, sh, name) {
+  const lv = data.leaveRequests?.[mk]?.[name]?.[ds];
+  if (!lv || !lv.ext || !lv.proxy) return null;
+  // 這一天已經排好班（有人被排到任一診）才顯示代理
+  const day = data.schedule?.[mk]?.[ds] || {};
+  return Object.values(day).some(s => s && Object.keys(s).length) ? lv.proxy : null;
+}
+function proxyLabel(data, mk, ds, sh, name) {
+  const p = proxyOf(data, mk, ds, sh, name);
+  if (!p) return null;
+  return (_opts.abbr ? _opts.abbr(p) : (p.length >= 3 ? p[1] : p.slice(-1))) + '代';
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: SwapBell（調班申請通知：確認後兩位助理崗位對調）
+// ═══════════════════════════════════════════
+function applySwap(draft, req) {
+  const mk = req.month, ds = req.date, sh = req.shift;
+  draft.schedule[mk] = draft.schedule[mk] || {};
+  draft.schedule[mk][ds] = draft.schedule[mk][ds] || {};
+  const slot = draft.schedule[mk][ds][sh] = draft.schedule[mk][ds][sh] || {};
+  const a = req.requesterName, b = req.targetName;
+  const pa = isWorkValue(slot[a]) ? slot[a] : null, pb = isWorkValue(slot[b]) ? slot[b] : null;
+  const give = (name, pos) => {
+    if (pos) {
+      slot[name] = pos;
+      const lv = draft.leaveRequests?.[mk]?.[name]?.[ds];
+      if (lv && !lv.ext && !lv.pre) {
+        lv.sessions = lv.sessions.filter(s => s !== sh);
+        if (!lv.sessions.length) delete draft.leaveRequests[mk][name][ds];
+      }
+    } else delete slot[name];
+  };
+  give(a, pb); give(b, pa);
+}
+
+function SwapBell({ data, onUpdate, onGoHoliday }) {
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(null);
+  const ref = useRef(null);
+  const list = (_opts.swaps ? _opts.swaps() : []).filter(r => r.status === 'pending');
+  const remindMk = holidayReminderMonth();
+  const remind = !data.holidayConfirmed?.[remindMk];
+  const rmM = parseInt(remindMk.slice(5, 7));
+  const rmOpen = (() => { const d = new Date(+remindMk.slice(0, 4), rmM - 2, 10); return `${d.getMonth() + 1}/10`; })();
+  const total = list.length + (remind ? 1 : 0);
+  useEffect(() => {
+    if (!open) return;
+    const close = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('pointerdown', close);
+    return () => document.removeEventListener('pointerdown', close);
+  }, [open]);
+
+  const md = ds => `${parseInt(ds.slice(5, 7))}/${parseInt(ds.slice(8))}`;
+  const cur = (req, name) => getCellValue(data, req.month, req.date, req.shift, name);
+  async function approve(req) {
+    const la = data.leaveRequests?.[req.month]?.[req.requesterName]?.[req.date];
+    const lb = data.leaveRequests?.[req.month]?.[req.targetName]?.[req.date];
+    if ((la && (la.ext || la.pre)) || (lb && (lb.ext || lb.pre))) { alert('其中一位當天已請假或預假，無法對調。'); return; }
+    if (!confirm(`確認對調 ${md(req.date)} ${req.shift}診？\n${req.requesterName}：${cur(req, req.requesterName)} → ${cur(req, req.targetName)}\n${req.targetName}：${cur(req, req.targetName)} → ${cur(req, req.requesterName)}`)) return;
+    setBusy(req.id);
+    onUpdate(draft => applySwap(draft, req));
+    await _opts.resolveSwap(req.id, 'approved');
+    setBusy(null);
+  }
+  async function reject(req) {
+    if (!confirm(`退回 ${req.requesterName} 的調班申請？`)) return;
+    setBusy(req.id);
+    await _opts.resolveSwap(req.id, 'rejected');
+    setBusy(null);
+  }
+
+  return (
+    <div className="dd-wrap" ref={ref}>
+      <button className={`bell-btn${open ? ' open' : ''}`} aria-label="調班通知" onClick={() => setOpen(v => !v)}>
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        {total > 0 && <span className="bell-count">{total}</span>}
+      </button>
+      {open && (
+        <div className="dd-menu bell-menu">
+          <div className="bell-hd">通知</div>
+          {remind && (
+            <div className="bell-item bell-remind">
+              <div className="bell-title">設定 {rmM} 月國定假日</div>
+              <div className="bell-body">{rmOpen} 起助理開始預假 {rmM} 月，請先設定並確認診所休假日，預假月曆才會顯示。</div>
+              <div className="bell-actions">
+                <button className="s-btn s-btn-primary" onClick={() => { setOpen(false); onGoHoliday && onGoHoliday(remindMk); }}>前往設定</button>
+              </div>
+            </div>
+          )}
+          {list.length === 0 && !remind && <div className="bell-empty">目前沒有新通知</div>}
+          {list.map(req => {
+            const wd = WDAY_LABELS[(weekday(req.date) + 6) % 7];
+            const changed = cur(req, req.requesterName) !== req.requesterPos || cur(req, req.targetName) !== req.targetPos;
+            return (
+              <div key={req.id} className="bell-item">
+                <div className="bell-title">{md(req.date)}（{wd}）{req.shift}診</div>
+                <div className="bell-body">
+                  <div><b>{req.requesterName}</b>　{cur(req, req.requesterName)}</div>
+                  <div><b>{req.targetName}</b>　{cur(req, req.targetName)}</div>
+                </div>
+                {changed && <div className="bell-warn">申請後班表已變動，將以目前崗位對調</div>}
+                <div className="bell-actions">
+                  <button className="s-btn s-btn-secondary" disabled={busy === req.id} onClick={() => reject(req)}>退回</button>
+                  <button className="s-btn s-btn-primary" disabled={busy === req.id} onClick={() => approve(req)}>確認對調</button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -10632,7 +11172,7 @@ function App() {
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
           {menuDot && <span className="sched-menu-dot"/>}
         </button>
-        <span className="topbar-title">立馥助理排班系統</span>
+        <span className="topbar-title"><span className="t-full">立馥助理排班系統</span><span className="t-short">立馥排班</span></span>
         <div className="tabs">
           <button className={`tab-btn${page==='schedule'?' active':''}`} onClick={() => setPage('schedule')}>助理班表</button>
           <div className="dd-wrap" ref={ddRef}>
@@ -10656,6 +11196,8 @@ function App() {
           <button className={`tab-btn${showStats?' active':''}`} onClick={() => setShowStats(true)}>統計</button>
           <button className={`tab-btn${page==='remarks'?' active':''}`} onClick={() => setPage('remarks')}>備註</button>
         </div>
+
+        <SwapBell data={data} onUpdate={onUpdate} onGoHoliday={mk => { setViewYear(+mk.slice(0, 4)); setViewMonth(+mk.slice(5, 7)); setPage('remarks'); }} />
 
         {/* Month navigation */}
         <div className="month-nav">
@@ -10725,7 +11267,7 @@ function App() {
         )}
         {page === 'remarks' && (
           <>
-            <HolidayManager data={data} year={viewYear} onUpdate={onUpdate} />
+            <HolidayManager data={data} year={viewYear} month={viewMonth} onUpdate={onUpdate} />
             <RemarkManager data={data} year={viewYear} month={viewMonth} onUpdate={onUpdate} />
           </>
         )}
