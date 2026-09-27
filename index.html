@@ -748,7 +748,8 @@
         .td-side-hd{font-size:var(--fs-xs);font-weight:700;color:var(--text-muted);padding:8px 10px 4px;}
         .td-side-row{display:flex;align-items:center;gap:10px;width:100%;border:none;background:none;padding:8px 10px;border-radius:8px;font-family:inherit;font-size:var(--fs-base);color:var(--text-primary);cursor:pointer;text-align:left;}
         .td-side-row b{margin-left:auto;font-size:var(--fs-sm);color:var(--text-muted);font-weight:500;}
-        .td-side-row:hover{background:var(--surface-alt);}
+        .td-side-row:not(.on):hover{background:var(--surface-alt);}
+        .td-side-row,.td-views button,.td-filt-btn{-webkit-tap-highlight-color:transparent;}
         .td-side-row.on{font-weight:700;}
         .td-side-views{position:relative;}
         .td-side-row{position:relative;z-index:1;}
@@ -1568,7 +1569,7 @@ appId: "..."'></textarea>
         <button class="btn-sidebar hidden" id="btn-settings" onclick="openSettings()">系統設定</button>
         <button class="btn-sidebar hidden" id="btn-logout" onclick="logoutAll()">登出</button>
         <button class="btn-sidebar" onclick="showSetup()">重新設定連線</button>
-        <div class="app-ver">版本 0928-3</div>
+        <div class="app-ver">版本 0928-4</div>
     </div>
 </nav>
 
@@ -3537,6 +3538,8 @@ function renderTodo() {
         ${Object.keys(byCat).length ? `<div class="td-side-card"><div class="td-side-hd">類別</div>${TODO_CATS.filter(c => byCat[c]).map(c => `<button class="td-side-row${_tdFilter.cat === c ? ' on' : ''}" onclick="tdSetFilter('cat','${c}')"><span class="td-cat">${c}</span><span></span><b>${byCat[c]}</b></button>`).join('')}</div>` : ''}
     </aside>`;
 
+    const keepGlass = {};
+    TD_GLASS_WRAPS.forEach(([k, sel]) => { const g = el.querySelector(sel + ' > .td-glass'); if (g) keepGlass[k] = g; });
     el.innerHTML = `<div class="td-layout"><div class="td-maincol">
         <div class="td-views"><span class="td-glass" aria-hidden="true"></span>${TD_VIEWS.map(v => `<button class="${_tdView === v.key ? 'on' : ''}" style="--vc:${v.color}" onclick="setTodoView('${v.key}')">${tdSvg(v.icon, v.color, 14)}${v.label}${counts[v.key] && v.key !== 'done' ? `<em class="td-badge">${counts[v.key]}</em>` : ''}</button>`).join('')}</div>
         <div class="td-filters${_tdFiltOpen ? ' open' : ''}${_tdFilter.who || _tdFilter.cat || _tdFilter.urg ? ' active' : ''}">
@@ -3553,6 +3556,7 @@ function renderTodo() {
         </div>${side}</div>
         <button class="td-fab${_tdOpen || _tdNew ? ' editing' : ''}" onclick="newTodo()" aria-label="新增待辦"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>`;
     _tdAnim = null;
+    TD_GLASS_WRAPS.forEach(([k, sel]) => { const n = el.querySelector(sel + ' > .td-glass'); if (n && keepGlass[k]) n.replaceWith(keepGlass[k]); });
     tdGlassRun(_tdGlassPrev); _tdGlassPrev = null;
     const sels = el.querySelectorAll('.td-filters select');
     sels[0].value = _tdFilter.who; if (sels[1]) sels[1].value = _tdFilter.cat; if (sels[2]) sels[2].value = _tdFilter.urg;
@@ -3644,8 +3648,16 @@ function tdGlassRect(wrap) {
 }
 function tdGlassSnap() {
     const o = {};
-    TD_GLASS_WRAPS.forEach(([k, sel]) => { o[k] = tdGlassRect(document.querySelector('#todo-content ' + sel)); });
+    TD_GLASS_WRAPS.forEach(([k, sel]) => {
+        const wrap = document.querySelector('#todo-content ' + sel);
+        const g = wrap && wrap.offsetParent !== null && wrap.querySelector(':scope > .td-glass');
+        o[k] = g && g.offsetWidth ? glassNow(g) : tdGlassRect(wrap);
+    });
     return o;
+}
+// 色塊當下實際的位置與顏色（動畫進行中也準確）
+function glassNow(g) {
+    return { x: g.offsetLeft, y: g.offsetTop, w: g.offsetWidth, h: g.offsetHeight, c: getComputedStyle(g).getPropertyValue('--gc').trim() };
 }
 function tdGlassRun(prev) {
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -3661,21 +3673,33 @@ function tdGlassRun(prev) {
         elasticMove(g, from, to, k === 'v');
     });
 }
-// 色塊由 from 滑到 to：中途沿移動方向拉長、另一方向壓扁，抵達時輕輕回彈
+// 色塊由 from 滑到 to：前緣先出發（稍微超過再彈回），後緣隨後跟上，
+// 中間自然被拉長、另一方向微微變薄，像一滴水滑過去
 function elasticMove(g, from, to, horiz) {
-    const px = n => n + 'px';
-    const midW = horiz ? (from.w + to.w) / 2 * 1.3 : to.w, midH = horiz ? to.h : (from.h + to.h) / 2 * 1.3;
-    const midX = horiz ? (from.x + to.x + (from.w + to.w) / 2) / 2 - midW / 2 : to.x;
-    const midY = horiz ? to.y : (from.y + to.y + (from.h + to.h) / 2) / 2 - midH / 2;
-    const f0 = { left: px(from.x), top: px(from.y), width: px(from.w), height: px(from.h), transform: 'scale(1,1)' };
-    const f3 = { left: px(to.x), top: px(to.y), width: px(to.w), height: px(to.h), transform: 'scale(1,1)' };
-    if (from.c && to.c) { f0['--gc'] = from.c; f3['--gc'] = to.c; }
-    g.animate([
-        f0,
-        { offset: .45, left: px(midX), top: px(midY), width: px(midW), height: px(midH), transform: horiz ? 'scale(1,.84)' : 'scale(.94,1)' },
-        { offset: .8, left: px(to.x), top: px(to.y), width: px(to.w), height: px(to.h), transform: horiz ? 'scale(1.04,.97)' : 'scale(.98,1.04)' },
-        f3,
-    ], { duration: 480, easing: 'cubic-bezier(.3,.7,.25,1)' });
+    const [pos, size, cpos, csize, P, S, CP, CS] = horiz
+        ? ['x', 'w', 'y', 'h', 'left', 'width', 'top', 'height']
+        : ['y', 'h', 'x', 'w', 'top', 'height', 'left', 'width'];
+    const a0 = from[pos], a1 = from[pos] + from[size], b0 = to[pos], b1 = to[pos] + to[size];
+    const forward = b0 >= a0;
+    const lerp = (p, q, t) => p + (q - p) * t;
+    const back = t => { const c = 1.25; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+    const out = t => 1 - Math.pow(1 - t, 3);
+    const frames = [], N = 24;
+    for (let i = 0; i <= N; i++) {
+        const t = i / N;
+        const lead = back(Math.min(1, t / 0.72));
+        const trail = out(Math.max(0, (t - 0.1) / 0.9));
+        const lo = lerp(a0, b0, forward ? trail : lead), hi = lerp(a1, b1, forward ? lead : trail);
+        const len = Math.max(hi - lo, 6), base = lerp(from[size], to[size], t);
+        const thin = Math.max(0.82, 1 - (len / base - 1) * 0.3);
+        frames.push({
+            [P]: lo + 'px', [S]: len + 'px', [CP]: to[cpos] + 'px', [CS]: to[csize] + 'px',
+            transform: horiz ? `scale(1,${thin})` : `scale(${thin},1)`,
+        });
+    }
+    if (from.c && to.c) { frames[0]['--gc'] = from.c; frames[N]['--gc'] = to.c; }
+    g.getAnimations().forEach(a => a.cancel());
+    g.animate(frames, { duration: 540, easing: 'linear' });
 }
 // ── 底部功能列：單色色塊指示目前功能 ──
 function mnGlassMove(animate) {
@@ -3685,7 +3709,7 @@ function mnGlassMove(animate) {
     const b = inner.offsetParent !== null && [...inner.querySelectorAll('.mn-item.active')].find(x => x.offsetParent !== null);
     if (!b) { g.style.opacity = 0; g.dataset.on = ''; return; }
     const to = { x: b.offsetLeft + 6, y: b.offsetTop + 5, w: b.offsetWidth - 12, h: b.offsetHeight - 10 };
-    const from = g.dataset.on ? { x: g.offsetLeft, y: g.offsetTop, w: g.offsetWidth, h: g.offsetHeight } : null;
+    const from = g.dataset.on ? glassNow(g) : null;
     Object.assign(g.style, { opacity: 1, left: to.x + 'px', top: to.y + 'px', width: to.w + 'px', height: to.h + 'px' });
     g.dataset.on = '1';
     if (animate && from && Math.abs(from.x - to.x) > 1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) elasticMove(g, from, to, true);
