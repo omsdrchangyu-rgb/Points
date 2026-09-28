@@ -1209,6 +1209,37 @@
 }
 #sched-root .wk-done{display:inline-flex;align-items:center;gap:4px}
 #sched-root .wk-done.on{background:var(--green-light,#E6F4EE);border-color:var(--green-border,#9FD3BD);color:var(--green,#009B6B);font-weight:700}
+/* 同崗位編號 */
+#sched-root .sb-num{font-size:.78em;font-weight:700;margin-left:1px;opacity:.85}
+#sched-root .pc-num{display:inline-block;min-width:13px;height:13px;line-height:11px;border-radius:7px;border:1px solid currentColor;box-sizing:border-box;margin-right:2px;font-size:9px;text-align:center;vertical-align:1px}
+#sched-root .ec-num{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:4px 0 12px;padding:8px 10px;background:#F7F7F7;border-radius:8px;font-size:var(--fs-sm);color:#555}
+#sched-root .ec-num button{padding:4px 10px;border-radius:6px;border:1.5px solid #E0E0E0;background:#fff;font-size:var(--fs-sm);cursor:pointer;color:#333;font-family:inherit}
+#sched-root .ec-num button.on{background:var(--text-primary);border-color:var(--text-primary);color:#fff;font-weight:700}
+#sched-root .name-click{cursor:pointer}
+#sched-root .name-click:hover{background:#F0F4F8}
+/* 個人統計視窗 */
+#sched-root .as-modal{width:520px;max-width:96vw;max-height:88vh;overflow:auto}
+#sched-root .s-modal.as-modal h3{display:flex;align-items:center;gap:6px;margin:0;border:none;padding:0}
+#sched-root .as-modal .vm-hd{margin-bottom:14px}
+#sched-root .as-modal .vm-x{margin-left:auto}
+#sched-root .as-modal h3 .color-bar{width:4px;height:16px;border-radius:2px;display:inline-block}
+#sched-root .as-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+#sched-root .as-tile{border:1px solid var(--border);border-radius:8px;padding:8px 6px;text-align:center;display:flex;flex-direction:column;gap:2px}
+#sched-root .as-tile b{font-size:18px;color:var(--text-primary)}
+#sched-root .as-tile span{font-size:var(--fs-xs);color:var(--text-muted)}
+#sched-root .as-tile em{font-style:normal;font-size:var(--fs-micro);color:var(--text-muted)}
+#sched-root .as-tile.zero b{color:#C8C8C8}
+#sched-root .as-dist{margin-bottom:14px}
+#sched-root .as-sec{font-weight:700;font-size:var(--fs-base);color:var(--text-primary);margin:4px 0 8px;display:flex;align-items:baseline;gap:8px}
+#sched-root .as-sec span{font-weight:400;font-size:var(--fs-xs);color:var(--text-muted)}
+#sched-root .as-empty{font-size:var(--fs-sm);color:var(--text-muted);padding:10px 0}
+#sched-root .as-table{width:100%;border-collapse:collapse;font-size:var(--fs-sm)}
+#sched-root .as-table th{font-size:var(--fs-xs);color:var(--text-muted);font-weight:600;text-align:center;padding:6px;border-bottom:1px solid var(--border)}
+#sched-root .as-table th:first-child,#sched-root .as-table td:first-child{text-align:left}
+#sched-root .as-table td{padding:7px 6px;border-bottom:1px solid #F0F0F0;text-align:center;color:var(--text-primary)}
+#sched-root .as-table td.z{color:#C8C8C8}
+#sched-root .as-table tr.tot td{font-weight:700;background:#FAFAFA}
+@media(max-width:700px){ #sched-root .as-tiles{grid-template-columns:repeat(3,1fr)} }
 /* 規則檢核視窗 */
 #sched-root .vm-modal{width:620px;max-width:96vw;max-height:86vh;overflow:auto}
 #sched-root .vm-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
@@ -1580,7 +1611,7 @@ appId: "..."'></textarea>
         <button class="btn-sidebar hidden" id="btn-settings" onclick="openSettings()">系統設定</button>
         <button class="btn-sidebar hidden" id="btn-logout" onclick="logoutAll()">登出</button>
         <button class="btn-sidebar" onclick="showSetup()">重新設定連線</button>
-        <div class="app-ver">版本 0929-1</div>
+        <div class="app-ver">版本 0929-3</div>
     </div>
 </nav>
 
@@ -2353,7 +2384,7 @@ appId: "..."'></textarea>
 // 只在 workspaces/{wsId}/schedule 底下讀寫，不碰點數系統原有資料表
 // ================================================================
 const SCHED_COL = 'schedule';
-const SCHED_MONTH_KEYS = ['doctorSchedule', 'schedule', 'leaveRequests', 'sessionTargets', 'remarks', 'restDays', 'weekDone', 'checkAck'];
+const SCHED_MONTH_KEYS = ['doctorSchedule', 'schedule', 'leaveRequests', 'sessionTargets', 'remarks', 'restDays', 'weekDone', 'checkAck', 'posOrder'];
 const SCHED_BACKUP_URL = 'data/schedule-backup-20260926.json';
 const SCHED_LIBS_CORE = [
     'https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js',
@@ -9424,6 +9455,41 @@ function isWorkValue(v) {
   return v && !LEAVE_TYPES.includes(v) && !EXT_LEAVE_TYPES.includes(v) && v !== '—';
 }
 
+// ─── 同崗位編號（同一診同崗位 2 人以上時：流動1、流動2…）───
+// 順序：排班者指定的順序（posOrder）優先，其餘依助理名單順序
+const POS_NO_NUMBER = ['教育訓練'];
+function posGroup(data, mk, ds, sh, pos) {
+  if (!isWorkValue(pos) || POS_NO_NUMBER.includes(pos)) return [];
+  const slot = data.schedule?.[mk]?.[ds]?.[sh] || {};
+  const names = Object.keys(slot).filter(n => slot[n] === pos && getCellValue(data, mk, ds, sh, n) === pos);
+  if (names.length < 2) return names;
+  const idx = n => { const i = data.assistants.findIndex(a => a.name === n); return i < 0 ? 999 : i; };
+  const pref = data.posOrder?.[mk]?.[ds]?.[sh]?.[pos] || [];
+  const rank = n => { const p = pref.indexOf(n); return p < 0 ? 100 + idx(n) : p; };
+  return names.sort((a, b) => rank(a) - rank(b));
+}
+function posNum(data, mk, ds, sh, name) {
+  const v = getCellValue(data, mk, ds, sh, name);
+  const g = posGroup(data, mk, ds, sh, v);
+  return g.length > 1 ? g.indexOf(name) + 1 : 0;
+}
+// 本月同崗位編號次數：{ 崗位: {1:n, 2:n, 3:n} }
+function calcPosNumStats(data, mk, name) {
+  const [y, m] = mk.split('-').map(Number);
+  const out = {};
+  for (let d = 1; d <= daysInMonth(y, m); d++) {
+    const ds = fmtDate(y, m, d);
+    getShiftsForDate(ds).forEach(sh => {
+      const n = posNum(data, mk, ds, sh, name);
+      if (!n) return;
+      const pos = getCellValue(data, mk, ds, sh, name);
+      out[pos] = out[pos] || {};
+      out[pos][n] = (out[pos][n] || 0) + 1;
+    });
+  }
+  return out;
+}
+
 // ═══════════════════════════════════════════
 // STATISTICS
 // ═══════════════════════════════════════════
@@ -9500,7 +9566,7 @@ function getShiftPositionStatus(data, mk, dateStr, shift) {
   if (!doctors.length) return null;
   const req = getRequiredStaff(doctors.length);
   const sched = data.schedule?.[mk]?.[dateStr]?.[shift] || {};
-  const assignedPos = Object.values(sched).filter(p => isWorkValue(p));
+  const assignedPos = Object.entries(sched).filter(([n, p]) => isWorkValue(p) && onDutyAt(data, mk, dateStr, shift, n, p)).map(([, p]) => p);
   const result = [];
 
   // Doctor follow slots
@@ -9624,7 +9690,7 @@ function checkScheduleRules(data, year, month) {
       const doctors = dayInfo[sh] || [];
       if (!doctors.length) return;
       const shiftSched = data.schedule?.[mk]?.[ds]?.[sh] || {};
-      const workers = Object.entries(shiftSched).filter(([, p]) => isWorkValue(p)).map(([n]) => n);
+      const workers = Object.entries(shiftSched).filter(([n, p]) => isWorkValue(p) && onDutyAt(data, mk, ds, sh, n, p)).map(([n]) => n);
 
       // 矯正診(王泓仁)出診 → 諮詢(盧蓓歆)需在場警告
       if (doctors.includes(ORTHO_DOCTOR)) {
@@ -9951,7 +10017,7 @@ function useIsMobile() {
   return m;
 }
 
-function ShiftBlock({ shift, value, onClick, noLabel, locked, fullRestDay, isPartTime, full, label }) {
+function ShiftBlock({ shift, value, onClick, noLabel, locked, fullRestDay, isPartTime, full, label, num }) {
   const isEmpty = isPartTime && (!value || value === '休');
   const bg = isEmpty ? '#f5f5f7' : cellBg(value, fullRestDay);
   const isWhite = bg === '#ffffff';
@@ -9971,7 +10037,7 @@ function ShiftBlock({ shift, value, onClick, noLabel, locked, fullRestDay, isPar
         textAlign: noLabel ? 'center' : undefined,
         color: isNationalHoliday ? '#c62828' : isZhixiu ? '#b0322e' : undefined,
         fontWeight: (isNationalHoliday || isZhixiu) ? 700 : undefined,
-      }}>{display}</span>
+      }}>{display}{num ? <span className="sb-num">{num}</span> : null}</span>
     </div>
   );
 }
@@ -9989,6 +10055,7 @@ function EditCellModal({ asst, dateStr, shift, currentValue, data, mk, onSave, o
   const [showMoreLeave, setShowMoreLeave] = useState(false);
   const [showOther, setShowOther] = useState(false);
   const [showEmergency, setShowEmergency] = useState(false);
+  const [nums, setNums] = useState({});   // 指定同崗位編號 {診: 編號}
 
   const wd = weekday(dateStr);
   const [,mm,dd] = dateStr.split('-');
@@ -10099,6 +10166,25 @@ function EditCellModal({ asst, dateStr, shift, currentValue, data, mk, onSave, o
           </div>
         )}
 
+        {(() => {
+          // 這一診同崗位還有別人 → 可指定編號
+          if (!isWorkValue(value) || POS_NO_NUMBER.includes(value)) return null;
+          const others = posGroup(data, mk, dateStr, activeShift, value).filter(n => n !== asst.name);
+          const slot = data.schedule?.[mk]?.[dateStr]?.[activeShift] || {};
+          const extra = Object.keys(slot).filter(n => n !== asst.name && slot[n] === value && !others.includes(n) && getCellValue(data, mk, dateStr, activeShift, n) === value);
+          const total = others.length + extra.length + 1;
+          if (total < 2) return null;
+          const curNum = nums[activeShift] || (posNum(data, mk, dateStr, activeShift, asst.name) || total);
+          return (
+            <div className="ec-num">
+              <span>{value} 共 {total} 人，{asst.name} 是</span>
+              {Array.from({ length: total }, (_, i) => i + 1).map(n => (
+                <button key={n} className={curNum === n ? 'on' : ''} onClick={() => setNums(p => ({ ...p, [activeShift]: n }))}>{value}{n}</button>
+              ))}
+            </div>
+          );
+        })()}
+
         <div style={{display:'flex',gap:6,marginBottom:14,flexWrap:'wrap'}}>
           {shiftsForDay.map(sh => (
             <span key={sh} style={{
@@ -10112,7 +10198,7 @@ function EditCellModal({ asst, dateStr, shift, currentValue, data, mk, onSave, o
 
         <div className="modal-btns">
           <button className="s-btn s-btn-secondary" onClick={onClose}>取消</button>
-          <button className="s-btn s-btn-primary" onClick={() => onSave(values)}>儲存</button>
+          <button className="s-btn s-btn-primary" onClick={() => onSave(values, false, nums)}>儲存</button>
         </div>
       </div>
     </div>
@@ -10124,6 +10210,7 @@ function EditCellModal({ asst, dateStr, shift, currentValue, data, mk, onSave, o
 // ═══════════════════════════════════════════
 function AssistantView({ data, year, month, onUpdate, isLocked }) {
   const [editTarget, setEditTarget] = useState(null);
+  const [statAsst, setStatAsst] = useState(null);
   const mk = monthKey(year, month);
   const weeks = useMemo(() => getMonthWeeks(year, month), [year, month]);
   const numWeeks = weeks.length;
@@ -10150,7 +10237,7 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
     setEditTarget({ asst, dateStr: ds, shift, currentValue: current });
   }
 
-  function handleSave(valueOrMap, applyAllDay) {
+  function handleSave(valueOrMap, applyAllDay, nums) {
     const { asst, dateStr, shift } = editTarget;
     const preLv = data.leaveRequests?.[mk]?.[asst.name]?.[dateStr];
     let dropPre = false;
@@ -10188,6 +10275,17 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
           const lv = draft.leaveRequests?.[mk]?.[asst.name]?.[dateStr];
           if (lv) { lv.sessions = lv.sessions.filter(s => s !== sh); if (lv.sessions.length === 0) delete draft.leaveRequests[mk][asst.name][dateStr]; }
         }
+      });
+      // 指定同崗位編號：把這位助理放到指定位置
+      Object.entries(nums || {}).forEach(([sh, n]) => {
+        const pos = draft.schedule[mk]?.[dateStr]?.[sh]?.[asst.name];
+        if (!pos) return;
+        const order = posGroup(draft, mk, dateStr, sh, pos).filter(x => x !== asst.name);
+        order.splice(Math.max(0, n - 1), 0, asst.name);
+        draft.posOrder = draft.posOrder || {};
+        draft.posOrder[mk] = draft.posOrder[mk] || {};
+        draft.posOrder[mk][dateStr] = draft.posOrder[mk][dateStr] || {};
+        draft.posOrder[mk][dateStr][sh] = { ...(draft.posOrder[mk][dateStr][sh] || {}), [pos]: order };
       });
     });
     setEditTarget(null);
@@ -10314,7 +10412,7 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
                   const cum = mWeeks.slice(0, wi + 1).flat().filter(ds => (recep || doneDates.has(ds)) && fullOffOf(ds)).length;
                   return (
                     <tr key={asst.id} className="asst-row">
-                      <td className="name-cell" style={{padding:'2px 4px'}}>
+                      <td className="name-cell name-click" style={{padding:'2px 4px'}} onClick={() => setStatAsst(asst)} title="點擊看個人統計">
                         <span className="color-bar" style={{background:asst.color}}/>{asst.name}
                         {!asst.isPartTime && <div style={{fontSize:'var(--fs-micro)',color:'#b0322e',fontWeight:700}}>休{cum}</div>}
                       </td>
@@ -10326,7 +10424,7 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
                           if (isNatHoliday && v === '休') v = '國定假日';
                           return (
                             <td key={ds + sh} className={off} style={{padding:0, borderLeft: sh === '早' ? '2px solid #C4C4C4' : undefined}}>
-                              <ShiftBlock shift={sh} value={v} full onClick={() => handleCellClick(asst, ds, sh)} noLabel locked={isLocked} isPartTime={asst.isPartTime} label={(() => { const p = proxyLabel(data, mk, ds, sh, asst.name); return p ? `${v}・${p}` : null; })()}/>
+                              <ShiftBlock shift={sh} value={v} full num={posNum(data, mk, ds, sh, asst.name)} onClick={() => handleCellClick(asst, ds, sh)} noLabel locked={isLocked} isPartTime={asst.isPartTime} label={(() => { const p = proxyLabel(data, mk, ds, sh, asst.name); return p ? `${v}・${p}` : null; })()}/>
                             </td>
                           );
                         });
@@ -10350,6 +10448,7 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
           <EditCellModal asst={editTarget.asst} dateStr={editTarget.dateStr} shift={editTarget.shift}
             currentValue={editTarget.currentValue} data={data} mk={mk} onSave={handleSave} onClose={() => setEditTarget(null)} />
         )}
+        {statAsst && <AsstStatsModal asst={statAsst} data={data} year={year} month={month} onClose={() => setStatAsst(null)} />}
       </div>
     );
   }
@@ -10537,7 +10636,7 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
                     const weeklyTarget = target ? Math.round(target / numWeeks) : null;
                     return (
                       <tr key={asst.id} className="asst-row">
-                        <td className="name-cell">
+                        <td className="name-cell name-click" onClick={() => setStatAsst(asst)} title="點擊看個人統計">
                           <span className="color-bar" style={{background:asst.color}}/>
                           {asst.name}
                           {(weeklyTarget !== null || !asst.isPartTime) && (
@@ -10581,7 +10680,7 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
                             if (isNatHoliday && v === '休') v = '國定假日';
                             return (
                               <td key={`${ds}${sh}`} className={baseCls + offCls} style={{padding:0, borderLeft:sh==='早'?'2px solid #C4C4C4':undefined}}>
-                                <ShiftBlock shift={sh} value={v} onClick={() => handleCellClick(asst, ds, sh)} noLabel locked={isLocked} fullRestDay={isFullRestDay} isPartTime={asst.isPartTime} label={proxyLabel(data, mk, ds, sh, asst.name)}/>
+                                <ShiftBlock shift={sh} value={v} num={posNum(data, mk, ds, sh, asst.name)} onClick={() => handleCellClick(asst, ds, sh)} noLabel locked={isLocked} fullRestDay={isFullRestDay} isPartTime={asst.isPartTime} label={proxyLabel(data, mk, ds, sh, asst.name)}/>
                               </td>
                             );
                           });
@@ -10667,6 +10766,61 @@ function AssistantView({ data, year, month, onUpdate, isLocked }) {
           onClose={() => setEditTarget(null)}
         />
       )}
+      {statAsst && <AsstStatsModal asst={statAsst} data={data} year={year} month={month} onClose={() => setStatAsst(null)} />}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// COMPONENT: AsstStatsModal（點助理姓名：個人當月統計＋同崗位編號次數）
+// ═══════════════════════════════════════════
+function AsstStatsModal({ asst, data, year, month, onClose }) {
+  const mk = monthKey(year, month);
+  const s = useMemo(() => calcMonthStats(data, mk, asst.name), [data, mk, asst.name]);
+  const pn = useMemo(() => calcPosNumStats(data, mk, asst.name), [data, mk, asst.name]);
+  useEffect(() => {
+    const onKey = e => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+  const total = s.早 + s.午 + s.晚;
+  const target = getEffectiveTarget(data, mk, asst.name);
+  const pct = k => total ? Math.round(s[k] / total * 100) : 0;
+  const tiles = [['早診', s.早], ['午診', s.午], ['晚診', s.晚], ['合計', total, `目標 ${target}`], ['全天班', s.全天], ['週六', s.週六], ['完整休息', s.完整休息],
+    ['特休', s.特休], ['請假', s.請假], ['指休', s.指休], ['國定', s.國定假日], ['教育訓練', s.教育訓練]];
+  const posRows = Object.entries(pn).sort((a, b) => a[0].localeCompare(b[0], 'zh-Hant'));
+  const maxN = Math.max(2, ...posRows.flatMap(([, c]) => Object.keys(c).map(Number)));
+  const cols = Array.from({ length: Math.min(maxN, 4) }, (_, i) => i + 1);
+  const sum = cols.map(n => posRows.reduce((t, [, c]) => t + (c[n] || 0), 0));
+  return (
+    <div className="modal-bg" onClick={onClose}>
+      <div className="s-modal as-modal" onClick={e => e.stopPropagation()}>
+        <div className="vm-hd">
+          <h3><span className="color-bar" style={{background:asst.color}}/>{asst.name}・{year}年{month}月</h3>
+          <button className="vm-x" onClick={onClose} aria-label="關閉">×</button>
+        </div>
+        <div className="as-tiles">
+          {tiles.map(([k, v, sub]) => (
+            <div key={k} className={`as-tile${v ? '' : ' zero'}`}><b>{v}</b><span>{k}</span>{sub && <em>{sub}</em>}</div>
+          ))}
+        </div>
+        {total > 0 && (
+          <div className="as-dist">
+            <div className="sm-bar">{['早','午','晚'].map(k => s[k] > 0 && <div key={k} style={{flex:s[k],background:DIST_COLORS[k]}}/>)}</div>
+            <div className="sm-pct">{['早','午','晚'].map(k => <span key={k}><i style={{background:DIST_COLORS[k]}}/>{k} {pct(k)}%</span>)}</div>
+          </div>
+        )}
+        <div className="as-sec">同崗位編號次數<span>同一診同崗位 2 人以上時</span></div>
+        {posRows.length === 0
+          ? <div className="as-empty">本月沒有和別人同崗位的診次</div>
+          : <table className="as-table">
+              <thead><tr><th>崗位</th>{cols.map(n => <th key={n}>{n} 號</th>)}</tr></thead>
+              <tbody>
+                {posRows.map(([pos, c]) => <tr key={pos}><td>{pos}</td>{cols.map(n => <td key={n} className={c[n] ? '' : 'z'}>{c[n] || '–'}</td>)}</tr>)}
+                <tr className="tot"><td>合計</td>{sum.map((v, i) => <td key={i}>{v}</td>)}</tr>
+              </tbody>
+            </table>}
+      </div>
     </div>
   );
 }
@@ -10679,7 +10833,7 @@ function EditPositionModal({ position, dateStr, shift, data, mk, onSave, onClose
   const isDoctorPos = (data.doctors||[]).includes(position);
   const doctorHasSession = isDoctorPos && (info[shift]||[]).includes(position);
   const sched = data.schedule?.[mk]?.[dateStr]?.[shift] || {};
-  const currentAssignees = Object.entries(sched).filter(([,p]) => p === position).map(([n]) => n);
+  const currentAssignees = Object.entries(sched).filter(([n, p]) => p === position && onDutyAt(data, mk, dateStr, shift, n, p)).map(([n]) => n);
   const [selectedSet, setSelectedSet] = useState(() => new Set(currentAssignees));
   function toggle(name) {
     setSelectedSet(prev => {
@@ -10842,7 +10996,7 @@ function PositionView({ data, year, month, onUpdate, isLocked }) {
   function getAssigned(position, ds, shift) {
     const daySched = data.schedule?.[mk]?.[ds]?.[shift] || {};
     return Object.entries(daySched)
-      .filter(([,pos]) => pos === position)
+      .filter(([name, pos]) => pos === position && onDutyAt(data, mk, ds, shift, name, pos))   // 請假的人不顯示
       .map(([name]) => name);
   }
 
@@ -10970,7 +11124,9 @@ function PositionView({ data, year, month, onUpdate, isLocked }) {
                                   color: SHIFT_COLORS[sh],
                                   fontWeight:700,
                                   fontSize:'var(--fs-xs)',
-                                }}>{assignedNames.map(n => { const p = proxyOf(data, mk, ds, sh, n); return p ? `${p}代` : n; }).join('、')}</span>
+                                }}>{(() => { const g = posGroup(data, mk, ds, sh, pos); const list = g.length > 1 ? [...g, ...assignedNames.filter(n => !g.includes(n))] : assignedNames;
+                                  return list.map((n, i) => { const p = proxyOf(data, mk, ds, sh, n); const t = p ? `${p}代` : n;
+                                    return <span key={n}>{i > 0 ? '、' : ''}{g.length > 1 && g.includes(n) && <span className="pc-num">{g.indexOf(n) + 1}</span>}{t}</span>; }); })()}</span>
                               : <span className="pos-cell-empty" style={{color:'#ccc',fontSize:16,lineHeight:'1'}}>+</span>
                           }
                         </td>
@@ -12203,6 +12359,10 @@ function PreLeaveBoard({ data, year, month }) {
 // ═══════════════════════════════════════════
 // 請假代理：已排班的時段被核准請假時，顯示「代理人縮寫＋代」
 // ═══════════════════════════════════════════
+// 這一診實際在崗（沒請假，或請假但有指定代理人 → 顯示「X代」）
+function onDutyAt(data, mk, ds, sh, name, pos) {
+  return getCellValue(data, mk, ds, sh, name) === pos || !!proxyOf(data, mk, ds, sh, name);
+}
 function proxyOf(data, mk, ds, sh, name) {
   const lv = data.leaveRequests?.[mk]?.[name]?.[ds];
   if (!lv || !lv.ext || !lv.proxy) return null;
