@@ -638,6 +638,10 @@
         .mc-day.past{opacity:.45;}
         .mc-day.today{border-color:var(--text-primary);}
         .mc-day.sel{box-shadow:0 0 0 2px var(--text-primary);border-color:var(--text-primary);opacity:1;}
+        .mc-day.meet{border:2px solid #0068B7;padding:3px 2px;}
+        .mc-day.meet.sel{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--text-primary);}
+        .mc-meet{margin-left:8px;padding:1px 8px;border-radius:10px;border:1.5px solid #0068B7;color:#0068B7;font-size:var(--fs-xs);font-weight:700;}
+        .mc-meet-key{display:inline-block;width:14px;height:12px;border:2px solid #0068B7;border-radius:3px;box-sizing:border-box;}
         .mc-day.sun{background:var(--surface-alt);border-color:var(--surface-alt);cursor:default;align-items:center;box-shadow:none;}
         .mc-num{font-size:var(--fs-sm);font-weight:700;line-height:1.1;text-align:center;}
         .mc-num.red{color:var(--red);}
@@ -804,6 +808,13 @@
         .td-ghd span{font-size:var(--fs-xs);color:var(--text-muted);font-weight:500;}
         .td-item{display:flex;align-items:flex-start;gap:11px;padding:10px 8px;border-radius:8px;transition:background .12s,opacity .4s;}
         .td-item:hover{background:#F4F6F8;}
+        .td-swipe{position:relative;border-radius:8px;overflow:hidden;}
+        .td-swipe .td-item{position:relative;z-index:1;background:var(--bg);will-change:transform;}
+        .td-swipe .td-item:hover{background:#F4F6F8;}
+        .td-swipe-del{position:absolute;right:0;top:0;bottom:0;width:84px;border:none;background:var(--red);color:#fff;font-family:inherit;font-size:var(--fs-base);font-weight:700;cursor:pointer;display:none;}
+        @media(hover:none){ .td-swipe-del{display:block;} }
+        .td-swipe .td-item.just{opacity:1;}
+        .td-swipe .td-item.just > *{opacity:.5;}
         .td-item.just{opacity:.5;}
         .td-check{width:16px;height:16px;border-radius:4px;border:1.5px solid #B4B9C0;background:var(--surface);flex-shrink:0;margin-top:3px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .15s,border-color .15s;}
         .td-check:hover{border-color:var(--accent);}
@@ -1569,7 +1580,7 @@ appId: "..."'></textarea>
         <button class="btn-sidebar hidden" id="btn-settings" onclick="openSettings()">系統設定</button>
         <button class="btn-sidebar hidden" id="btn-logout" onclick="logoutAll()">登出</button>
         <button class="btn-sidebar" onclick="showSetup()">重新設定連線</button>
-        <div class="app-ver">版本 0928-4</div>
+        <div class="app-ver">版本 0929-1</div>
     </div>
 </nav>
 
@@ -3025,6 +3036,7 @@ function renderMyShift() {
         if (ds === today) cls.push('today');
         if (ds === _msSel) cls.push('sel');
         if (ds < today) cls.push('past');
+        if (msMeeting(data, mk, ds)) cls.push('meet');
         if (wd === 0) {
             cal += `<div class="${cls.join(' ')} sun"><span class="mc-num">${d}</span><span class="mc-closed">休診</span></div>`;
             continue;
@@ -3058,7 +3070,7 @@ function renderMyShift() {
                     : canSwap ? `<button class="btn btn-outline btn-sm" onclick="openSwapSheet('${sel}','${c.sh}')">調班</button><button class="btn btn-outline btn-sm" onclick="openPosSheet('${sel}','${c.sh}')">改崗位</button>` : ''}
             </div>`;
         }).join('');
-        detail = `<div class="mc-detail"><div class="mc-dhd">${md(sel)}（${WD[selWd]}）${hol[sel] ? `<span class="mc-hol">${hol[sel]}</span>` : ''}${sel === today ? '<span class="mc-today">今天</span>' : ''}</div>${rows}</div>`;
+        detail = `<div class="mc-detail"><div class="mc-dhd">${md(sel)}（${WD[selWd]}）${hol[sel] ? `<span class="mc-hol">${hol[sel]}</span>` : ''}${msMeeting(data, mk, sel) ? `<span class="mc-meet">全院開會</span>` : ''}${sel === today ? '<span class="mc-today">今天</span>' : ''}</div>${rows}</div>`;
     }
 
     const mine = asst ? schedSwaps.filter(r => r.requesterId === asst.id).slice(0, 8) : [];
@@ -3074,11 +3086,16 @@ function renderMyShift() {
         <div class="mc-grid">${cal}</div>
         <div class="mc-legend">${who.kind === 'doc'
             ? '<span><i class="mc-bar work">瑜</i>看診（跟診助理）</span><span><i class="mc-bar work">診</i>看診</span><span><i class="mc-bar rest"></i>未排診</span>'
-            : '<span><i class="mc-bar work">昶</i>上班</span><span><i class="mc-bar rest"></i>休</span><span><i class="mc-bar pre">指</i>指休</span><span><i class="mc-bar leave">病</i>請假</span>'}</div>
+            : '<span><i class="mc-bar work">昶</i>上班</span><span><i class="mc-bar rest"></i>休</span><span><i class="mc-bar pre">指</i>指休</span><span><i class="mc-bar leave">病</i>請假</span>'}<span><i class="mc-meet-key"></i>全院開會</span></div>
         ${detail}
         ${reqHtml}`;
 }
 let _msSel = null;
+// 全院開會：班表備註有「月會」「開會」「院會」
+function msMeeting(data, mk, ds) {
+    const v = data.remarks?.[mk]?.[ds]; if (!v) return false;
+    return (Array.isArray(v) ? v : [v]).some(r => /月會|開會|院會/.test(r));
+}
 
 // ── 我的班表：助理或醫師 ──
 function msWho() {
@@ -3139,13 +3156,24 @@ function msExportIcs() {
     const ics = lines.join('\r\n');
     const name = `班表_${who.name}_${y}${pad(m)}.ics`;
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
     if (isIOS) {
-        // iPhone：以行事曆格式開啟，系統會跳出「加入全部」
-        const url = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
-        const w = window.open(url, '_blank');
-        if (!w) location.href = url;
+        // iPhone：Safari 會擋 data: 網址，所以改用 blob。
+        // 主畫面 App（standalone）直接開檔會卡在預覽回不來 → 用分享選單
+        const standalone = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
+        const file = typeof File === 'function' ? new File([blob], name, { type: 'text/calendar' }) : null;
+        if (standalone && file && navigator.canShare?.({ files: [file] })) {
+            navigator.share({ files: [file] })
+                .then(() => {})
+                .catch(e => { if (e.name !== 'AbortError') location.href = URL.createObjectURL(blob); });
+            toast('在分享選單選「行事曆」；若沒有，選「儲存到檔案」後在「檔案」App 點開即可加入', 5200);
+            return;
+        }
+        // Safari：直接前往 text/calendar 檔案，會出現「加入全部」
+        location.href = URL.createObjectURL(blob);
+        return;
     } else {
-        const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+        const url = URL.createObjectURL(blob);
         const a = document.createElement('a'); a.href = url; a.download = name;
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 2000);
@@ -3436,16 +3464,16 @@ document.addEventListener('pointerdown', e => {
 function tdAssignees(t) { return t && t.assignees && t.assignees.length ? t.assignees : (t && t.assigneeKey ? [{ key: t.assigneeKey, name: t.assigneeName || '' }] : []); }
 function tdIsAssignee(t, key) { return tdAssignees(t).some(a => a.key === key); }
 const TD_VIEWS = [
+    { key: 'all', label: '全部', color: '#0068B7', icon: '<rect x="4" y="4" width="16" height="4" rx="1"/><rect x="4" y="10" width="16" height="4" rx="1"/><rect x="4" y="16" width="16" height="4" rx="1"/>' },
     { key: 'today', label: '今天', color: '#F5A200', icon: '<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>' },
     { key: 'late', label: '逾期', color: '#E8380D', icon: '<circle cx="12" cy="12" r="9"/><line x1="12" y1="7" x2="12" y2="13"/><line x1="12" y1="16.6" x2="12" y2="16.7"/>' },
     { key: 'upcoming', label: '即將到來', color: '#6E5BD6', icon: '<rect x="4" y="5" width="16" height="15" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="9" y1="3" x2="9" y2="7"/><line x1="15" y1="3" x2="15" y2="7"/>' },
-    { key: 'all', label: '全部', color: '#0068B7', icon: '<rect x="4" y="4" width="16" height="4" rx="1"/><rect x="4" y="10" width="16" height="4" rx="1"/><rect x="4" y="16" width="16" height="4" rx="1"/>' },
     { key: 'done', label: '已完成', color: '#009B6B', icon: '<rect x="4" y="4" width="16" height="16" rx="4"/><polyline points="8 12 11 15 16 9"/>' },
 ];
 const tdSvg = (d, color, size = 15) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const _tdRecent = new Set();
 let _tdAnim = null;
-let _tdView = 'today', _tdOpen = null, _tdNew = null, _tdFilter = { who: '', cat: '', urg: '' }, _tdBusy = false;
+let _tdView = 'all', _tdOpen = null, _tdNew = null, _tdFilter = { who: '', cat: '', urg: '' }, _tdBusy = false;
 function tdToday() { return msToday(); }
 function tdDueLabel(due) {
     if (!due) return '';
@@ -3579,7 +3607,8 @@ function tdRow(x, me) {
     const who = tdAssignees(x);
     const cl = x.checklist || [], clDone = cl.filter(c => c.done).length;
     const canDone = x.creatorKey === me.key;
-    return `<div class="td-item${x.done ? ' done' : ''}${_tdRecent.has(x.id) ? ' just' : ''}" data-row="${x.id}">
+    const canDel = isTodoAdmin() || x.creatorKey === me.key;
+    return `<div class="td-swipe"${canDel ? ` data-swipe="${x.id}"` : ''}>${canDel ? `<button class="td-swipe-del" onclick="deleteTodo('${x.id}')">刪除</button>` : ''}<div class="td-item${x.done ? ' done' : ''}${_tdRecent.has(x.id) ? ' just' : ''}" data-row="${x.id}">
         <button class="td-check${x.done ? ' on' : ''}${canDone ? '' : ' locked'}" ${canDone ? `onclick="toggleTodoDone('${x.id}')"` : 'title="只有建立人可以勾選完成"'} aria-label="${x.done ? '標為未完成' : '完成'}">${x.done ? TD_ICON.check : ''}</button>
         <div class="td-main" onclick="openTodo('${x.id}')">
             <div class="td-title">${esc(x.title)}${unread ? '<span class="td-dot"></span>' : ''}</div>
@@ -3592,8 +3621,47 @@ function tdRow(x, me) {
                 ${(x.replies || []).length ? `<span>${TD_ICON.chat}${x.replies.length}</span>` : ''}
             </div>
         </div>
-    </div>`;
+    </div></div>`;
 }
+// ── 左滑刪除（觸控）──
+let _tdSw = null, _tdSwOpen = null;
+function tdSwipeClose(except) {
+    if (_tdSwOpen && _tdSwOpen !== except) { const it = _tdSwOpen.querySelector('.td-item'); it.style.transition = 'transform .25s cubic-bezier(.3,.7,.25,1)'; it.style.transform = ''; _tdSwOpen.classList.remove('open'); _tdSwOpen = null; }
+}
+document.addEventListener('touchstart', e => {
+    const w = e.target.closest && e.target.closest('#todo-content .td-swipe[data-swipe]');
+    if (!w || e.target.closest('.td-swipe-del') || e.target.closest('.td-check')) { if (!e.target.closest?.('.td-swipe-del')) tdSwipeClose(); _tdSw = null; return; }
+    tdSwipeClose(w);
+    const t = e.touches[0];
+    _tdSw = { w, it: w.querySelector('.td-item'), x: t.clientX, y: t.clientY, dx: 0, base: w.classList.contains('open') ? -84 : 0, dir: null };
+}, { passive: true });
+document.addEventListener('touchmove', e => {
+    if (!_tdSw) return;
+    const t = e.touches[0], dx = t.clientX - _tdSw.x, dy = t.clientY - _tdSw.y;
+    if (!_tdSw.dir) { if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; _tdSw.dir = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v'; }
+    if (_tdSw.dir !== 'h') return;
+    e.preventDefault();
+    let x = _tdSw.base + dx;
+    if (x > 0) x = x / 4;                    // 往右拉有阻力
+    if (x < -84) x = -84 + (x + 84) / 3;     // 超過按鈕寬度後變慢
+    _tdSw.dx = x;
+    _tdSw.it.style.transition = 'none';
+    _tdSw.it.style.transform = `translateX(${x}px)`;
+}, { passive: false });
+document.addEventListener('touchend', () => {
+    if (!_tdSw) return;
+    const s = _tdSw; _tdSw = null;
+    const eat = () => { const stop = ev => { ev.stopPropagation(); ev.preventDefault(); }; s.w.addEventListener('click', stop, { capture: true, once: true }); setTimeout(() => s.w.removeEventListener('click', stop, { capture: true }), 400); };
+    if (!s.dir && s.base < 0) { _tdSwOpen = s.w; tdSwipeClose(); eat(); return; }   // 點已打開的列＝收回
+    if (s.dir !== 'h') return;
+    const open = s.dx < -42;
+    s.it.style.transition = 'transform .3s cubic-bezier(.3,.7,.25,1.1)';
+    s.it.style.transform = open ? 'translateX(-84px)' : '';
+    s.w.classList.toggle('open', open);
+    _tdSwOpen = open ? s.w : null;
+    // 滑動結束後的 click 不要打開卡片
+    if (Math.abs(s.dx) > 8) eat();
+});
 function tdCard(x) {
     const me = todoMe(), isNew = !x;
     const v = x || _tdNew;
@@ -3624,7 +3692,7 @@ function tdCard(x) {
                 <button class="td-cl-check${c.done ? ' on' : ''}" onclick="tdToggleCl('${id}','${c.id}')">${c.done ? TD_ICON.check : ''}</button>
                 <span>${esc(c.text)}</span>
                 <button class="td-cl-del" onclick="tdDelCl('${id}','${c.id}')" aria-label="刪除">${TD_ICON.x}</button></div>`).join('')}
-            <div class="td-cl-add"><span class="td-cl-check ghost"></span><input placeholder="新增清單項目" onkeydown="if(tdEnter(event))tdAddCl('${id}',this)"></div>
+            <div class="td-cl-add"><span class="td-cl-check ghost"></span><input placeholder="新增清單項目" onkeydown="if(tdEnter(event))tdAddCl('${id}',this)" onblur="tdAddCl('${id}',this,true)"></div>
         </div>
         ${isNew ? `<div class="td-card-ft"><button class="btn btn-outline btn-sm" onclick="cancelNewTodo()">取消</button><button class="btn btn-primary btn-sm" onclick="createTodo()">建立</button></div>` : `
         <div class="td-creator">由 ${esc(v.creatorName)} 建立・${fmt(v.createdAt)}${v.done && v.doneByName ? `　${esc(v.doneByName)} 於 ${fmt(v.doneAt)} 完成` : ''}</div>
@@ -3718,6 +3786,8 @@ window.addEventListener('resize', () => mnGlassMove(false));
 window.addEventListener('resize', () => { if (currentPage === 'todo') tdGlassRun(null); });
 function openTodo(id) {
     if (_tdOpen === id) { closeTodoCard(); return; }
+    // 正在新增的待辦有文字就先存起來
+    if (_tdNew) { tdFlushCl(); if ((document.querySelector('.td-card[data-id="new"] .td-title-in')?.value || _tdNew.title || '').trim()) createTodo(); }
     const t = todos.find(x => x.id === id);
     const go = () => {
         _tdOpen = id; _tdNew = null; _tdAnim = id;
@@ -3732,6 +3802,7 @@ function openTodo(id) {
     if (_tdOpen) closeTodoCard(go); else go();
 }
 function closeTodoCard(after) {
+    tdFlushCl();
     const card = document.querySelector(`.td-card[data-id="${_tdNew ? 'new' : _tdOpen}"]`);
     const done = () => { _tdOpen = null; if (typeof after !== 'function') _tdNew = null; renderTodo(); if (typeof after === 'function') after(); };
     if (!card) { done(); return; }
@@ -3743,12 +3814,14 @@ document.addEventListener('pointerdown', e => {
     if (currentPage !== 'todo' || (!_tdOpen && !_tdNew)) return;
     const t = e.target;
     if (t.closest('.td-card') || t.closest('.csel-menu') || t.closest('.td-who-menu') || t.closest('.modal-overlay') || t.closest('#nt-panel') || t.closest('.td-fab') || t.closest('.td-item')) return;
-    if (_tdNew && (_tdNew.title || '').trim()) return;   // 新待辦已輸入內容時不自動丟棄
+    tdFlushCl();
+    if (_tdNew) { if ((document.querySelector('.td-card[data-id="new"] .td-title-in')?.value || _tdNew.title || '').trim()) createTodo(); else closeTodoCard(); return; }
     closeTodoCard();
 }, true);
 
 // ── 新增 ──
 function newTodo() {
+    if (_tdNew && (document.querySelector('.td-card[data-id="new"] .td-title-in')?.value || _tdNew.title || '').trim()) { createTodo(); return; }
     const me = todoMe();
     _tdOpen = null;
     _tdNew = { title: '', due: '', urgency: 'none', category: '其他', assignees: [{ key: me.key, name: me.name }], checklist: [] };
@@ -3773,7 +3846,7 @@ async function createTodo() {
             done: false, replies: [], createdAt: now, updatedAt: now,
             lastEvent: { type: 'assigned', to: who.map(a => a.key), by: me.key, byName: me.name, at: now }, seen: { [me.key]: now },
         });
-        _tdNew = null; renderTodo(); toast('已建立待辦');
+        _tdNew = null; renderTodo(); toast('已存為待辦');
     } catch (e) { toast(e.code === 'permission-denied' ? '建立被拒：請在 Firebase 安全性規則允許 todos 資料表' : '建立失敗：' + e.message); }
     finally { _tdBusy = false; }
 }
@@ -3793,7 +3866,10 @@ let _tdWhoMenu = null;
 function tdPickWho(btn, id) {
     _tdWhoMenu?.remove();
     const cur = id === 'new' ? _tdNew.assignees : tdAssignees(todos.find(x => x.id === id));
-    const opts = todoPeople().filter(p => !cur.some(a => a.key === p.key));
+    const me = todoMe();
+    // 管理者（院長、主任、組長）可指派給任何人；助理只能指派給自己和院長
+    const pool = viewMode === 'assistant' ? todoPeople().filter(p => p.key === 'p' || p.key === me.key) : todoPeople();
+    const opts = pool.filter(p => !cur.some(a => a.key === p.key));
     if (!opts.length) { toast('所有人都已是負責人'); return; }
     const m = document.createElement('div');
     m.className = 'csel-menu td-who-menu';
@@ -3826,12 +3902,24 @@ function tdSetWho(id, list, added) {
     if (added) { patch.lastEvent = { type: 'assigned', to: [added.key], by: me.key, byName: me.name, at: now }; patch.seen = { ...(t.seen || {}), [me.key]: now }; }
     tdPatch(id, patch);
 }
+// 收合前把清單輸入框裡還沒送出的文字存起來
+function tdFlushCl() {
+    const inp = document.querySelector('#todo-content .td-card .td-cl-add input');
+    const card = inp?.closest('.td-card');
+    if (inp && inp.value.trim()) tdAddCl(card.dataset.id, inp, true);
+}
 // 子清單
 function tdClId() { return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
-function tdAddCl(id, input) {
+function tdAddCl(id, input, quiet) {
     const text = input.value.trim(); if (!text) return;
     input.value = '';
-    if (id === 'new') { _tdNew.checklist.push({ id: tdClId(), text, done: false }); renderTodo(); requestAnimationFrame(() => document.querySelector('.td-card[data-id="new"] .td-cl-add input')?.focus()); return; }
+    if (id === 'new') {
+        if (!_tdNew) return;
+        const c = { id: tdClId(), text, done: false };
+        _tdNew.checklist.push(c);
+        // 離開輸入框時只把項目插進畫面，不整頁重畫（避免打斷正在點的下一個欄位）
+        if (quiet) { input.closest('.td-cl-add')?.insertAdjacentHTML('beforebegin', `<div class="td-cl-item"><button class="td-cl-check" onclick="tdToggleCl('new','${c.id}')"></button><span>${esc(text)}</span><button class="td-cl-del" onclick="tdDelCl('new','${c.id}')" aria-label="刪除">${TD_ICON.x}</button></div>`); return; }
+        renderTodo(); requestAnimationFrame(() => document.querySelector('.td-card[data-id="new"] .td-cl-add input')?.focus()); return; }
     const t = todos.find(x => x.id === id); if (!t) return;
     tdPatch(id, { checklist: [...(t.checklist || []), { id: tdClId(), text, done: false }] });
 }
@@ -7706,7 +7794,7 @@ function confirm2(text,onOk) {
     showModal('modal-confirm');
 }
 let _tt;
-function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2800);}
+function toast(msg,ms){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),ms||2800);}
 function setConn(s,l){document.getElementById('conn-dot').className='conn-dot '+s;document.getElementById('conn-label').textContent=l;}
 function showSetup(err){hideLoading();document.getElementById('setup-overlay').style.display='flex';if(err){const e=document.getElementById('setup-err');e.textContent=err;e.style.display='block';}else{document.getElementById('setup-err').style.display='none';}}
 function hideSetup(){document.getElementById('setup-overlay').style.display='none';}
