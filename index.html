@@ -1682,7 +1682,7 @@ appId: "..."'></textarea>
         <button class="btn-sidebar hidden" id="btn-settings" onclick="openSettings()">系統設定</button>
         <button class="btn-sidebar hidden" id="btn-logout" onclick="logoutAll()">登出</button>
         <button class="btn-sidebar" onclick="showSetup()">重新設定連線</button>
-        <div class="app-ver">版本 0929-4</div>
+        <div class="app-ver">版本 0929-5</div>
     </div>
 </nav>
 
@@ -8478,13 +8478,13 @@ const LEAVE_RULES = {
         pay: '不給薪', payNotes: ['日薪以 $36,000 ÷ 30 天＝$1,200 計算', '以天數為單位，一天 2 診', '原為 All 班（3 診）者需另行補一診'],
         bonus: '當月累計：3 天內扣 $500、5 天內扣 $1,000、8 天以上扣 $2,000（全額）', note: '一年合計不超過 14 日' },
     sick: { name: '病假', proc: ['提前 3 天於線上填寫請假單', '助理長、院長審核通過'],
-        pay: '不給薪', payNotes: ['日薪以 $36,000 ÷ 30 天＝$1,200 計算', '以天數為單位，一天 2 診', '原為 All 班（3 診）者需另行補一診'],
+        pay: '折半發給', payNotes: ['一年內未超過 30 日的部分工資折半發給', '日薪以 $36,000 ÷ 30 天＝$1,200 計算', '以天數為單位，一天 2 診', '原為 All 班（3 診）者需另行補一診', '例：請假 1 天（2 診）→ 當日薪資 $1,200 ÷ 2＝$600'],
         bonus: '當月累計：3 天內扣 $500、5 天內扣 $1,000、8 天以上扣 $2,000（全額）', note: '一年合計不超過 14 日' },
     menstrual: { name: '生理假', proc: ['事先 LINE 通知助理長／院長', '線上填寫請假單', '助理長、院長審核通過'],
         pay: '折半發給', payNotes: ['日薪以 $36,000 ÷ 30 天＝$1,200 計算', '以天數為單位，一天 2 診', '原為 All 班（3 診）者需另行補一診', '例：請假 1 天（2 診）→ 當日薪資 $1,200 ÷ 2＝$600'],
         bonus: '照常', note: '超過 3 日會併入病假計算，一年合計不超過 12 日' },
     annual: { name: '特休', proc: ['事先 LINE 通知助理長／院長', '線上填寫請假單', '助理長、院長審核通過'],
-        pay: '折半發給', payNotes: ['日薪以 $36,000 ÷ 30 天＝$1,200 計算', '以天數為單位，一天 2 診', '原為 All 班（3 診）者需另行補一診', '例：請假 1 天（2 診）→ 當日薪資 $1,200 ÷ 2＝$600'],
+        pay: '照常給薪', payNotes: ['以天數為單位，一天 2 診', '原為 All 班（3 診）者需另行補一診'],
         bonus: '照常', note: '天數依勞基法規定' },
     typhoon: { name: '颱風假', proc: ['按政府公告放假'], pay: '照常給薪', payNotes: [], bonus: '', note: '' },
 };
