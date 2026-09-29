@@ -175,6 +175,60 @@
         .stl-pct{width:50px;text-align:right;font-weight:700;font-size:var(--fs-base);color:var(--accent);flex-shrink:0;}
         .stl-pts{width:60px;text-align:right;font-size:var(--fs-cap);color:var(--text-muted);flex-shrink:0;}
 
+        /* ── 月份切換（‹ 本月 ›）── */
+        .mnav{display:inline-flex;flex-direction:column;align-items:center;gap:4px;}
+        .mnav-row{display:flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:3px;}
+        .mnav-arrow{width:34px;height:32px;border:none;background:none;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+        .mnav-arrow:hover{background:var(--surface-alt);color:var(--text-primary);}
+        .mnav-arrow:disabled{opacity:.25;cursor:default;background:none;}
+        .mnav-label{min-width:104px;height:32px;border:none;background:none;border-radius:9px;font-family:inherit;font-size:var(--fs-base);font-weight:700;color:var(--text-primary);cursor:pointer;position:relative;padding:0 8px;}
+        .mnav.two .mnav-label{min-width:64px;}
+        .mnav-label.now::after{content:'';position:absolute;left:50%;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--accent);transform:translateX(-50%);}
+        .mnav-year{display:inline-flex;align-items:center;gap:4px;border:none;background:none;font-family:inherit;font-size:var(--fs-sm);font-weight:700;color:var(--text-secondary);cursor:pointer;padding:2px 8px;border-radius:6px;}
+        .mnav-year:hover{background:var(--surface-alt);color:var(--text-primary);}
+        .mnav-wrap{justify-content:center;}
+        @media(max-width:700px){ #dash-mnav,#ms-mnav{width:100%;display:flex;justify-content:center;} }
+        /* 時數：數字大、單位小 */
+        .dur b{font-weight:700;}
+        .dur small{font-size:.5em;font-weight:500;color:var(--text-muted);margin:0 5px 0 3px;}
+        .dur small:last-child{margin-right:0;}
+        /* ── 加班及請假記錄 ── */
+        .rc-wrap{max-width:520px;margin:0 auto;}
+        .rc-sum{text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 12px 14px;margin-bottom:18px;}
+        .rc-sum-lbl{font-size:var(--fs-sm);color:var(--text-muted);}
+        .rc-sum-val{font-size:38px;line-height:1.15;color:var(--accent);margin:4px 0 2px;}
+        .rc-sum-sub{font-size:var(--fs-xs);color:var(--text-muted);}
+        .rc-sum-sub b{color:var(--gold,#C68600);}
+        .rc-sec{font-size:var(--fs-sm);font-weight:700;color:var(--text-secondary);text-align:center;margin:0 0 10px;}
+        .rc{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;}
+        .rc-date{flex-shrink:0;width:46px;text-align:center;display:flex;flex-direction:column;padding-top:1px;}
+        .rc-date b{font-size:var(--fs-sub);line-height:1.2;color:var(--text-primary);}
+        .rc-date small{font-size:var(--fs-xs);color:var(--text-muted);}
+        .rc-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+        .rc-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+        .rc-kind{font-size:var(--fs-xs);font-weight:700;padding:1px 7px;border-radius:5px;}
+        .rc-kind.ot{background:var(--accent-light);color:var(--accent);}
+        .rc-kind.lv{background:var(--gold-light,#FFF6E0);color:#996600;}
+        .rc-title{font-size:var(--fs-base);font-weight:700;color:var(--text-primary);}
+        .rc-line{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:var(--fs-sm);color:var(--text-secondary);}
+        .rc-dur{font-size:18px;color:var(--accent);white-space:nowrap;}
+        .rc-note{font-size:var(--fs-sm);color:var(--text-primary);}
+        .rc-meta{font-size:var(--fs-xs);color:var(--text-muted);}
+        .rc-reject{font-size:var(--fs-xs);color:var(--red);}
+        .rc-sig{max-width:140px;margin-top:4px;}
+        .rc-del{align-self:flex-start;margin-top:4px;border:1px solid var(--red-border);background:none;color:var(--red);border-radius:8px;padding:4px 10px;font-family:inherit;font-size:var(--fs-xs);cursor:pointer;}
+        .rc-st{flex-shrink:0;font-size:var(--fs-xs);font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+        .rc-st.pend{background:var(--gold-light,#FFF6E0);color:#996600;}
+        .rc-st.ok{background:var(--green-light);color:var(--green);}
+        .rc-st.bad{background:var(--red-light);color:var(--red);}
+        .rc-empty{text-align:center;font-size:var(--fs-sm);color:var(--text-muted);padding:18px 0;}
+        .rc-fold{width:100%;display:flex;align-items:center;justify-content:center;gap:6px;margin:10px 0;padding:10px;border:none;background:var(--surface-alt);border-radius:10px;font-family:inherit;font-size:var(--fs-sm);font-weight:700;color:var(--text-secondary);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+        .rc-fold em{font-style:normal;font-weight:500;color:var(--text-muted);}
+        .rc-fold svg{transition:transform .3s;}
+        .rc-fold.open svg{transform:rotate(180deg);}
+        .rc-rest-in{gap:0!important;}
+        .rc-mhd{font-size:var(--fs-xs);font-weight:700;color:var(--text-muted);text-align:center;margin:8px 0 8px;}
+        .rc-foot{text-align:center;font-size:var(--fs-xs);color:var(--text-muted);margin:14px 0 4px;}
         /* ── Month tabs ── */
         .month-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
         .month-tab{padding:6px 14px;border-radius:4px;border:1px solid var(--border);background:var(--surface);font-size:var(--fs-cap);font-weight:500;cursor:pointer;color:var(--text-secondary);transition:background .15s,color .15s,border-color .15s;font-family:inherit;}
@@ -1682,7 +1736,7 @@ appId: "..."'></textarea>
         <button class="btn-sidebar hidden" id="btn-settings" onclick="openSettings()">系統設定</button>
         <button class="btn-sidebar hidden" id="btn-logout" onclick="logoutAll()">登出</button>
         <button class="btn-sidebar" onclick="showSetup()">重新設定連線</button>
-        <div class="app-ver">版本 0929-5</div>
+        <div class="app-ver">版本 0929-6</div>
     </div>
 </nav>
 
@@ -1765,7 +1819,7 @@ appId: "..."'></textarea>
             </div>
         </div>
         <div id="rec-tab-history" class="hidden page-content">
-            <div class="month-tabs" id="rec-history-month-tabs"></div>
+            <div class="month-tabs mnav-wrap" id="rec-history-month-tabs"></div>
             <div class="filter-row" style="flex-wrap:wrap;gap:8px">
                 <select class="form-select" id="rec-history-asst-filter" onchange="renderRecordHistory()" style="max-width:180px"><option value="">所有助理</option></select>
                 <select class="form-select" id="rec-history-type-filter" onchange="renderRecordHistory()" style="max-width:140px">
@@ -1800,7 +1854,7 @@ appId: "..."'></textarea>
             </div>
         </div>
         <div id="hist-tab-history" class="page-content">
-            <div class="month-tabs" id="history-month-tabs"></div>
+            <div class="month-tabs mnav-wrap" id="history-month-tabs"></div>
             <div class="filter-row">
                 <select class="form-select" id="history-asst-filter" onchange="renderHistory()"><option value="">所有助理</option></select>
                 <select class="form-select" id="history-type-filter" onchange="renderHistory()">
@@ -1835,7 +1889,7 @@ appId: "..."'></textarea>
             <button class="btn btn-outline btn-sm" onclick="exportToExcel('settlement')">↓ 匯出 Excel</button>
         </div>
         <div class="page-content">
-            <div class="month-tabs" id="stl-month-tabs"></div>
+            <div class="month-tabs mnav-wrap" id="stl-month-tabs"></div>
             <div id="stl-content"></div>
         </div>
     </div>
@@ -1847,7 +1901,7 @@ appId: "..."'></textarea>
             <button class="btn btn-outline btn-sm" onclick="exportToExcel('salary')">↓ 匯出 Excel</button>
         </div>
         <div class="page-content">
-            <div class="month-tabs" id="sal-month-tabs"></div>
+            <div class="month-tabs mnav-wrap" id="sal-month-tabs"></div>
             <div id="sal-content"></div>
         </div>
     </div>
@@ -2018,10 +2072,7 @@ appId: "..."'></textarea>
     <div id="page-dashboard" class="page">
         <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
             <div><h2>總覽</h2><p id="dash-month-label">—</p></div>
-            <div class="tab-btn-group">
-                <button class="tbb" onclick="setDashMonth(-1)">上個月</button>
-                <button class="tbb" id="dash-next" onclick="setDashMonth(1)">下個月</button>
-            </div>
+            <div id="dash-mnav"></div>
         </div>
         <div class="page-content" id="dash-content"></div>
     </div>
@@ -2036,11 +2087,7 @@ appId: "..."'></textarea>
     <div id="page-myshift" class="page">
         <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
             <div><h2>我的班表</h2><p id="myshift-month">—</p></div>
-            <div class="tab-btn-group">
-                <button class="tbb" onclick="setMyShiftMonth(-1)">上個月</button>
-                <button class="tbb" onclick="_msMonth=null;renderMyShift()">本月</button>
-                <button class="tbb" onclick="setMyShiftMonth(1)">下個月</button>
-            </div>
+            <div id="ms-mnav"></div>
         </div>
         <div class="page-content" id="myshift-content"></div>
     </div>
@@ -3055,6 +3102,7 @@ function msCell(data, mk, ds, sh, name, pid) {
 
 // ── 助理：我的班表 ──
 let _msMonth = null, _msSheet = null;
+function msGoMonth(m) { _msMonth = m === currentMonth() ? null : m; renderMyShift(); }
 function setMyShiftMonth(delta) {
     const [y, m] = (_msMonth || currentMonth()).split('-').map(Number);
     const d = new Date(y, m - 1 + delta, 1);
@@ -3068,7 +3116,8 @@ function renderMyShift() {
     const asst = who.kind === 'asst' ? currentAssistantView : null;
     msEnsureSched(); schedStartPreLeave(); schedStartSwaps();
     const mk = _msMonth || currentMonth();
-    document.getElementById('myshift-month').textContent = monthLabel(mk);
+    document.getElementById('myshift-month').textContent = mk === currentMonth() ? '本月' : monthLabel(mk);
+    document.getElementById('ms-mnav').innerHTML = monthNavHTML(mk, 'msGoMonth', { max: addMonthYM(currentMonth(), 3) });
     if (_msErr) { el.innerHTML = `<div class="info-box">班表讀取失敗：${_msErr.code === 'permission-denied' ? '請院長在 Firebase 安全性規則允許 schedule 資料表' : _msErr.message}</div>`; return; }
     if (!_msLoaded) { el.innerHTML = '<div class="sched-boot"><div class="spinner"></div></div>'; return; }
     const data = schedStore.get();
@@ -4156,6 +4205,7 @@ function dashShortNames(list) {
     });
     return out;
 }
+function dashGoMonth(m) { _dashMonth = m; renderDashboard(); }
 function setDashMonth(delta) {
     const [y, m] = (_dashMonth || currentMonth()).split('-').map(Number);
     const d = new Date(y, m - 1 + delta, 1);
@@ -4165,8 +4215,8 @@ function setDashMonth(delta) {
 function renderDashboard() {
     const el = document.getElementById('dash-content'); if (!el) return;
     const mk = _dashMonth || currentMonth();
-    document.getElementById('dash-month-label').textContent = monthLabel(mk);
-    document.getElementById('dash-next').disabled = mk >= currentMonth();
+    document.getElementById('dash-month-label').textContent = mk === currentMonth() ? '本月' : monthLabel(mk);
+    document.getElementById('dash-mnav').innerHTML = monthNavHTML(mk, 'dashGoMonth');
 
     const recs = (state.overtime || []).filter(r => (r.date || '').startsWith(mk));
     const approved = recs.filter(r => r.status === 'approved');
@@ -4190,12 +4240,12 @@ function renderDashboard() {
         const color = slices[i].color;
         const pct = totalMin ? (r.min / totalMin * 100).toFixed(1) : '0.0';
         return `<tr><td><span class="dash-chip" style="background:${color};color:${dashInk(color)}">${short[r.id]}</span>${r.name}</td>
-            <td class="num">${hrs(r.min)} h</td><td class="num muted">${pct}%</td></tr>`;
+            <td class="num">${durShort(r.min)}</td><td class="num muted">${pct}%</td></tr>`;
     }).join('');
 
     el.innerHTML = `
         <div class="grid-3 section">
-            <div class="stat-card"><div class="lb">本月加班總時數</div><div class="val">${hrs(totalMin)}<span class="dash-unit">小時</span></div><div class="sub">已核准 ${approved.length} 筆</div></div>
+            <div class="stat-card"><div class="lb">${mk === currentMonth() ? '本月' : monthLabel(mk)}加班總時數</div><div class="val dur">${durHTML(totalMin)}</div><div class="sub">已核准 ${approved.length} 筆・共 ${totalMin} 分鐘</div></div>
             <div class="stat-card dash-link" onclick="navigate('attendance')"><div class="lb">待簽核加班</div><div class="val">${pendingOT}</div><div class="sub">前往假勤管理</div></div>
             <div class="stat-card dash-link" onclick="navigate('attendance')"><div class="lb">待簽核請假</div><div class="val">${pendingLV}</div><div class="sub">前往假勤管理</div></div>
         </div>
@@ -4246,7 +4296,7 @@ function renderDashboard() {
         options: {
             responsive: true, maintainAspectRatio: true, animation: { duration: 300 },
             layout: { padding: { left: 34, right: 34, top: 22, bottom: 22 } },
-            plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.label}：${c.parsed.toFixed(1)} 小時（${(slices[c.dataIndex].min / totalMin * 100).toFixed(1)}%）` } } },
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.label}：${durShort(slices[c.dataIndex].min)}（${(slices[c.dataIndex].min / totalMin * 100).toFixed(1)}%）` } } },
         },
         plugins: [sliceLabels],
     });
@@ -4747,6 +4797,48 @@ function last6Months() {
     return arr;
 }
 function monthLabel(ym) { const [y,m]=ym.split('-'); return `${y}年${parseInt(m)}月`; }
+function addMonthYM(ym, d) { const [y, m] = ym.split('-').map(Number); const t = new Date(y, m - 1 + d, 1); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}`; }
+// 月份切換：‹ 本月 ›，點中間回到本月；opts.year＝上方多一列年度（點擊選年）
+const MNAV_ARROW = d => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="${d < 0 ? '15 6 9 12 15 18' : '9 6 15 12 9 18'}"/></svg>`;
+function monthNavHTML(cur, fn, opts = {}) {
+    const max = opts.max || currentMonth(), min = opts.min || '2020-01';
+    const prev = addMonthYM(cur, -1), next = addMonthYM(cur, 1), now = currentMonth();
+    const home = now < min ? min : now > max ? max : now;
+    const y = cur.slice(0, 4), m = +cur.slice(5, 7);
+    return `<div class="mnav${opts.year ? ' two' : ''}">
+        ${opts.year ? `<button type="button" class="mnav-year" onclick="mnavYearMenu(this,'${fn}','${cur}','${min}','${max}')">${y} 年<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>` : ''}
+        <div class="mnav-row">
+            <button type="button" class="mnav-arrow" ${prev < min ? 'disabled' : ''} onclick="${fn}('${prev}')" aria-label="上個月">${MNAV_ARROW(-1)}</button>
+            <button type="button" class="mnav-label${cur === now ? ' now' : ''}" onclick="${fn}('${home}')" title="回到本月">${opts.year ? m + ' 月' : monthLabel(cur)}</button>
+            <button type="button" class="mnav-arrow" ${next > max ? 'disabled' : ''} onclick="${fn}('${next}')" aria-label="下個月">${MNAV_ARROW(1)}</button>
+        </div></div>`;
+}
+let _mnavMenu = null;
+function mnavYearMenu(btn, fn, cur, min, max) {
+    _mnavMenu?.remove();
+    const ys = []; for (let y = +max.slice(0, 4); y >= +min.slice(0, 4); y--) ys.push(y);
+    const m = document.createElement('div');
+    m.className = 'csel-menu';
+    m.innerHTML = ys.map(y => `<button type="button" class="csel-opt${String(y) === cur.slice(0, 4) ? ' on' : ''}" data-y="${y}">${y} 年</button>`).join('');
+    m.addEventListener('click', e => {
+        const b = e.target.closest('button[data-y]'); if (!b) return;
+        let ym = `${b.dataset.y}-${cur.slice(5, 7)}`;
+        if (ym > max) ym = max; if (ym < min) ym = min;
+        m.remove(); _mnavMenu = null; window[fn](ym);
+    });
+    document.body.appendChild(m);
+    const r = btn.getBoundingClientRect();
+    m.style.left = Math.max(8, Math.min(r.left + r.width / 2 - m.offsetWidth / 2, innerWidth - m.offsetWidth - 8)) + 'px';
+    m.style.top = (r.bottom + 6) + 'px';
+    _mnavMenu = m;
+}
+document.addEventListener('pointerdown', e => { if (_mnavMenu && !_mnavMenu.contains(e.target) && !e.target.closest('.mnav-year')) { _mnavMenu.remove(); _mnavMenu = null; } }, true);
+// 時數：數字大、單位小
+function durHTML(mins) {
+    mins = Math.max(0, Math.round(mins || 0)); const hh = Math.floor(mins / 60), mm = mins % 60;
+    return hh ? `<b>${hh}</b><small>小時</small>${mm ? `<b>${mm}</b><small>分</small>` : ''}` : `<b>${mm}</b><small>分鐘</small>`;
+}
+function durShort(mins) { mins = Math.max(0, Math.round(mins || 0)); const hh = Math.floor(mins / 60), mm = mins % 60; return hh ? `${hh} 時 ${mm} 分` : `${mm} 分`; }
 function txnMonth(t) { return t.date.slice(0,7); }
 function fmtDate(s) { const d=new Date(s); return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`; }
 function fmtTimestamp(iso) {
@@ -4939,6 +5031,7 @@ function navigate(p) {
     mnGlassMove(true);
     closeDrawer();
     document.body.classList.toggle('on-sched', p === 'schedule');
+    if (p === 'schedule' && currentPage !== 'schedule' && !window._schedGoto) { window._schedGoto = { mk: currentMonth() }; if (_schedMounted) setTimeout(() => schedStore._notify(), 0); }
     currentPage=p; renderPage(p);
     window.mtableScan?.();
 }
@@ -5131,9 +5224,7 @@ let recHistSelected = new Set();
 
 function renderRecordHistory() {
     if (!recHistoryMonth) recHistoryMonth = currentMonth();
-    document.getElementById('rec-history-month-tabs').innerHTML = last6Months().map(m =>
-        `<button class="month-tab ${m===recHistoryMonth?'active':''}" onclick="setRecHistoryMonth('${m}')">${monthLabel(m)}</button>`
-    ).join('');
+    document.getElementById('rec-history-month-tabs').innerHTML = monthNavHTML(recHistoryMonth, 'setRecHistoryMonth', { min: last6Months()[5] });
     const af = document.getElementById('rec-history-asst-filter');
     const curAf = af.value;
     af.innerHTML = '<option value="">所有助理</option>' + state.assistants.map(a=>`<option value="${a.id}" ${a.id===curAf?'selected':''}>${a.name}</option>`).join('');
@@ -5569,9 +5660,7 @@ function renderHistory() {
     // sync tab UI state
     setHistoryTab(histPageTab);
     if(!historyMonth) historyMonth=currentMonth();
-    document.getElementById('history-month-tabs').innerHTML=last6Months().map(m=>
-        `<button class="month-tab ${m===historyMonth?'active':''}" onclick="setHistoryMonth('${m}')">${monthLabel(m)}</button>`
-    ).join('');
+    document.getElementById('history-month-tabs').innerHTML = monthNavHTML(historyMonth, 'setHistoryMonth', { min: last6Months()[5] });
     const af=document.getElementById('history-asst-filter');
     const curAf=af.value;
     af.innerHTML='<option value="">所有助理</option>'+state.assistants.map(a=>`<option value="${a.id}" ${a.id===curAf?'selected':''}>${a.name}</option>`).join('');
@@ -5614,9 +5703,7 @@ function deleteTxn(id){
 // ================================================================
 function renderSettlementPage() {
     if(!stlMonth) stlMonth=currentMonth();
-    document.getElementById('stl-month-tabs').innerHTML=last6Months().map(m=>
-        `<button class="month-tab ${m===stlMonth?'active':''}" onclick="setStlMonth('${m}')">${monthLabel(m)}</button>`
-    ).join('');
+    document.getElementById('stl-month-tabs').innerHTML = monthNavHTML(stlMonth, 'setStlMonth', { min: last6Months()[5] });
     renderStlContent();
 }
 function setStlMonth(m){stlMonth=m;renderSettlementPage();}
@@ -5705,9 +5792,7 @@ function renderStlContent() {
 // ================================================================
 function renderSalaryPage() {
     if (!salaryMonth) salaryMonth = currentMonth();
-    document.getElementById('sal-month-tabs').innerHTML = last6Months().map(m =>
-        `<button class="month-tab ${m===salaryMonth?'active':''}" onclick="setSalaryMonth('${m}')">${monthLabel(m)}</button>`
-    ).join('');
+    document.getElementById('sal-month-tabs').innerHTML = monthNavHTML(salaryMonth, 'setSalaryMonth', { min: last6Months()[5] });
     renderSalaryContent();
 }
 function setSalaryMonth(m) { salaryMonth = m; renderSalaryPage(); }
@@ -6952,7 +7037,7 @@ function renderOvertimeApprove() {
             <div class="ot-stat-grid" style="margin-bottom:14px">
                 <div class="ot-stat-card total-card">
                     <div class="sc-name">所有助理合計</div>
-                    <div class="sc-val">${formatOTDuration(totalMins)}</div>
+                    <div class="sc-val dur">${durHTML(totalMins)}</div>
                     <div class="sc-sub">${totalMins} 分鐘</div>
                 </div>
                 ${asstCards}
@@ -7117,9 +7202,9 @@ function renderOTHistoryModal() {
     const totalApproved = recs.filter(r=>r.status==='approved').reduce((s,r)=>s+r.overtimeMinutes,0);
 
     const monthTabs = `
-        <div class="month-tabs" style="margin:0 0 12px">
-            ${months6.map(mo=>`<button class="month-tab ${mo===_otHistMonth?'active':''}" onclick="setOTHistMonth('${mo}')">${monthLabel(mo)}</button>`).join('')}
-            <button class="month-tab ${isAll?'active':''}" onclick="setOTHistMonth('all')">近半年全部</button>
+        <div class="month-tabs mnav-wrap" style="margin:0 0 12px;align-items:center;gap:10px">
+            ${monthNavHTML(isAll ? currentMonth() : _otHistMonth, 'setOTHistMonth', { min: oldest })}
+            <button class="month-tab ${isAll?'active':''}" onclick="setOTHistMonth('${isAll ? currentMonth() : 'all'}')">近半年全部</button>
         </div>`;
 
     el.innerHTML = `
@@ -8127,7 +8212,7 @@ function renderAttendanceOTMgmt() {
         const mins = byAsstId[a.id] || 0;
         return `<div class="ot-stat-card" style="position:relative">
             <div class="sc-name">${a.name}</div>
-            <div class="sc-val" style="font-size:18px">${formatOTDuration(mins)}</div>
+            <div class="sc-val dur" style="font-size:22px">${durHTML(mins)}</div>
             <div class="sc-sub">${mins} 分鐘</div>
             <button onclick="openOTHistory('${a.id}','${a.name}','${m}')" style="margin-top:8px;width:100%;padding:4px 0;font-size:var(--fs-xs);border:1px solid var(--border);border-radius:4px;background:var(--surface-alt);cursor:pointer;font-family:inherit;color:var(--text-secondary)">${PENCIL_ICON} 查看/調整</button>
         </div>`;
@@ -8137,12 +8222,12 @@ function renderAttendanceOTMgmt() {
         <div class="section">
             <div class="sec-header">
                 <div class="sec-title">加班時數總覽</div>
-                <div class="month-tabs" style="margin:0">${last6Months().map(mo=>`<button class="month-tab ${mo===m?'active':''}" onclick="setAttOTMonth('${mo}')">${monthLabel(mo)}</button>`).join('')}</div>
+                ${monthNavHTML(m, 'setAttOTMonth', { year: true, min: (state.overtime.map(r => (r.date || '').slice(0, 7)).filter(Boolean).sort()[0] || currentMonth()).slice(0, 4) + '-01' })}
             </div>
             <div class="ot-stat-grid" style="margin-bottom:14px;margin-top:12px">
                 <div class="ot-stat-card total-card">
                     <div class="sc-name">所有助理合計</div>
-                    <div class="sc-val">${formatOTDuration(totalMins)}</div>
+                    <div class="sc-val dur">${durHTML(totalMins)}</div>
                     <div class="sc-sub">${totalMins} 分鐘</div>
                 </div>
                 ${asstCards}
@@ -8583,76 +8668,80 @@ async function deleteMyOTRecord(id) {
     });
 }
 
+let _rcOpen = false;
 function renderCombinedRecords() {
     const asst = otAsst();
     const isDemo = asst && asst.id === '__demo';
     const el = document.getElementById('combined-records-content'); if (!el) return;
     if (!asst) { el.innerHTML = '<div class="empty-state"><p>請先登入助理帳號</p></div>'; return; }
-    const months6 = last6Months();
-    const oldest = months6[months6.length - 1];
-    const m = currentMonth();
+    const oldest = last6Months()[5], m = currentMonth();
+    const WD = ['日','一','二','三','四','五','六'];
+    const md = ds => { const d = new Date(ds + 'T00:00:00'); return { m: d.getMonth() + 1, d: d.getDate(), w: WD[d.getDay()] }; };
+    // 只留存近 6 個月（請假含未來）
+    const otRecs = (isDemo ? _demoOT : state.overtime).filter(r => r.assistantId === asst.id && r.date.slice(0, 7) >= oldest);
+    const lvRecs = (isDemo ? _demoLV : state.leaveRequests).filter(r => r.assistantId === asst.id && (r.dates || []).some(d => d.slice(0, 7) >= oldest));
+    const monthOT = otRecs.filter(r => r.date.startsWith(m) && r.status === 'approved');
+    const totalMins = monthOT.reduce((s, r) => s + r.overtimeMinutes, 0);
+    const pendN = otRecs.filter(r => r.status === 'pending').length + lvRecs.filter(r => /^pending/.test(r.status)).length;
 
-    // OT records (last 6 months)
-    const otRecs = (isDemo ? _demoOT : state.overtime)
-        .filter(r => r.assistantId === asst.id && r.date.slice(0,7) >= oldest)
-        .sort((x,y) => new Date(y.date) - new Date(x.date));
-    const monthOT = otRecs.filter(r => r.date.startsWith(m) && r.status==='approved');
-    const totalMins = monthOT.reduce((s,r) => s+r.overtimeMinutes, 0);
-    const pendingOT = otRecs.filter(r => r.status === 'pending');
+    const items = [
+        ...otRecs.map(r => ({ kind: 'ot', r, date: r.date, last: r.date })),
+        ...lvRecs.map(r => { const ds = [...(r.dates || [])].sort(); return { kind: 'lv', r, date: ds[0], last: ds[ds.length - 1] }; }),
+    ];
+    // 優先：本月與未來、尚未核准；其餘（過去或已簽核）收在下方
+    const top = it => it.last >= m + '-01' && it.r.status !== 'approved';
+    const byDate = (a, b) => b.date.localeCompare(a.date);
+    const primary = items.filter(top).sort(byDate);
+    const rest = items.filter(it => !top(it)).sort(byDate);
 
-    const renderOTRow = (r) => {
-        const sig = r.approverSignature ? `<img class="ot-sig-img sig-zoomable" src="${r.approverSignature}" alt="${r.approverName}簽名" onclick="openImgZoom(this.src)"><div style="font-size:var(--fs-xs);color:var(--text-muted);margin-top:3px">${r.approverName} 簽核${r.approvedAt?' · '+fmtTimestamp(r.approvedAt):''}</div>` : '';
-        // 助理僅能自行刪除「待簽核」或「已退回」的加班單；已簽核者需請院長處理
-        const canDelete = r.status === 'pending' || r.status === 'rejected';
-        const delBtn = canDelete
-            ? `<div style="margin-top:8px"><button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red-border)" onclick="deleteMyOTRecord('${r.id}')">刪除申請</button></div>`
-            : '';
-        return `<div class="ot-record">
-            <div class="ot-record-hd">
-                <div>
-                    <span style="font-weight:700;font-size:var(--fs-base)">${r.date}</span>
-                    <span style="color:var(--text-muted);font-size:var(--fs-sm);margin-left:8px">${r.otShiftName}</span>
+    const stMap = { pending: ['待簽核', 'pend'], approved: ['已核准', 'ok'], rejected: ['已退回', 'bad'], pending_supervisor: ['待主管簽核', 'pend'], pending_principal: ['待院長批核', 'pend'] };
+    const card = it => {
+        const r = it.r, d = md(it.date), st = stMap[r.status] || [r.status, 'pend'];
+        if (it.kind === 'ot') {
+            const canDelete = r.status === 'pending' || r.status === 'rejected';
+            return `<div class="rc">
+                <div class="rc-date"><b>${d.m}/${d.d}</b><small>週${d.w}</small></div>
+                <div class="rc-main">
+                    <div class="rc-top"><span class="rc-kind ot">加班</span><span class="rc-title">${esc(r.otShiftName || '')}</span></div>
+                    <div class="rc-line"><span>${r.otType === 'early' ? '提早 ' : ''}${esc(r.scheduledEnd || '')} → ${esc(r.actualEnd || '')}</span><span class="rc-dur dur">${durHTML(r.overtimeMinutes)}</span></div>
+                    ${r.note ? `<div class="rc-note">${esc(r.note)}</div>` : ''}
+                    <div class="rc-meta">簽核醫師：${esc(r.approverName || '—')}${r.approvedAt ? '・' + fmtTimestamp(r.approvedAt) : ''}</div>
+                    ${r.approverSignature ? `<img class="ot-sig-img sig-zoomable rc-sig" src="${r.approverSignature}" alt="${esc(r.approverName)}簽名" onclick="openImgZoom(this.src)">` : ''}
+                    ${canDelete ? `<button class="rc-del" onclick="deleteMyOTRecord('${r.id}')">刪除申請</button>` : ''}
                 </div>
-                <span class="${r.status==='approved'?'ot-appr':r.status==='rejected'?'badge br':'ot-pend'}">${r.status==='approved'?'已簽核':r.status==='rejected'?'已退回':'待簽核'}</span>
+                <span class="rc-st ${st[1]}">${st[0]}</span>
+            </div>`;
+        }
+        const dates = [...(r.dates || [])].sort().map(x => { const q = md(x); return `${q.m}/${q.d}（${q.w}）`; }).join('、');
+        return `<div class="rc">
+            <div class="rc-date"><b>${d.m}/${d.d}</b><small>週${d.w}</small></div>
+            <div class="rc-main">
+                <div class="rc-top"><span class="rc-kind lv">請假</span><span class="rc-title">${esc(leaveTypeLabel(r.leaveType, r.leaveSubType))}・${(r.dates || []).length} 天</span></div>
+                <div class="rc-line"><span>${dates}</span></div>
+                <div class="rc-meta">代理：${esc(r.proxyName || '—')}・主管：${esc(r.approverName || '—')}</div>
+                ${r.status === 'rejected' ? `<div class="rc-reject">退回原因：${esc(r.rejectReason || '—')}</div>` : ''}
             </div>
-            <div style="font-size:var(--fs-sm);color:var(--text-secondary);line-height:1.8">
-                ${r.scheduledEnd} → ${r.actualEnd}
-                <span class="pp" style="margin-left:8px">+${formatOTDuration(r.overtimeMinutes)}</span>
-                <span style="color:var(--text-muted);margin-left:8px">簽核：${r.approverName}</span>
-            </div>
-            ${r.note?`<div style="font-size:var(--fs-sm);color:var(--text-muted);margin-top:4px">${r.note}</div>`:''}
-            ${sig}
-            ${delBtn}
+            <span class="rc-st ${st[1]}">${st[0]}</span>
         </div>`;
     };
+    const groups = {};
+    rest.forEach(it => { const k = it.date.slice(0, 7); (groups[k] = groups[k] || []).push(it); });
+    const restHTML = Object.keys(groups).sort().reverse().map(k => `<div class="rc-mhd">${monthLabel(k)}</div>${groups[k].map(card).join('')}`).join('');
 
-    // Leave records (current year)
-    const thisYear = String(new Date().getFullYear());
-    const lvRecs = (isDemo ? _demoLV : state.leaveRequests)
-        .filter(r => r.assistantId === asst.id && (r.dates||[]).some(d => d.startsWith(thisYear)))
-        .sort((a,b) => (b.dates?.[0]||'') > (a.dates?.[0]||'') ? 1 : -1);
-    const pendingLV = lvRecs.filter(r => r.status === 'pending_supervisor' || r.status === 'pending_principal');
-    const doneLV    = lvRecs.filter(r => r.status === 'approved' || r.status === 'rejected');
-
-    el.innerHTML = `
-        <div class="stat-card section">
-            <div class="lb">本月已核加班時數</div>
-            <div class="val" style="color:var(--accent)">${formatOTDuration(totalMins)}</div>
-            <div class="sub">${monthOT.length} 筆已簽核</div>
+    el.innerHTML = `<div class="rc-wrap">
+        <div class="rc-sum">
+            <div class="rc-sum-lbl">本月已核准加班</div>
+            <div class="rc-sum-val dur">${durHTML(totalMins)}</div>
+            <div class="rc-sum-sub">${monthOT.length} 筆已簽核${pendN ? `・<b>${pendN}</b> 筆待簽核` : ''}</div>
         </div>
-        ${pendingOT.length || pendingLV.length ? `<div class="section">
-            <div class="sec-title" style="margin-bottom:10px;color:var(--text-secondary)">待簽核（${pendingOT.length+pendingLV.length}）</div>
-            ${pendingOT.map(renderOTRow).join('')}
-            ${pendingLV.map(r=>renderLeaveCard(r, false, false)).join('')}
-        </div>` : ''}
-        <div class="section">
-            <div class="sec-title" style="margin-bottom:10px">加班記錄（近 6 個月）</div>
-            ${otRecs.filter(r=>r.status!=='pending').length ? otRecs.filter(r=>r.status!=='pending').map(renderOTRow).join('') : '<div class="empty-state"><p>近 6 個月尚無加班記錄</p></div>'}
-        </div>
-        <div class="section">
-            <div class="sec-title" style="margin-bottom:10px">請假記錄</div>
-            ${doneLV.length ? doneLV.map(r=>renderLeaveCard(r, false, false)).join('') : '<div class="empty-state"><p>尚無請假記錄</p></div>'}
-        </div>`;
+        <div class="rc-sec">本月與即將到來</div>
+        ${primary.length ? primary.map(card).join('') : '<div class="rc-empty">目前沒有待簽核的申請</div>'}
+        ${rest.length ? `<button type="button" class="rc-fold${_rcOpen ? ' open' : ''}" onclick="_rcOpen=!_rcOpen;this.classList.toggle('open',_rcOpen);fxReveal('rc-rest',_rcOpen)">
+            <span>已簽核與較早的記錄</span><em>${rest.length}</em>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <div class="fx-reveal${_rcOpen ? ' open' : ''}" id="rc-rest"><div class="fx-reveal-in rc-rest-in">${restHTML}</div></div>` : ''}
+        <div class="rc-foot">紀錄保留近 6 個月</div>
+    </div>`;
 }
 
 function renderLeavePrincipal(el, year) {
@@ -12640,7 +12729,7 @@ function App() {
     const g = window._schedGoto; if (!g) return;
     window._schedGoto = null;
     if (g.mk) { setViewYear(+g.mk.slice(0, 4)); setViewMonth(+g.mk.slice(5, 7)); }
-    setPage(g.page || 'schedule');
+    if ('page' in g) setPage(g.page || 'schedule');
   });
 
   // 其他裝置的修改即時同步進來
