@@ -417,6 +417,77 @@
 
         /* ─── Overtime ─── */
         .ot-shift-row{display:flex;gap:8px;flex-wrap:wrap;}
+        /* ─── 置中表單（加班／請假）─── */
+        .fx{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:18px;}
+        .fx-field{display:flex;flex-direction:column;align-items:stretch;gap:7px;}
+        .fx-lbl{font-size:var(--fs-sm);font-weight:700;color:var(--text-secondary);text-align:center;}
+        .fx-sublbl{font-size:var(--fs-xs);color:var(--text-muted);text-align:center;margin:10px 0 6px;}
+        .fx-in{width:100%;height:44px;box-sizing:border-box;padding:0 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-family:inherit;font-size:var(--fs-base);color:var(--text-primary);text-align:center;}
+        input.fx-in[type=date]{-webkit-appearance:none;appearance:none;display:block;line-height:42px;}
+        input.fx-in[type=date]::-webkit-date-and-time-value{text-align:center;}
+        .fx-field .csel-btn,.fx-row .csel-btn{width:100%;height:44px;border-radius:10px;justify-content:center;font-size:var(--fs-base);}
+        .fx-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+        .fx-add{align-self:center;padding:5px 14px;font-size:var(--fs-sm);}
+        .fx-dates{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+        .fx-dates:empty{display:none;}
+        .fx-date-chip{display:inline-flex;align-items:center;gap:2px;padding:4px 4px 4px 12px;border-radius:14px;background:var(--surface-alt);font-size:var(--fs-sm);color:var(--text-primary);}
+        .fx-date-chip button{border:none;background:none;cursor:pointer;color:var(--text-muted);font-size:16px;line-height:1;padding:0 6px;}
+        .fx-submit{width:100%;height:46px;border-radius:10px;font-size:var(--fs-base);margin-top:4px;justify-content:center;}
+        .fx .csel-text{text-align:center;padding-left:12px;}
+        .lv-rule .csel-text{text-align:left;padding-left:0;}
+        .fx-card{max-width:520px;margin-left:auto;margin-right:auto;}
+        .fx-card-hd{display:flex;align-items:center;justify-content:space-between;font-size:var(--fs-base);font-weight:700;padding-bottom:12px;margin-bottom:16px;border-bottom:1px solid var(--border);}
+        /* 分段滑動選擇（與底部功能列同樣的單色色塊） */
+        .seg{position:relative;display:flex;gap:2px;padding:3px;border:1px solid var(--border);border-radius:12px;background:var(--surface);}
+        .seg-pill{position:absolute;z-index:0;left:0;top:0;width:0;height:0;opacity:0;border-radius:9px;background:#EDEDED;pointer-events:none;transition:opacity .2s;}
+        .seg-btn{position:relative;z-index:1;flex:1 1 0;min-width:0;min-height:38px;border:none;background:none;border-radius:9px;padding:6px 4px;font-family:inherit;font-size:var(--fs-base);color:var(--text-secondary);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;-webkit-tap-highlight-color:transparent;transition:color .2s;}
+        .seg-btn.on{color:var(--text-primary);font-weight:700;}
+        .seg-btn small{font-size:10px;font-weight:400;color:var(--text-muted);line-height:1.3;}
+        /* 展開下一層 */
+        .fx-reveal{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .38s cubic-bezier(.3,.7,.25,1),opacity .28s ease,margin .38s;margin-top:-18px;}
+        .fx-reveal.open{grid-template-rows:1fr;opacity:1;margin-top:0;}
+        .fx-reveal > .fx-reveal-in{overflow:hidden;min-height:0;display:flex;flex-direction:column;gap:18px;}
+        .fx-field .fx-reveal{margin-top:0;}
+        .fx-field .fx-reveal > .fx-reveal-in{gap:0;}
+        .fx-field .fx-reveal.open > .fx-reveal-in{padding-top:2px;}
+        .fx-field #ot-other.open > .fx-reveal-in{padding-top:8px;}
+        @media(prefers-reduced-motion:reduce){ .fx-reveal{transition:none;} }
+        .fx-chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+        .fx-chip{min-height:44px;padding:6px 8px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-family:inherit;font-size:var(--fs-sm);color:var(--text-secondary);cursor:pointer;line-height:1.3;-webkit-tap-highlight-color:transparent;transition:background .2s,color .2s,border-color .2s;}
+        .fx-chip.on{background:#EDEDED;border-color:#D6D6D6;color:var(--text-primary);font-weight:700;}
+        .ot-result{text-align:center;border-radius:10px;}
+        .ot-result.bad{background:var(--red-light)!important;color:var(--red)!important;border-color:var(--red-border)!important;}
+        /* 特休概況（精簡） */
+        .lv-quota{max-width:520px;margin:0 auto 14px;display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 14px;}
+        .lv-q-hd{font-size:var(--fs-sm);font-weight:700;color:var(--text-primary);display:flex;flex-direction:column;line-height:1.3;white-space:nowrap;}
+        .lv-q-hd span{font-size:var(--fs-xs);font-weight:400;color:var(--text-muted);}
+        .lv-q-nums{flex:1;display:grid;grid-template-columns:repeat(3,1fr);text-align:center;}
+        .lv-q-nums div{display:flex;flex-direction:column;}
+        .lv-q-nums b{font-size:22px;line-height:1.15;}
+        .lv-q-nums span{font-size:var(--fs-xs);color:var(--text-muted);}
+        /* 請假規定框 */
+        .lv-rule{border:1px solid var(--border);border-radius:12px;background:var(--surface-alt);padding:12px 14px;min-height:92px;}
+        .lv-rule.empty{display:flex;align-items:center;justify-content:center;}
+        .lv-rule-empty{font-size:var(--fs-sm);color:var(--text-muted);}
+        .lv-rule-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+        .lv-rule-name{font-size:var(--fs-sub);font-weight:700;color:var(--text-primary);}
+        .lv-rule-tag{font-size:var(--fs-xs);color:var(--text-muted);}
+        .lv-rule .csel-btn{height:34px;border-radius:8px;font-weight:700;min-width:120px;}
+        .lvr-row{display:grid;grid-template-columns:64px 1fr;gap:8px;padding:7px 0;border-top:1px solid rgba(0,0,0,.06);font-size:var(--fs-sm);color:var(--text-primary);line-height:1.5;}
+        .lvr-row > span{color:var(--text-muted);font-size:var(--fs-xs);padding-top:2px;}
+        .lvr-row ul{margin:3px 0 0;padding-left:16px;color:var(--text-secondary);}
+        .lvr-row li{margin:1px 0;}
+        .lvr-row b.warn{color:var(--red);} .lvr-row b.ok{color:var(--green);}
+        .lvr-steps{display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px;}
+        .lvr-steps em{font-style:normal;}
+        .lvr-steps i{font-style:normal;color:var(--text-muted);}
+        .lvr-modal{max-width:760px;}
+        .lvr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+        .lvr-card{border:1px solid var(--border);border-radius:12px;padding:10px 14px;}
+        .lvr-name{font-size:var(--fs-sub);font-weight:700;padding-bottom:6px;}
+        /* 院長：助理預覽開關 */
+        .ot-demo{display:none;align-items:center;gap:8px;font-size:var(--fs-sm);font-weight:600;color:var(--text-secondary);cursor:pointer;white-space:nowrap;}
+        body.principal-mode .ot-demo{display:flex;}
         .ot-shift-btn{flex:1;min-width:90px;padding:10px 12px;border-radius:4px;border:1px solid var(--border);font-size:var(--fs-base);font-weight:500;cursor:pointer;background:var(--surface);color:var(--text-secondary);font-family:inherit;transition:background .15s,border-color .15s,color .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.4;}
         .ot-shift-btn:hover{border-color:var(--border-strong);background:var(--surface-alt);color:var(--text-primary);}
         .ot-shift-btn.sm{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
@@ -1611,7 +1682,7 @@ appId: "..."'></textarea>
         <button class="btn-sidebar hidden" id="btn-settings" onclick="openSettings()">系統設定</button>
         <button class="btn-sidebar hidden" id="btn-logout" onclick="logoutAll()">登出</button>
         <button class="btn-sidebar" onclick="showSetup()">重新設定連線</button>
-        <div class="app-ver">版本 0929-3</div>
+        <div class="app-ver">版本 0929-4</div>
     </div>
 </nav>
 
@@ -1890,60 +1961,11 @@ appId: "..."'></textarea>
                 <button class="tbb" id="tbb-lv-apply" onclick="setOTTab('lv-apply')">申請請假</button>
                 <button class="tbb" id="tbb-records" onclick="setOTTab('records')">記錄</button>
             </div>
+            <label class="ot-demo" title="用示範助理的資料預覽助理看到的畫面，不會寫入資料庫">助理預覽<span class="ios-switch"><input type="checkbox" id="ot-demo" onchange="setOTDemo(this.checked)"><span class="ios-slider"></span></span></label>
         </div>
         <div class="page-content">
-            <div id="ot-apply-form">
-                <div class="section">
-                    <div class="form-group"><label class="form-label">日期</label><input type="date" class="form-input" id="ot-date" style="max-width:180px"></div>
-                </div>
-                <div class="section">
-                    <div class="form-label" style="margin-bottom:10px">當日班別（可複選）</div>
-                    <div class="ot-shift-row" id="ot-worked-shifts"></div>
-                </div>
-                <div class="section" id="ot-overtime-section" style="display:none">
-                    <div class="form-label" style="margin-bottom:10px">加班班次</div>
-                    <div class="ot-shift-row" id="ot-ot-shift-btns"></div>
-                    <!-- 加班類型切換 -->
-                    <div class="ot-type-toggle" style="display:flex;gap:0;margin-top:14px;border:1px solid var(--border);border-radius:4px;overflow:hidden;max-width:320px">
-                        <button id="ot-type-late" onclick="setOTType('late')"
-                            style="flex:1;padding:8px 0;border:none;font-size:var(--fs-sm);font-family:inherit;cursor:pointer;background:var(--accent);color:#fff;font-weight:700">延後結束</button>
-                        <button id="ot-type-early" onclick="setOTType('early')"
-                            style="flex:1;padding:8px 0;border:none;font-size:var(--fs-sm);font-family:inherit;cursor:pointer;background:var(--surface);color:var(--text-secondary)">提早上班</button>
-                    </div>
-                    <!-- 延後結束：輸入結束時間 -->
-                    <div id="ot-late-section" style="margin-top:14px">
-                        <div class="form-label">加班結束時間（24 小時制）</div>
-                        <div style="display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap">
-                            <select class="form-select" id="ot-end-hour" style="width:90px" onchange="updateOTCalc()"></select>
-                            <span style="font-weight:700">時</span>
-                            <select class="form-select" id="ot-end-min" style="width:90px" onchange="updateOTCalc()"></select>
-                            <span style="font-weight:700">分</span>
-                        </div>
-                    </div>
-                    <!-- 提早上班：輸入開始時間 -->
-                    <div id="ot-early-section" style="display:none;margin-top:14px">
-                        <div class="form-label">提早上班時間（24 小時制）</div>
-                        <div style="display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap">
-                            <select class="form-select" id="ot-start-hour" style="width:90px" onchange="updateOTCalc()"></select>
-                            <span style="font-weight:700">時</span>
-                            <select class="form-select" id="ot-start-min" style="width:90px" onchange="updateOTCalc()"></select>
-                            <span style="font-weight:700">分</span>
-                        </div>
-                    </div>
-                    <div id="ot-calc-result" class="ot-result hidden"></div>
-                </div>
-                <div class="section">
-                    <div class="form-group">
-                        <label class="form-label">簽核醫師</label>
-                        <select class="form-select" id="ot-approver" style="max-width:200px"></select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">加班原因（可複選）</label>
-                        <div id="ot-reason-list" style="display:flex;flex-direction:column;gap:9px;margin-top:6px"></div>
-                    </div>
-                    <button class="btn btn-primary" onclick="submitOvertimeApply()">送出申請</button>
-                </div>
-            </div>
+            <div id="ot-need-asst" class="info-box" style="display:none"></div>
+            <div id="ot-apply-form"></div>
             <div id="ot-status-content" style="display:none"></div>
             <div id="lv-apply-form" style="display:none"></div>
             <div id="combined-records-content" style="display:none"></div>
@@ -2172,6 +2194,12 @@ appId: "..."'></textarea>
 </div>
 
 <!-- ══ Modal: 新增請假紀錄（院長） ══ -->
+<div id="modal-lv-rules" class="modal-overlay hidden" onclick="if(event.target===this)hideModal('modal-lv-rules')">
+    <div class="modal lvr-modal">
+        <div class="modal-hd"><div class="modal-title">請假規則</div><button class="modal-x" onclick="hideModal('modal-lv-rules')">×</button></div>
+        <div class="modal-body" id="lv-rules-body"></div>
+    </div>
+</div>
 <div id="modal-add-leave" class="modal-overlay hidden">
     <div class="modal" style="max-width:520px">
         <div class="modal-hd"><div class="modal-title">新增請假紀錄</div><button class="modal-x" onclick="hideModal('modal-add-leave')">×</button></div>
@@ -4322,7 +4350,9 @@ let settings = {
     }
 };
 // ── Overtime state ────────────────────────────────────────────────
-let otState = { workedShifts: [], otSegKey: null, otType: 'late' }; // otSegKey = 'shiftId:segIdx', otType = 'late'|'early'
+// 加班表單狀態（班別單選；otSegKey = 'shiftId:segIdx'；h/m 為結束或提早上班的時間）
+function otFresh() { return { date: '', shift: null, otSegKey: null, otType: 'late', h: null, m: 0, reasons: [], delaySub: '', other: '' }; }
+let otState = otFresh();
 let otTab = 'ot-apply'; // 'ot-apply' | 'lv-apply' | 'records'
 let recPageTab = 'record'; // 'record' | 'rules' | 'history'
 let histPageTab = 'history'; // 'history' | 'rules'
@@ -6614,258 +6644,225 @@ function setOTTab(tab) {
     renderOvertimeApply();
 }
 
+// ── 滑動切換（單選）：共用的分段選擇器，色塊用彈性移動 ──
+function segHTML(id, opts, sel, fn) {
+    return `<div class="seg" id="${id}" data-fn="${fn}"><span class="seg-pill" aria-hidden="true"></span>${opts.map(o =>
+        `<button type="button" class="seg-btn${o.key === sel ? ' on' : ''}" data-k="${esc(o.key)}" onclick="segClick(this)"><span>${esc(o.label)}</span>${o.sub ? `<small>${esc(o.sub)}</small>` : ''}</button>`).join('')}</div>`;
+}
+function segPlace(seg, animate) {
+    const pill = seg.querySelector(':scope > .seg-pill'), b = seg.querySelector(':scope > .seg-btn.on');
+    if (!pill) return;
+    if (!b || !seg.offsetWidth) { if (!b) { pill.style.opacity = 0; pill.dataset.on = ''; } return; }
+    const to = { x: b.offsetLeft, y: b.offsetTop, w: b.offsetWidth, h: b.offsetHeight };
+    const from = pill.dataset.on ? glassNow(pill) : null;
+    Object.assign(pill.style, { opacity: 1, left: to.x + 'px', top: to.y + 'px', width: to.w + 'px', height: to.h + 'px' });
+    pill.dataset.on = '1';
+    if (animate && from && Math.abs(from.x - to.x) > 1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) elasticMove(pill, from, to, true);
+}
+function segInitAll(root) { (root || document).querySelectorAll('.seg').forEach(s => segPlace(s, false)); }
+function segClick(btn) {
+    const seg = btn.closest('.seg');
+    if (btn.classList.contains('on')) return;
+    seg.querySelectorAll(':scope > .seg-btn').forEach(b => b.classList.toggle('on', b === btn));
+    segPlace(seg, true);
+    const fn = window[seg.dataset.fn]; if (typeof fn === 'function') fn(btn.dataset.k);
+}
+window.addEventListener('resize', () => segInitAll());
+// 展開／收合下一層（高度與透明度過渡）
+function fxReveal(id, open) { const el = document.getElementById(id); if (el) el.classList.toggle('open', !!open); }
+
+// ── 院長預覽：示範助理與虛擬資料（只存在這個畫面，不寫入資料庫）──
+let _otDemo = false;
+const DEMO_ASST = { id: '__demo', name: '示範助理', hireDate: '2022-03-01', active: true };
+let _demoOT = null, _demoLV = null;
+function demoSeed() {
+    if (_demoOT) return;
+    const d = n => { const x = new Date(); x.setDate(x.getDate() - n); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`; };
+    const now = new Date().toISOString(), doc = settings.doctors[0]?.name || '醫師', mgr = settings.managers?.[0]?.name || '主任';
+    const base = { assistantId: '__demo', assistantName: '示範助理', createdAt: now };
+    _demoOT = [
+        { ...base, id: 'demo-ot1', date: d(1), otShiftName: '早午班－午班', scheduledEnd: '18:00', actualEnd: '18:40', overtimeMinutes: 40, otType: 'late', approverName: doc, status: 'pending', note: '醫師延遲下診（跟診）' },
+        { ...base, id: 'demo-ot2', date: d(6), otShiftName: '午晚班－晚班', scheduledEnd: '21:30', actualEnd: '22:05', overtimeMinutes: 35, otType: 'late', approverName: doc, status: 'approved', approvedAt: now, note: '流動器械量大' },
+        { ...base, id: 'demo-ot3', date: d(13), otShiftName: '全天班－早班', scheduledEnd: '08:30', actualEnd: '09:00', overtimeMinutes: 30, otType: 'early', approverName: doc, status: 'rejected', note: '其他：整理庫存' },
+    ];
+    _demoLV = [
+        { ...base, id: 'demo-lv1', leaveType: 'annual', leaveSubType: '', dates: [d(21), d(20)], proxyName: '金孟漪', approverName: mgr, status: 'approved' },
+        { ...base, id: 'demo-lv2', leaveType: 'sick', leaveSubType: '', dates: [d(-4)], proxyName: '鍾庭茵', approverName: mgr, status: 'pending_supervisor' },
+    ];
+}
+function otAsst() {
+    if (currentAssistantView) return currentAssistantView;
+    if (viewMode === 'principal' && _otDemo) { demoSeed(); return DEMO_ASST; }
+    return null;
+}
+function setOTDemo(on) {
+    _otDemo = !!on; otState = otFresh(); window._leaveDates = []; _selectedLeaveType = null; _lvSubType = '';
+    const f = document.getElementById('ot-apply-form'); if (f) f.dataset.for = '';
+    renderOvertimeApply();
+}
+
 function renderOvertimeApply() {
-    const titleEl   = document.getElementById('ot-page-title');
-    const subEl     = document.getElementById('ot-page-sub');
-    const applyForm = document.getElementById('ot-apply-form');
-    const statusSec = document.getElementById('ot-status-content');
-    const lvForm    = document.getElementById('lv-apply-form');
-    const recSec    = document.getElementById('combined-records-content');
-
-    // Update tab button active states
-    ['ot-apply','lv-apply','records'].forEach(t => {
-        document.getElementById('tbb-'+t)?.classList.toggle('active', otTab === t);
-    });
-
-    // Show/hide panels
+    const titleEl = document.getElementById('ot-page-title');
+    const subEl   = document.getElementById('ot-page-sub');
+    ['ot-apply','lv-apply','records'].forEach(t => document.getElementById('tbb-'+t)?.classList.toggle('active', otTab === t));
+    const demoEl = document.getElementById('ot-demo'); if (demoEl) demoEl.checked = _otDemo;
     const show = id => { const el = document.getElementById(id); if (el) el.style.display = ''; };
     const hide = id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
-
+    ['ot-apply-form','ot-status-content','lv-apply-form','combined-records-content','ot-need-asst'].forEach(hide);
+    const asst = otAsst();
+    const demoTag = asst && asst.id === '__demo' ? '・預覽模式' : '';
+    if (!asst) {
+        const need = document.getElementById('ot-need-asst');
+        need.innerHTML = viewMode === 'principal' ? '這是助理填寫加班及請假的頁面。打開右上角的「助理預覽」，就能用示範資料看到助理的畫面。' : '請先登入助理帳號';
+        show('ot-need-asst');
+        return;
+    }
     if (otTab === 'records') {
         if (titleEl) titleEl.textContent = '記錄';
-        if (subEl)   subEl.textContent   = '加班及請假申請記錄';
-        hide('ot-apply-form'); hide('ot-status-content'); hide('lv-apply-form');
-        show('combined-records-content');
-        renderCombinedRecords();
-        return;
+        if (subEl) subEl.textContent = '加班及請假申請記錄' + demoTag;
+        show('combined-records-content'); renderCombinedRecords(); return;
     }
     if (otTab === 'lv-apply') {
         if (titleEl) titleEl.textContent = '申請請假';
-        if (subEl)   subEl.textContent   = '填寫請假申請單';
-        hide('ot-apply-form'); hide('ot-status-content'); hide('combined-records-content');
-        show('lv-apply-form');
-        renderLeaveForm();
-        return;
+        if (subEl) subEl.textContent = '填寫請假申請單' + demoTag;
+        show('lv-apply-form'); renderLeaveForm(); return;
     }
-    // ot-apply (default)
     if (titleEl) titleEl.textContent = '加班及請假';
-    if (subEl)   subEl.textContent   = '填寫加班申請單';
-    hide('ot-status-content'); hide('lv-apply-form'); hide('combined-records-content');
+    if (subEl) subEl.textContent = '填寫加班申請單' + demoTag;
     show('ot-apply-form');
+    renderOTForm();
+}
 
-    // Date — restrict to past 3 days
-    const dateEl = document.getElementById('ot-date');
+function renderOTForm() {
+    const box = document.getElementById('ot-apply-form'); const asst = otAsst();
+    if (!box || !asst) return;
     const todayStr = today();
     const d3 = new Date(); d3.setDate(d3.getDate() - 2);
     const minStr = `${d3.getFullYear()}-${String(d3.getMonth()+1).padStart(2,'0')}-${String(d3.getDate()).padStart(2,'0')}`;
-    dateEl.max = todayStr; dateEl.min = minStr;
-    if (!dateEl.value || dateEl.value < minStr || dateEl.value > todayStr) dateEl.value = todayStr;
-
-    // Worked shift buttons
-    const wsEl = document.getElementById('ot-worked-shifts');
-    wsEl.innerHTML = settings.shifts.map(sh=>`
-        <button class="ot-shift-btn ${otState.workedShifts.includes(sh.id)?getShiftClass(sh.id):''}"
-            onclick="toggleOTWorkedShift('${sh.id}')">${sh.name}<br><span style="font-size:var(--fs-xs);font-weight:400;opacity:.8">${sh.segments?.map(s=>s.start+'–'+s.end).join('<br>') || (sh.endTime?sh.endTime:'')}</span></button>
-    `).join('');
-
-    // 加班原因（動態，院長可於系統設定調整）— 須在提前 return 之前渲染
-    renderOTReasonChecks();
-
-    // OT shift section
-    const otSec = document.getElementById('ot-overtime-section');
-    if (!otState.workedShifts.length) { otSec.style.display='none'; return; }
-    otSec.style.display='';
-    const otBtns = document.getElementById('ot-ot-shift-btns');
-    const segments = [];
-    otState.workedShifts.forEach(sid => {
-        const sh = settings.shifts.find(s => s.id === sid);
-        if (!sh?.segments?.length) return;
-        sh.segments.forEach((seg, idx) => {
-            segments.push({ key: `${sid}:${idx}`, label: getSegmentName(seg), time: `${seg.start}-${seg.end}`, shiftId: sid });
-        });
-    });
-    otBtns.innerHTML = segments.map(seg => `
-        <button class="ot-shift-btn ${otState.otSegKey===seg.key?getShiftClass(seg.shiftId):''}"
-            onclick="selectOTSeg('${seg.key}')">${seg.label}<br><span style="font-size:var(--fs-xs);font-weight:400;opacity:.8">${seg.time}</span></button>
-    `).join('');
-
-    // Hour/min selects (end time)
-    const hourEl = document.getElementById('ot-end-hour');
-    const minEl = document.getElementById('ot-end-min');
-    if (!hourEl.options.length) {
-        for (let h=0;h<24;h++) hourEl.add(new Option(String(h).padStart(2,'0'),h));
-        for (let m=0;m<60;m++) minEl.add(new Option(String(m).padStart(2,'0'),m));
+    if (!otState.date || otState.date < minStr || otState.date > todayStr) otState.date = todayStr;
+    const reasons = [...getOTReasons(), '其他'];
+    const docOpts = settings.doctors.length ? settings.doctors.map(d => `<option value="${esc(d.name)}">${esc(d.name)}</option>`).join('') : '<option value="">（尚無醫師帳號）</option>';
+    if (box.dataset.for !== asst.id || box.dataset.docs !== String(settings.doctors.length)) {
+        box.dataset.for = asst.id; box.dataset.docs = String(settings.doctors.length);
+        const hh = Array.from({ length: 24 }, (_, i) => `<option value="${i}">${String(i).padStart(2, '0')} 時</option>`).join('');
+        const mm = Array.from({ length: 60 }, (_, i) => `<option value="${i}">${String(i).padStart(2, '0')} 分</option>`).join('');
+        box.innerHTML = `<div class="fx">
+            <div class="fx-field"><div class="fx-lbl">日期</div><input type="date" class="fx-in" id="ot-date" value="${otState.date}" min="${minStr}" max="${todayStr}" onchange="otState.date=this.value"></div>
+            <div class="fx-field"><div class="fx-lbl">當日班別</div>${segHTML('ot-shift', settings.shifts.map(s => ({ key: s.id, label: s.name, sub: s.segments?.length ? s.segments[0].start + '–' + s.segments[s.segments.length - 1].end : '' })), otState.shift, 'otPickShift')}</div>
+            <div class="fx-reveal${otState.shift ? ' open' : ''}" id="ot-more"><div class="fx-reveal-in">
+                <div class="fx-field"><div class="fx-lbl">加班班次</div><div id="ot-seg-wrap"></div></div>
+                <div class="fx-field"><div class="fx-lbl">加班類型</div>${segHTML('ot-type', [{ key: 'late', label: '延後結束' }, { key: 'early', label: '提早上班' }], otState.otType, 'otPickType')}</div>
+                <div class="fx-field"><div class="fx-lbl" id="ot-time-lbl">${otState.otType === 'early' ? '提早上班時間' : '加班結束時間'}</div>
+                    <div class="fx-row"><select class="fx-in" id="ot-h" onchange="otState.h=+this.value;updateOTCalc()">${hh}</select><select class="fx-in" id="ot-m" onchange="otState.m=+this.value;updateOTCalc()">${mm}</select></div></div>
+                <div id="ot-calc-result" class="ot-result hidden"></div>
+            </div></div>
+            <div class="fx-field"><div class="fx-lbl">簽核醫師</div><select class="fx-in" id="ot-approver">${docOpts}</select></div>
+            <div class="fx-field"><div class="fx-lbl">加班原因（可複選）</div>
+                <div class="fx-chips">${reasons.map(r => `<button type="button" class="fx-chip${otState.reasons.includes(r) ? ' on' : ''}" data-r="${esc(r)}" onclick="otToggleReason(this)">${esc(r)}</button>`).join('')}</div>
+                <div class="fx-reveal${otState.reasons.includes('醫師延遲下診') ? ' open' : ''}" id="ot-delay"><div class="fx-reveal-in"><div class="fx-sublbl">醫師延遲下診時，你的崗位</div>${segHTML('ot-delay-seg', ['櫃檯', '跟診', '流動'].map(k => ({ key: k, label: k })), otState.delaySub, 'otPickDelay')}</div></div>
+                <div class="fx-reveal${otState.reasons.includes('其他') ? ' open' : ''}" id="ot-other"><div class="fx-reveal-in"><input class="fx-in" id="ot-note-other" placeholder="請說明其他原因…" value="${esc(otState.other)}" oninput="otState.other=this.value"></div></div>
+            </div>
+            <button class="btn btn-primary fx-submit" onclick="submitOvertimeApply()">送出申請</button>
+        </div>`;
+        renderOTSegs();
+        segInitAll(box);
     }
-    // Hour/min selects (start time — early OT)
-    const startHourEl = document.getElementById('ot-start-hour');
-    const startMinEl  = document.getElementById('ot-start-min');
-    if (startHourEl && !startHourEl.options.length) {
-        for (let h=0;h<24;h++) startHourEl.add(new Option(String(h).padStart(2,'0'),h));
-        for (let m=0;m<60;m++) startMinEl.add(new Option(String(m).padStart(2,'0'),m));
-    }
-    // Restore type toggle UI
-    setOTType(otState.otType || 'late');
-
-    // Approver
-    const aprEl = document.getElementById('ot-approver');
-    if (!aprEl.innerHTML || aprEl.dataset.count !== String(settings.doctors.length)) {
-        aprEl.dataset.count = String(settings.doctors.length);
-        aprEl.innerHTML = settings.doctors.length
-            ? settings.doctors.map(d=>`<option value="${d.name}">${d.name}</option>`).join('')
-            : '<option value="">（尚無醫師帳號）</option>';
-    }
+    if (otState.h !== null) { document.getElementById('ot-h').value = otState.h; document.getElementById('ot-m').value = otState.m; }
     updateOTCalc();
 }
-
-// 依系統設定渲染加班原因勾選項（保留已勾選狀態），「其他」永遠置於最後
-function renderOTReasonChecks() {
-    const el = document.getElementById('ot-reason-list');
-    if (!el) return;
-    const reasons = getOTReasons();
-    // 保留目前勾選狀態，避免重新渲染時被清空
-    const checkedTexts = new Set();
-    el.querySelectorAll('input.ot-reason-chk:checked').forEach(c => checkedTexts.add(c.dataset.reason));
-    const otherChecked = el.querySelector('#ot-reason-other')?.checked;
-    const otherVal     = el.querySelector('#ot-note-other')?.value || '';
-
-    el.innerHTML = reasons.map((txt, i) => `
-        <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
-            <input type="checkbox" class="ot-reason-chk" id="ot-reason-${i}" data-reason="${txt.replace(/"/g,'&quot;')}"
-                ${checkedTexts.has(txt)?'checked':''}
-                style="width:15px;height:15px;accent-color:var(--accent);flex-shrink:0">
-            <span>${txt}</span>
-        </label>`).join('') + `
-        <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
-            <input type="checkbox" id="ot-reason-other" ${otherChecked?'checked':''}
-                style="width:15px;height:15px;accent-color:var(--accent);flex-shrink:0"
-                onchange="document.getElementById('ot-note-other').style.display=this.checked?'':'none'">
-            <span>其他</span>
-        </label>
-        <input type="text" class="form-input" id="ot-note-other" placeholder="請說明…" value="${otherVal.replace(/"/g,'&quot;')}"
-            style="display:${otherChecked?'':'none'};margin-top:2px;max-width:280px">`;
+// 依選的班別列出可加班的班次
+function renderOTSegs() {
+    const wrap = document.getElementById('ot-seg-wrap'); if (!wrap) return;
+    const sh = settings.shifts.find(s => s.id === otState.shift);
+    const segs = (sh?.segments || []).map((seg, i) => ({ key: `${sh.id}:${i}`, label: getSegmentName(seg), sub: `${seg.start}–${seg.end}` }));
+    wrap.innerHTML = segs.length ? segHTML('ot-seg', segs, otState.otSegKey, 'otPickSeg') : '';
+    segInitAll(wrap);
 }
-
-// 收集使用者勾選的加班原因
+function otSeg() {
+    if (!otState.otSegKey) return null;
+    const [sid, i] = otState.otSegKey.split(':');
+    return settings.shifts.find(s => s.id === sid)?.segments?.[+i] || null;
+}
+// 預設時間：延後結束＝班次下班時間；提早上班＝班次上班時間
+function otDefaultTime() {
+    const seg = otSeg(); if (!seg) return;
+    const t = otState.otType === 'early' ? seg.start : seg.end;
+    otState.h = +t.slice(0, 2); otState.m = +t.slice(3, 5);
+    const hEl = document.getElementById('ot-h'), mEl = document.getElementById('ot-m');
+    if (hEl) hEl.value = otState.h; if (mEl) mEl.value = otState.m;
+}
+function otPickShift(k) {
+    otState.shift = k; otState.otSegKey = null;
+    renderOTSegs();
+    fxReveal('ot-more', true);
+    requestAnimationFrame(() => segInitAll(document.getElementById('ot-more')));
+    updateOTCalc();
+}
+function otPickSeg(k) { otState.otSegKey = k; otDefaultTime(); updateOTCalc(); }
+function otPickType(k) {
+    otState.otType = k;
+    const lbl = document.getElementById('ot-time-lbl'); if (lbl) lbl.textContent = k === 'early' ? '提早上班時間' : '加班結束時間';
+    otDefaultTime(); updateOTCalc();
+}
+function otPickDelay(k) { otState.delaySub = k; }
+function otToggleReason(btn) {
+    const r = btn.dataset.r, i = otState.reasons.indexOf(r);
+    if (i >= 0) otState.reasons.splice(i, 1); else otState.reasons.push(r);
+    btn.classList.toggle('on', i < 0);
+    if (r === '醫師延遲下診') { fxReveal('ot-delay', i < 0); requestAnimationFrame(() => segInitAll(document.getElementById('ot-delay'))); }
+    if (r === '其他') { fxReveal('ot-other', i < 0); if (i < 0) setTimeout(() => document.getElementById('ot-note-other')?.focus(), 250); }
+}
+// 收集加班原因（醫師延遲下診附上崗位、其他附上說明）
 function collectOTReasons() {
-    const reasons = [];
-    document.querySelectorAll('#ot-reason-list input.ot-reason-chk:checked').forEach(c => reasons.push(c.dataset.reason));
-    if (document.getElementById('ot-reason-other')?.checked) {
-        const other = document.getElementById('ot-note-other')?.value.trim();
-        reasons.push(other ? `其他：${other}` : '其他');
+    return [...getOTReasons(), '其他'].filter(r => otState.reasons.includes(r)).map(r =>
+        r === '醫師延遲下診' ? (otState.delaySub ? `醫師延遲下診（${otState.delaySub}）` : r)
+        : r === '其他' ? (otState.other.trim() ? `其他：${otState.other.trim()}` : '其他') : r);
+}
+function otCalc() {
+    const seg = otSeg(); if (!seg || otState.h === null) return null;
+    const t = String(otState.h).padStart(2, '0') + ':' + String(otState.m || 0).padStart(2, '0');
+    if (otState.otType === 'early') {
+        const mins = calcEarlyOTMinutes(seg.start, t);
+        return { mins, t, seg, label: mins > 0 ? `提早上班加班：${formatOTDuration(mins)}（${t} → ${seg.start}）` : '上班時間不早於班次開始，請確認' };
     }
-    return reasons;
+    const mins = calcOTMinutes(seg.end, t);
+    return { mins, t, seg, label: mins > 0 ? `加班時數：${formatOTDuration(mins)}（${seg.end} → ${t}）` : '結束時間需晚於下班時間' };
 }
-
-function toggleOTWorkedShift(sid) {
-    const idx = otState.workedShifts.indexOf(sid);
-    if (idx>=0) {
-        otState.workedShifts.splice(idx, 1);
-        if (otState.otSegKey?.startsWith(sid+':')) otState.otSegKey = null;
-    } else otState.workedShifts.push(sid);
-    renderOvertimeApply();
-}
-
-function selectOTSeg(key) {
-    otState.otSegKey = otState.otSegKey === key ? null : key;
-    renderOvertimeApply();
-}
-
-function setOTType(type) {
-    otState.otType = type;
-    document.getElementById('ot-type-late').style.background  = type==='late'  ? 'var(--accent)' : 'var(--surface)';
-    document.getElementById('ot-type-late').style.color        = type==='late'  ? '#fff' : 'var(--text-secondary)';
-    document.getElementById('ot-type-early').style.background  = type==='early' ? 'var(--accent)' : 'var(--surface)';
-    document.getElementById('ot-type-early').style.color       = type==='early' ? '#fff' : 'var(--text-secondary)';
-    document.getElementById('ot-late-section').style.display   = type==='late'  ? '' : 'none';
-    document.getElementById('ot-early-section').style.display  = type==='early' ? '' : 'none';
-    updateOTCalc();
-}
-
 function updateOTCalc() {
-    const resultEl = document.getElementById('ot-calc-result');
-    if (!resultEl) return;
-    if (!otState.otSegKey) { resultEl.classList.add('hidden'); return; }
-    const [shiftId, segIdx] = otState.otSegKey.split(':');
-    const sh = settings.shifts.find(s => s.id === shiftId);
-    const seg = sh?.segments?.[parseInt(segIdx)];
-    if (!seg) { resultEl.classList.add('hidden'); return; }
-
-    const isEarly = (otState.otType || 'late') === 'early';
-    let mins, label;
-
-    if (isEarly) {
-        const h = document.getElementById('ot-start-hour')?.value;
-        const m = document.getElementById('ot-start-min')?.value;
-        if (h===undefined||h==='') { resultEl.classList.add('hidden'); return; }
-        const actualStart = String(h).padStart(2,'0')+':'+String(m||0).padStart(2,'0');
-        mins = calcEarlyOTMinutes(seg.start, actualStart);
-        label = mins > 0 ? `提早上班加班：${formatOTDuration(mins)}（${actualStart} → ${seg.start}）`
-                         : '上班時間不早於班次開始，請確認';
-    } else {
-        const h = document.getElementById('ot-end-hour')?.value;
-        const m = document.getElementById('ot-end-min')?.value;
-        if (h===undefined||h==='') { resultEl.classList.add('hidden'); return; }
-        const actualEnd = String(h).padStart(2,'0')+':'+String(m||0).padStart(2,'0');
-        mins = calcOTMinutes(seg.end, actualEnd);
-        label = mins > 0 ? `加班時數：${formatOTDuration(mins)}（${seg.end} → ${actualEnd}）`
-                         : '結束時間早於下班時間，請確認';
-    }
-
-    resultEl.classList.remove('hidden');
-    if (mins <= 0) {
-        resultEl.style.background='var(--red-light)';resultEl.style.color='var(--red)';resultEl.style.borderColor='var(--red-border)';
-        resultEl.textContent = label;
-    } else {
-        resultEl.style.background='var(--accent-light)';resultEl.style.color='var(--accent)';resultEl.style.borderColor='#bacde8';
-        resultEl.textContent = label;
-    }
+    const el = document.getElementById('ot-calc-result'); if (!el) return;
+    const c = otCalc();
+    if (!c) { el.classList.add('hidden'); return; }
+    el.classList.remove('hidden');
+    el.classList.toggle('bad', c.mins <= 0);
+    el.textContent = c.label;
 }
 
 async function submitOvertimeApply() {
-    const a = currentAssistantView; if (!a) return;
-    const date = document.getElementById('ot-date').value || today();
-    if (!otState.workedShifts.length) { toast('請選擇當日班別'); return; }
+    const a = otAsst(); if (!a) return;
+    if (!otState.shift) { toast('請選擇當日班別'); return; }
     if (!otState.otSegKey) { toast('請選擇加班班次'); return; }
-    const [shiftId, segIdx] = otState.otSegKey.split(':');
-    const sh = settings.shifts.find(s => s.id === shiftId);
-    const seg = sh?.segments?.[parseInt(segIdx)];
-    if (!seg) { toast('班次設定異常，請重新選擇'); return; }
-    const segName = getSegmentName(seg);
-    const isEarly = (otState.otType || 'late') === 'early';
-    let scheduledEnd, actualEnd, mins;
-    if (isEarly) {
-        const h = document.getElementById('ot-start-hour').value;
-        const m = document.getElementById('ot-start-min').value||'0';
-        const actualStart = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
-        mins = calcEarlyOTMinutes(seg.start, actualStart);
-        if (mins <= 0) { toast('提早上班時間必須早於班次開始時間'); return; }
-        scheduledEnd = actualStart;  // store actual start as scheduledEnd reference
-        actualEnd    = seg.start;    // store shift start as actualEnd reference
-    } else {
-        const h = document.getElementById('ot-end-hour').value;
-        const m = document.getElementById('ot-end-min').value||'0';
-        actualEnd    = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
-        scheduledEnd = seg.end;
-        mins = calcOTMinutes(scheduledEnd, actualEnd);
-        if (mins <= 0) { toast('加班結束時間必須晚於下班時間'); return; }
-    }
+    const c = otCalc();
+    if (!c) { toast('請選擇時間'); return; }
+    if (c.mins <= 0) { toast(otState.otType === 'early' ? '提早上班時間必須早於班次開始時間' : '加班結束時間必須晚於下班時間'); return; }
+    if (otState.reasons.includes('醫師延遲下診') && !otState.delaySub) { toast('請選擇醫師延遲下診時你的崗位'); return; }
     const approver = document.getElementById('ot-approver').value;
     if (!approver) { toast('請選擇簽核醫師'); return; }
-    const reasons = collectOTReasons();
-    const note = reasons.join('、');
+    const sh = settings.shifts.find(s => s.id === otState.shift);
+    const isEarly = otState.otType === 'early';
+    const rec = {
+        assistantId: a.id, assistantName: a.name, date: otState.date || today(),
+        workedShifts: [otState.shift], otShiftId: otState.shift,
+        otShiftName: `${sh.name}－${getSegmentName(c.seg)}${isEarly ? ' (提早上班)' : ''}`,
+        scheduledEnd: isEarly ? c.t : c.seg.end, actualEnd: isEarly ? c.seg.start : c.t,
+        overtimeMinutes: c.mins, otType: otState.otType,
+        approverName: approver, status: 'pending', approverSignature: null, note: collectOTReasons().join('、'),
+        createdAt: new Date().toISOString()
+    };
+    const reset = () => { otState = otFresh(); const f = document.getElementById('ot-apply-form'); if (f) f.dataset.for = ''; renderOvertimeApply(); };
+    if (a.id === '__demo') { _demoOT.unshift({ ...rec, id: 'demo-' + Date.now() }); reset(); toast('預覽模式：已加入示範記錄（不會寫入資料庫）'); return; }
     try {
-        await db.collection(col('overtime')).add({
-            assistantId: a.id, assistantName: a.name, date,
-            workedShifts: otState.workedShifts, otShiftId: shiftId,
-            otShiftName: `${sh.name}－${segName}${isEarly?' (提早上班)':''}`, scheduledEnd, actualEnd, overtimeMinutes: mins, otType: otState.otType || 'late',
-            approverName: approver, status: 'pending', approverSignature: null, note,
-            createdAt: new Date().toISOString()
-        });
-        otState = { workedShifts: [], otSegKey: null, otType: 'late' };
-        document.getElementById('ot-date').value = today();
-        document.querySelectorAll('#ot-reason-list input[type=checkbox]').forEach(c => c.checked = false);
-        const otherEl = document.getElementById('ot-note-other'); if(otherEl){otherEl.value='';otherEl.style.display='none';}
-        renderOvertimeApply();
+        await db.collection(col('overtime')).add(rec);
+        reset();
         toast('申請已送出，等待醫師簽核');
     } catch(e) { toast('送出失敗：'+e.message); }
 }
@@ -8475,73 +8472,104 @@ function renderLeave() {
 }
 
 // ─── renderLeaveForm (injected into combined page for assistants) ──
+// 請假規則（依診所規定整理）
+const LEAVE_RULES = {
+    personal: { name: '事假', proc: ['提前 3 天於線上填寫請假單', '助理長、院長審核通過'],
+        pay: '不給薪', payNotes: ['日薪以 $36,000 ÷ 30 天＝$1,200 計算', '以天數為單位，一天 2 診', '原為 All 班（3 診）者需另行補一診'],
+        bonus: '當月累計：3 天內扣 $500、5 天內扣 $1,000、8 天以上扣 $2,000（全額）', note: '一年合計不超過 14 日' },
+    sick: { name: '病假', proc: ['提前 3 天於線上填寫請假單', '助理長、院長審核通過'],
+        pay: '不給薪', payNotes: ['日薪以 $36,000 ÷ 30 天＝$1,200 計算', '以天數為單位，一天 2 診', '原為 All 班（3 診）者需另行補一診'],
+        bonus: '當月累計：3 天內扣 $500、5 天內扣 $1,000、8 天以上扣 $2,000（全額）', note: '一年合計不超過 14 日' },
+    menstrual: { name: '生理假', proc: ['事先 LINE 通知助理長／院長', '線上填寫請假單', '助理長、院長審核通過'],
+        pay: '折半發給', payNotes: ['日薪以 $36,000 ÷ 30 天＝$1,200 計算', '以天數為單位，一天 2 診', '原為 All 班（3 診）者需另行補一診', '例：請假 1 天（2 診）→ 當日薪資 $1,200 ÷ 2＝$600'],
+        bonus: '照常', note: '超過 3 日會併入病假計算，一年合計不超過 12 日' },
+    annual: { name: '特休', proc: ['事先 LINE 通知助理長／院長', '線上填寫請假單', '助理長、院長審核通過'],
+        pay: '折半發給', payNotes: ['日薪以 $36,000 ÷ 30 天＝$1,200 計算', '以天數為單位，一天 2 診', '原為 All 班（3 診）者需另行補一診', '例：請假 1 天（2 診）→ 當日薪資 $1,200 ÷ 2＝$600'],
+        bonus: '照常', note: '天數依勞基法規定' },
+    typhoon: { name: '颱風假', proc: ['按政府公告放假'], pay: '照常給薪', payNotes: [], bonus: '', note: '' },
+};
+const LEAVE_RULE_ORDER = ['personal', 'sick', 'menstrual', 'annual', 'typhoon'];
+function lvRuleRows(r) {
+    return `<div class="lvr-row"><span>請假程序</span><div class="lvr-steps">${r.proc.map(s => `<em>${esc(s)}</em>`).join('<i>›</i>')}</div></div>
+        <div class="lvr-row"><span>工資</span><div><b class="${/不給薪|折半/.test(r.pay) ? 'warn' : 'ok'}">${esc(r.pay)}</b>${r.payNotes.length ? `<ul>${r.payNotes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}</div></div>
+        ${r.bonus ? `<div class="lvr-row"><span>全勤獎金</span><div>${r.bonus === '照常' ? '<b class="ok">照常</b>' : esc(r.bonus)}</div></div>` : ''}
+        ${r.note ? `<div class="lvr-row"><span>備註</span><div>${esc(r.note)}</div></div>` : ''}`;
+}
+function openLeaveRules() {
+    const body = document.getElementById('lv-rules-body');
+    body.innerHTML = `<div class="lvr-grid">${LEAVE_RULE_ORDER.map(k => `<div class="lvr-card"><div class="lvr-name">${LEAVE_RULES[k].name}</div>${lvRuleRows(LEAVE_RULES[k])}</div>`).join('')}</div>`;
+    showModal('modal-lv-rules');
+}
+let _selectedLeaveType = null, _lvSubType = '';
+// 規定框：未選假別時顯示提示；選「其他」時假別名稱變成下拉選單
+function lvRuleBox() {
+    const t = _selectedLeaveType;
+    if (!t) return '<div class="lv-rule-empty">選擇假別後顯示規定</div>';
+    const sub = t === 'other' ? (_lvSubType || LEAVE_SUB_TYPES[0].key) : '';
+    const name = t === 'other'
+        ? `<select class="lv-rule-sel" id="lv-subtype" onchange="_lvSubType=this.value;updateLvRule()">${LEAVE_SUB_TYPES.map(s => `<option value="${s.key}" ${s.key === sub ? 'selected' : ''}>${s.label}</option>`).join('')}</select>`
+        : `<span class="lv-rule-name">${esc(LEAVE_TYPES.find(x => x.key === t)?.label || '')}</span>`;
+    const rule = LEAVE_RULES[t === 'other' ? sub : t];
+    return `<div class="lv-rule-hd">${name}<span class="lv-rule-tag">請假規定</span></div>
+        <div class="lv-rule-bd">${rule ? lvRuleRows(rule) : '<div class="lvr-row"><span>規定</span><div>依勞動法令規定辦理，申請前請先與助理長確認。</div></div>'}</div>`;
+}
+function updateLvRule() {
+    const box = document.getElementById('lv-rule'); if (!box) return;
+    box.innerHTML = lvRuleBox();
+    box.classList.toggle('empty', !_selectedLeaveType);
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches)
+        box.querySelector('.lv-rule-bd, .lv-rule-empty')?.animate([{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'ease-out' });
+}
 function renderLeaveForm() {
-    const asst = currentAssistantView;
+    const asst = otAsst();
     const el = document.getElementById('lv-apply-form'); if (!el) return;
     if (!asst) { el.innerHTML = '<div class="empty-state"><p>請先登入助理帳號</p></div>'; return; }
     const year = new Date().getFullYear();
     const entitled = calcAnnualLeaveEntitlement(asst, year);
-    const used = calcAnnualLeaveUsed(asst.id, year);
+    const used = asst.id === '__demo'
+        ? _demoLV.filter(r => r.leaveType === 'annual' && r.status === 'approved').reduce((s, r) => s + r.dates.filter(d => d.startsWith(String(year))).length, 0)
+        : calcAnnualLeaveUsed(asst.id, year);
     const remaining = Math.max(0, entitled - used);
     const managers = settings.managers || [];
+    if (!window._leaveDates) window._leaveDates = [];
 
     el.innerHTML = `
-        <div class="card section">
-            <div class="card-title">本年度特休（${year}）</div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;text-align:center">
-                <div><div style="font-size:var(--fs-disp);font-weight:700;color:var(--accent)">${entitled}</div><div style="font-size:var(--fs-sm);color:var(--text-muted);margin-top:4px">應得天數</div></div>
-                <div><div style="font-size:var(--fs-disp);font-weight:700;color:var(--red)">${used}</div><div style="font-size:var(--fs-sm);color:var(--text-muted);margin-top:4px">已使用</div></div>
-                <div><div style="font-size:var(--fs-disp);font-weight:700;color:var(--green)">${remaining}</div><div style="font-size:var(--fs-sm);color:var(--text-muted);margin-top:4px">剩餘天數</div></div>
+        <div class="lv-quota">
+            <div class="lv-q-hd">本年度特休<span>${year}</span></div>
+            <div class="lv-q-nums">
+                <div><b style="color:var(--accent)">${entitled}</b><span>應得</span></div>
+                <div><b style="color:var(--red)">${used}</b><span>已使用</span></div>
+                <div><b style="color:var(--green)">${remaining}</b><span>剩餘</span></div>
             </div>
         </div>
-        <div class="card section">
-            <div class="card-title">申請請假</div>
-            <div class="form-group">
-                <label class="form-label">假別</label>
-                <div class="leave-type-grid" id="lv-type-grid">
-                    ${LEAVE_TYPES.map(t=>`<button class="leave-type-btn" data-ltype="${t.key}" onclick="selectLeaveType('${t.key}')">${t.label}</button>`).join('')}
+        <div class="card section fx-card">
+            <div class="fx-card-hd"><span>申請請假</span><button class="btn btn-outline btn-sm" onclick="openLeaveRules()">請假規則</button></div>
+            <div class="fx">
+                <div class="fx-field"><div class="fx-lbl">假別</div>${segHTML('lv-type', LEAVE_TYPES.map(t => ({ key: t.key, label: t.label })), _selectedLeaveType, 'selectLeaveType')}</div>
+                <div class="lv-rule${_selectedLeaveType ? '' : ' empty'}" id="lv-rule">${lvRuleBox()}</div>
+                <div class="fx-field"><div class="fx-lbl">請假日期（可加入多天）</div>
+                    <input type="date" class="fx-in" id="lv-date-add" value="${today()}">
+                    <button class="btn btn-outline btn-sm fx-add" onclick="addLeaveDate()">＋ 加入日期</button>
+                    <div id="lv-dates-list" class="fx-dates"></div>
                 </div>
+                <div class="fx-field"><div class="fx-lbl">代理人</div>
+                    <select class="fx-in" id="lv-proxy"><option value="">— 請選擇 —</option>
+                    ${state.assistants.filter(a => a.active && a.id !== asst.id).map(a => `<option value="${a.id}" data-name="${esc(a.name)}">${esc(a.name)}</option>`).join('')}</select></div>
+                <div class="fx-field"><div class="fx-lbl">簽核主管</div>
+                    <select class="fx-in" id="lv-approver"><option value="">— 請選擇 —</option>
+                    ${managers.length ? managers.map(m => `<option value="${esc(m.name)}">${esc(m.name)}</option>`).join('') : '<option disabled>（尚無管理者帳號）</option>'}</select></div>
+                <button class="btn btn-primary fx-submit" onclick="submitLeaveRequest()">送出簽核申請</button>
             </div>
-            <div id="lv-subtype-wrap" style="display:none" class="form-group">
-                <label class="form-label">其他假別</label>
-                <select class="form-select" id="lv-subtype" style="max-width:200px">
-                    ${LEAVE_SUB_TYPES.map(s=>`<option value="${s.key}">${s.label}</option>`).join('')}
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">請假日期（可複選多天）</label>
-                <div id="lv-dates-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
-                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                    <input type="date" class="form-input" id="lv-date-add" style="max-width:180px">
-                    <button class="btn btn-outline btn-sm" onclick="addLeaveDate()">＋ 加入日期</button>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="form-label">代理人</label>
-                <select class="form-select" id="lv-proxy" style="max-width:200px">
-                    <option value="">— 請選擇 —</option>
-                    ${state.assistants.filter(a=>a.active&&a.id!==asst.id).map(a=>`<option value="${a.id}" data-name="${a.name}">${a.name}</option>`).join('')}
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">簽核主管</label>
-                <select class="form-select" id="lv-approver" style="max-width:200px">
-                    <option value="">— 請選擇 —</option>
-                    ${managers.length ? managers.map(m=>`<option value="${m.name}">${m.name}</option>`).join('') : '<option disabled>（尚無管理者帳號）</option>'}
-                </select>
-            </div>
-            <button class="btn btn-primary" onclick="submitLeaveRequest()">送出簽核申請</button>
         </div>`;
-
-    const dateEl = document.getElementById('lv-date-add');
-    if (dateEl && !dateEl.value) dateEl.value = today();
-    window._leaveDates = [];
+    segInitAll(el);
+    refreshLeaveDateList();
 }
 
 // ─── renderCombinedRecords (OT + Leave combined for assistant) ─────
 // 助理自行刪除加班申請（僅限本人、且尚未簽核／已退回的紀錄）
 async function deleteMyOTRecord(id) {
-    const asst = currentAssistantView;
+    const asst = otAsst();
+    if (asst && asst.id === '__demo') { _demoOT = _demoOT.filter(r => r.id !== id); toast('預覽模式：已刪除示範記錄'); renderCombinedRecords(); return; }
     const rec = state.overtime.find(r => r.id === id);
     if (!rec) { toast('找不到該筆加班紀錄'); return; }
     if (!asst || rec.assistantId !== asst.id) { toast('僅能刪除自己的加班單'); return; }
@@ -8556,7 +8584,8 @@ async function deleteMyOTRecord(id) {
 }
 
 function renderCombinedRecords() {
-    const asst = currentAssistantView;
+    const asst = otAsst();
+    const isDemo = asst && asst.id === '__demo';
     const el = document.getElementById('combined-records-content'); if (!el) return;
     if (!asst) { el.innerHTML = '<div class="empty-state"><p>請先登入助理帳號</p></div>'; return; }
     const months6 = last6Months();
@@ -8564,7 +8593,7 @@ function renderCombinedRecords() {
     const m = currentMonth();
 
     // OT records (last 6 months)
-    const otRecs = state.overtime
+    const otRecs = (isDemo ? _demoOT : state.overtime)
         .filter(r => r.assistantId === asst.id && r.date.slice(0,7) >= oldest)
         .sort((x,y) => new Date(y.date) - new Date(x.date));
     const monthOT = otRecs.filter(r => r.date.startsWith(m) && r.status==='approved');
@@ -8599,7 +8628,7 @@ function renderCombinedRecords() {
 
     // Leave records (current year)
     const thisYear = String(new Date().getFullYear());
-    const lvRecs = state.leaveRequests
+    const lvRecs = (isDemo ? _demoLV : state.leaveRequests)
         .filter(r => r.assistantId === asst.id && (r.dates||[]).some(d => d.startsWith(thisYear)))
         .sort((a,b) => (b.dates?.[0]||'') > (a.dates?.[0]||'') ? 1 : -1);
     const pendingLV = lvRecs.filter(r => r.status === 'pending_supervisor' || r.status === 'pending_principal');
@@ -8792,15 +8821,9 @@ async function deleteSelectedLeave() {
 }
 
 // ─── Leave type selector ─────────────────────────────────────────
-let _selectedLeaveType = null;
 function selectLeaveType(type) {
     _selectedLeaveType = type;
-    document.querySelectorAll('#lv-type-grid .leave-type-btn').forEach(btn => {
-        const t = LEAVE_TYPES.find(x=>x.key===btn.dataset.ltype);
-        btn.className = 'leave-type-btn' + (btn.dataset.ltype===type ? ` ${t?.cls||''}` : '');
-    });
-    const wrap = document.getElementById('lv-subtype-wrap');
-    if (wrap) wrap.style.display = type === 'other' ? '' : 'none';
+    updateLvRule();
 }
 
 // ─── Leave date list ─────────────────────────────────────────────
@@ -8819,25 +8842,33 @@ function removeLvDate(d) {
 }
 function refreshLeaveDateList() {
     const el = document.getElementById('lv-dates-list'); if (!el) return;
+    const wd = ['日','一','二','三','四','五','六'];
     el.innerHTML = (window._leaveDates||[]).map(d=>`
-        <span style="display:inline-flex;align-items:center;gap:4px;background:var(--accent-light);color:var(--accent);padding:3px 10px;border-radius:4px;font-size:var(--fs-sm)">
-            ${d}
-            <button onclick="removeLvDate('${d}')" style="background:none;border:none;cursor:pointer;color:var(--accent);font-size:var(--fs-base);line-height:1;padding:0 2px">×</button>
+        <span class="fx-date-chip">${+d.slice(5,7)}/${+d.slice(8)}（${wd[new Date(d+'T00:00:00').getDay()]}）
+            <button onclick="removeLvDate('${d}')" aria-label="移除">×</button>
         </span>`).join('');
 }
 
 // ─── Submit leave request ─────────────────────────────────────────
 async function submitLeaveRequest() {
-    const asst = currentAssistantView; if (!asst) return;
+    const asst = otAsst(); if (!asst) return;
     if (!_selectedLeaveType) { toast('請選擇假別'); return; }
     if (!(window._leaveDates||[]).length) { toast('請加入請假日期'); return; }
     const proxyEl = document.getElementById('lv-proxy');
     if (!proxyEl?.value) { toast('請選擇代理人'); return; }
     const approverEl = document.getElementById('lv-approver');
     if (!approverEl?.value) { toast('請選擇簽核主管'); return; }
-    const subTypeEl = document.getElementById('lv-subtype');
-    const subType = _selectedLeaveType === 'other' ? (subTypeEl?.value || '') : '';
+    const subType = _selectedLeaveType === 'other' ? (_lvSubType || LEAVE_SUB_TYPES[0].key) : '';
     const proxyOpt = proxyEl.options[proxyEl.selectedIndex];
+    if (asst.id === '__demo') {
+        _demoLV.unshift({ id: 'demo-' + Date.now(), assistantId: '__demo', assistantName: asst.name, leaveType: _selectedLeaveType, leaveSubType: subType,
+            dates: [...window._leaveDates], proxyId: proxyEl.value, proxyName: proxyOpt.dataset.name || proxyOpt.text, approverName: approverEl.value,
+            status: 'pending_supervisor', createdAt: new Date().toISOString() });
+        window._leaveDates = []; _selectedLeaveType = null; _lvSubType = '';
+        renderLeaveForm();
+        toast('預覽模式：已加入示範記錄（不會寫入資料庫）');
+        return;
+    }
     try {
         await db.collection(col('leaveRequests')).add({
             assistantId: asst.id, assistantName: asst.name,
@@ -8851,9 +8882,9 @@ async function submitLeaveRequest() {
             createdAt: new Date().toISOString()
         });
         window._leaveDates = [];
-        _selectedLeaveType = null;
+        _selectedLeaveType = null; _lvSubType = '';
         toast('申請已送出，等待主管簽核');
-        renderLeave();
+        renderLeaveForm();
     } catch(e) { toast('送出失敗：'+e.message); }
 }
 
