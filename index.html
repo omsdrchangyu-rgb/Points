@@ -1334,6 +1334,36 @@
 }
 #sched-root .wk-done{display:inline-flex;align-items:center;gap:4px}
 #sched-root .wk-done.on{background:var(--green-light,#E6F4EE);border-color:var(--green-border,#9FD3BD);color:var(--green,#009B6B);font-weight:700}
+/* 醫師診次統計 */
+#sched-root .ds-card{max-width:1100px}
+#sched-root .ds-note{font-size:var(--fs-xs);color:var(--text-muted);margin:-4px 0 12px;line-height:1.6}
+#sched-root .ds-empty{padding:24px 0;text-align:center;color:var(--text-muted);font-size:var(--fs-sm)}
+#sched-root .ds-scroll{overflow-x:auto}
+#sched-root .ds-table{border-collapse:separate;border-spacing:0;font-size:var(--fs-sm);min-width:100%}
+#sched-root .ds-table th{font-size:var(--fs-xs);font-weight:600;color:var(--text-muted);padding:6px 8px;border-bottom:1px solid var(--border);text-align:center;white-space:nowrap;vertical-align:bottom}
+#sched-root .ds-table th.nodata{color:#C8C8C8}
+#sched-root .ds-y{display:block;font-size:10px;font-weight:400;color:var(--text-muted)}
+#sched-root .ds-table td{padding:7px 8px;text-align:center;border-bottom:1px solid #F0F0F0;color:var(--text-primary);font-variant-numeric:tabular-nums;white-space:nowrap}
+#sched-root .ds-table td.zero{color:#C8C8C8}
+#sched-root .ds-table td.nodata{color:#D8D8D8}
+#sched-root .ds-name{text-align:left!important;position:sticky;left:0;background:var(--surface);z-index:1;font-weight:700;padding-left:10px!important;min-width:72px}
+#sched-root .ds-table tr.dec .ds-name{box-shadow:inset 3px 0 0 var(--red)}
+#sched-root .ds-sp{color:var(--text-secondary);padding:2px 6px!important}
+#sched-root .ds-spark{display:block}
+#sched-root tr.dec .ds-sp{color:var(--red)}
+#sched-root .ds-tr{font-size:var(--fs-xs);font-weight:700;padding:2px 8px;border-radius:10px}
+#sched-root .ds-tr.down{background:var(--red-light);color:var(--red)}
+#sched-root .ds-tr.up{background:var(--green-light);color:var(--green)}
+#sched-root .ds-tr.flat{color:var(--text-muted);font-weight:500}
+#sched-root .ds-total td{font-weight:700;background:#FAFAFA;border-bottom:none}
+#sched-root .ds-total .ds-name{background:#FAFAFA}
+#sched-root .ds-chg-m{display:none}
+@media(max-width:700px){
+#sched-root .ds-table .ds-sp,#sched-root .ds-table .ds-chg{display:none}
+#sched-root .ds-chg-m{display:block;margin-top:3px}
+#sched-root .ds-chg-m .ds-tr{padding:1px 6px;font-size:10px}
+#sched-root .ds-table td{padding:7px 6px}
+}
 /* 同崗位編號 */
 #sched-root .sb-num{font-size:.78em;font-weight:700;margin-left:1px;opacity:.85}
 #sched-root .pc-num{display:inline-block;min-width:13px;height:13px;line-height:11px;border-radius:7px;border:1px solid currentColor;box-sizing:border-box;margin-right:2px;font-size:9px;text-align:center;vertical-align:1px}
@@ -1736,7 +1766,7 @@ appId: "..."'></textarea>
         <button class="btn-sidebar hidden" id="btn-settings" onclick="openSettings()">系統設定</button>
         <button class="btn-sidebar hidden" id="btn-logout" onclick="logoutAll()">登出</button>
         <button class="btn-sidebar" onclick="showSetup()">重新設定連線</button>
-        <div class="app-ver">版本 0929-6</div>
+        <div class="app-ver">版本 1026-1</div>
     </div>
 </nav>
 
@@ -11278,6 +11308,101 @@ function PositionView({ data, year, month, onUpdate, isLocked }) {
 // ═══════════════════════════════════════════
 // COMPONENT: DoctorScheduleView
 // ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// COMPONENT: DoctorStats（醫師每月診次＋趨勢，看醫師來的次數有沒有變少）
+// ═══════════════════════════════════════════
+const DOC_SKIP_NOTES = ['整日無診', '國定假日'];
+function doctorMonthCounts(data, mk) {
+  const sched = data.doctorSchedule?.[mk];
+  if (!sched) return null;
+  const out = {};
+  Object.entries(sched).forEach(([ds, info]) => {
+    if (!info || weekday(ds) === 0 || DOC_SKIP_NOTES.includes(info._note)) return;
+    getShiftsForDate(ds).forEach(sh => (info[sh] || []).forEach(doc => { out[doc] = (out[doc] || 0) + 1; }));
+  });
+  return out;
+}
+function DoctorStats({ data, year, month }) {
+  const [span, setSpan] = useState(6);
+  const months = [];
+  for (let i = span - 1; i >= 0; i--) { const d = new Date(year, month - 1 - i, 1); months.push(monthKey(d.getFullYear(), d.getMonth() + 1)); }
+  const counts = months.map(mk => doctorMonthCounts(data, mk));   // null＝該月沒有醫師班表
+  const names = [...new Set([...(data.doctors || []), ...counts.flatMap(c => c ? Object.keys(c) : [])])];
+  const dataIdx = months.map((_, i) => i).filter(i => counts[i]);
+  const rows = names.map(name => {
+    const vals = counts.map(c => c ? (c[name] || 0) : null);
+    const have = dataIdx.map(i => vals[i]);
+    const recent = have.slice(-3), prev = have.slice(-6, -3);
+    const avg = a => a.length ? a.reduce((s, v) => s + v, 0) / a.length : null;
+    const ra = avg(recent), pa = avg(prev);
+    let change = null;
+    if (pa !== null && ra !== null) change = pa === 0 ? (ra > 0 ? Infinity : 0) : (ra - pa) / pa;
+    const total = have.reduce((s, v) => s + v, 0);
+    return { name, vals, total, change, ra, pa };
+  }).filter(r => r.total > 0)
+    .sort((a, b) => (a.change ?? 0) - (b.change ?? 0) || b.total - a.total);
+  const max = Math.max(1, ...rows.flatMap(r => r.vals.filter(v => v !== null)));
+  const totals = months.map((_, i) => counts[i] ? rows.reduce((s, r) => s + (r.vals[i] || 0), 0) : null);
+  const ml = mk => `${+mk.slice(5, 7)}月`;
+  const trend = r => {
+    if (r.change === null) return <span className="ds-tr flat" title="資料不足 6 個月，無法比較">—</span>;
+    if (r.change === Infinity) return <span className="ds-tr up">新加入</span>;
+    const p = Math.round(r.change * 100);
+    const cls = p <= -15 ? 'down' : p >= 15 ? 'up' : 'flat';
+    return <span className={`ds-tr ${cls}`} title={`近 3 個月平均 ${r.ra.toFixed(1)} 診，前 3 個月平均 ${r.pa.toFixed(1)} 診`}>
+      {cls === 'down' ? '減少 ' : cls === 'up' ? '增加 ' : '持平 '}{p > 0 ? '+' : ''}{p}%</span>;
+  };
+  const spark = r => {
+    const pts = r.vals.map((v, i) => v === null ? null : [6 + i * (88 / Math.max(1, span - 1)), 22 - (v / max) * 18]).filter(Boolean);
+    if (pts.length < 2) return null;
+    const last = pts[pts.length - 1];
+    return <svg className="ds-spark" width="100" height="26" viewBox="0 0 100 26" aria-hidden="true">
+      <polyline points={pts.map(p => p.join(',')).join(' ')} fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"/>
+      <circle cx={last[0]} cy={last[1]} r="3" fill="currentColor"/>
+    </svg>;
+  };
+  return (
+    <div className="section-card ds-card">
+      <h3 style={{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}}>
+        醫師每月診次
+        <div className="subnav-toggle" style={{marginLeft:'auto'}}>
+          <button className={span===6?'active':''} onClick={() => setSpan(6)}>近 6 個月</button>
+          <button className={span===12?'active':''} onClick={() => setSpan(12)}>近 12 個月</button>
+        </div>
+      </h3>
+      <div className="ds-note">算到 {year}年{month}月。依醫師班表計算，不含週日、整日無診和國定假日；變化＝近 3 個月平均和前 3 個月平均相比，減少最多的排在最上面。</div>
+      {rows.length === 0 ? <div className="ds-empty">這段期間沒有醫師班表資料</div> : (
+        <div className="ds-scroll">
+          <table className="ds-table">
+            <thead><tr>
+              <th className="ds-name">醫師</th>
+              {months.map(mk => <th key={mk} className={counts[months.indexOf(mk)] ? '' : 'nodata'}>{mk.slice(5, 7) === '01' || mk === months[0] ? <span className="ds-y">{mk.slice(0, 4)}</span> : null}{ml(mk)}</th>)}
+              <th className="ds-sp">走勢</th><th className="ds-chg">變化</th>
+            </tr></thead>
+            <tbody>
+              {rows.map(r => (
+                <tr key={r.name} className={r.change !== null && r.change !== Infinity && r.change <= -0.15 ? 'dec' : ''}>
+                  <td className="ds-name">{r.name}<div className="ds-chg-m">{trend(r)}</div></td>
+                  {r.vals.map((v, i) => v === null
+                    ? <td key={i} className="nodata">—</td>
+                    : <td key={i} style={{background: v ? `color-mix(in srgb, #0068B7 ${Math.round(6 + v / max * 30)}%, #fff)` : undefined}} title={`${r.name} ${months[i].slice(0, 4)}年${ml(months[i])}：${v} 診`} className={v ? '' : 'zero'}>{v}</td>)}
+                  <td className="ds-sp">{spark(r)}</td>
+                  <td className="ds-chg">{trend(r)}</td>
+                </tr>
+              ))}
+              <tr className="ds-total">
+                <td className="ds-name">全院合計</td>
+                {totals.map((v, i) => <td key={i}>{v === null ? '—' : v}</td>)}
+                <td className="ds-sp"></td><td className="ds-chg"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function DoctorScheduleView({ data, year, month, onUpdate }) {
   const mk = monthKey(year, month);
   const [tab, setTab] = useState('calendar'); // 'pattern' | 'calendar'
@@ -11364,12 +11489,15 @@ function DoctorScheduleView({ data, year, month, onUpdate }) {
       <div style={{display:'flex',gap:8,marginBottom:12,alignItems:'center'}}>
         <button onClick={() => setTab('pattern')} className={`content-tab${tab==='pattern'?' active':''}`}>週期規律設定</button>
         <button onClick={() => setTab('calendar')} className={`content-tab${tab==='calendar'?' active':''}`}>月曆覆蓋</button>
+        <button onClick={() => setTab('stats')} className={`content-tab${tab==='stats'?' active':''}`}>診次統計</button>
         {tab==='calendar' && (
           <button onClick={generateFromPattern} style={{marginLeft:8,padding:'4px 14px',border:'1px solid #1A1A1A',background:'#F0F0F0',borderRadius:4,cursor:'pointer',fontSize:'var(--fs-sm)',fontWeight:600,color:'#1A1A1A'}}>
             從規律產生本月班表
           </button>
         )}
       </div>
+
+      {tab === 'stats' && <DoctorStats data={data} year={year} month={month} />}
 
       {tab === 'pattern' && (
         <div className="section-card">
