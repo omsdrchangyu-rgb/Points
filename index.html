@@ -259,6 +259,18 @@
         .modal-body{padding:20px 24px;padding-top:16px;}
         .modal-ft{padding:0 24px 22px;display:flex;gap:8px;justify-content:flex-end;}
 
+        /* ── 院長留言 ── */
+        .msg-item{padding:12px 0;border-bottom:1px solid var(--border);}
+        .msg-item:last-child{border-bottom:none;}
+        .msg-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:var(--fs-cap);color:var(--text-muted);margin-bottom:6px;}
+        .msg-tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:var(--fs-xs);font-weight:700;background:var(--surface-alt);color:var(--text-secondary);}
+        .msg-tag.all{background:var(--accent);color:#fff;}
+        .msg-text{white-space:pre-wrap;line-height:1.7;color:var(--text-primary);margin-bottom:8px;word-break:break-word;}
+        .msg-ok{color:var(--green);font-weight:700;}
+        .msg-no{color:var(--red);font-weight:700;}
+        .msg-row-hd{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+        #msg-pop{z-index:1200;}
+
         /* ── Toast ── */
         .toast{position:fixed;bottom:22px;right:22px;background:var(--text-primary);color:#fff;padding:11px 16px;border-radius:4px;font-size:var(--fs-base);opacity:0;transform:translateY(10px);transition:all .25s;z-index:2000;pointer-events:none;}
         .toast.show{opacity:1;transform:translateY(0);}
@@ -622,10 +634,10 @@
         body.manager-mode #mode-btn-add{display:none!important}
         /* 手機底部列：每個角色只露出 2–3 個最常用頁面，其餘走左上角選單。
            這裡的可見頁面完全落在 navigate() 允許的範圍內。 */
-        .mnb-overview,.mnb-record,.mnb-settlement,.mnb-attendance,
+        .mnb-overview,.mnb-record,.mnb-settlement,.mnb-attendance,.mnb-schedule,
         .mnb-myview,.mnb-otapply,.mnb-otapprove,.mnb-lvapprove{display:none!important}
-        /* 院長：月結算 / 記錄點數 / 假勤管理 */
-        body.principal-mode .mnb-settlement,
+        /* 院長：助理排班 / 記錄點數 / 假勤管理（月結算改走左上角選單） */
+        body.principal-mode .mnb-schedule,
         body.principal-mode .mnb-record,
         body.principal-mode .mnb-attendance{display:flex!important}
         /* 管理者：本月總覽 / 記錄點數 / 假勤簽核 */
@@ -1714,6 +1726,9 @@ appId: "..."'></textarea>
         <button class="nav-item nfull" onclick="navigate('assistants')">
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zM5 17a5 5 0 0110 0H5z"/></svg>助理管理
         </button>
+        <button class="nav-item nfull" onclick="navigate('messages')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.84 8.84 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zm-6 0h2v2H9V9z" clip-rule="evenodd"/></svg>院長留言
+        </button>
         <!-- 個人 -->
         <div class="nav-sec-label nasst-lbl">個人</div>
         <button class="nav-item nasst" onclick="navigate('myview')">
@@ -1769,7 +1784,7 @@ appId: "..."'></textarea>
         <button class="btn-sidebar hidden" id="btn-settings" onclick="openSettings()">系統設定</button>
         <button class="btn-sidebar hidden" id="btn-logout" onclick="logoutAll()">登出</button>
         <button class="btn-sidebar" onclick="showSetup()">重新設定連線</button>
-        <div class="app-ver">版本 1026-1</div>
+        <div class="app-ver">版本 1125-1</div>
     </div>
 </nav>
 
@@ -2020,6 +2035,24 @@ appId: "..."'></textarea>
         </div>
     </div>
 
+    <!-- ── 院長留言（院長） ── -->
+    <div id="page-messages" class="page">
+        <div class="page-header"><h2>院長留言</h2><p>一對一留言只顯示給那位助理；全員公告每位助理都會看到。助理登入後會跳出，按「收到」才會關掉。</p></div>
+        <div class="page-content">
+            <div class="card section">
+                <div class="card-title">新增留言</div>
+                <div class="form-group"><label class="form-label" for="msg-to">對象</label><select class="form-select" id="msg-to" style="max-width:260px"></select></div>
+                <div class="form-group"><label class="form-label" for="msg-text">內容</label><textarea class="form-textarea" id="msg-text" rows="4" placeholder="例如：謝謝你上次主動去支援院外塗氟，還先發現人數超過上限。"></textarea></div>
+                <div style="display:flex;justify-content:flex-end"><button class="btn btn-primary" id="msg-send" onclick="msgSend()">送出</button></div>
+            </div>
+            <div class="card">
+                <div class="card-title msg-row-hd" style="display:flex"><span>已送出</span>
+                    <select class="form-select" id="msg-filter" onchange="renderMessages()" style="max-width:180px;font-weight:400" aria-label="篩選對象"></select></div>
+                <div id="msg-list"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- ── 規定管理 ── -->
     <div id="page-rules" class="page">
         <div class="page-header"><h2>規定管理</h2><p>加扣分規定列表</p></div>
@@ -2165,6 +2198,10 @@ appId: "..."'></textarea>
     <button class="mn-item mnb-settlement" onclick="navigate('settlement')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
       月結算
+    </button>
+    <button class="mn-item mnb-schedule" onclick="navigate('schedule')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      助理排班
     </button>
     <button class="mn-item mnb-myview" onclick="navigate('myview')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -5098,7 +5135,8 @@ function updateMenuBadge() {
 function renderPage(p) {
     ({overview:renderOverview,record:renderRecord,history:renderHistory,
       settlement:renderSettlementPage,salary:renderSalaryPage,assistants:renderAssistants,rules:renderRules,
-      myview:renderMyView,'overtime-apply':renderOvertimeApply,
+      myview:()=>{ renderMyView(); msgMyCardRender(); },
+      messages:renderMessages,'overtime-apply':renderOvertimeApply,
       'overtime-approve':renderOvertimeApprove,
       attendance:renderAttendance,
       leave:renderLeave,'leave-approve':renderLeaveApprove,
@@ -5607,6 +5645,127 @@ async function saveSettlementSignature() {
 // ================================================================
 // PERSONAL VIEW (assistant mode)
 // ================================================================
+// ================================================================
+// 院長留言：一對一留言＋全員公告；助理登入後跳出，按「收到」才關掉
+// 資料：messages/{id} = { to: 助理id | 'all', text, by, createdAt, acks: { 助理id: 時間 } }
+// ================================================================
+let msgs = [], _msgUnsub = null;
+function msgStart() {
+    if (_msgUnsub) return;
+    _msgUnsub = db.collection(col('messages')).orderBy('createdAt', 'desc').limit(300).onSnapshot(snap => {
+        msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        msgAfterUpdate();
+    }, e => { console.error('messages', e); _msgUnsub = null; });
+}
+function msgStop() {
+    _msgUnsub?.(); _msgUnsub = null; msgs = [];
+    document.getElementById('msg-pop')?.remove();
+}
+function msgApplyAccess() {
+    if (viewMode === 'principal' || viewMode === 'assistant') msgStart(); else msgStop();
+    msgAfterUpdate();
+}
+function msgAfterUpdate() {
+    if (viewMode === 'assistant') { msgPopRender(); if (currentPage === 'myview') msgMyCardRender(); }
+    else document.getElementById('msg-pop')?.remove();
+    if (viewMode === 'principal' && currentPage === 'messages') renderMessages();
+}
+function msgTime(iso) {
+    if (!iso) return '';
+    const d = new Date(iso), p = n => String(n).padStart(2, '0');
+    return `${d.getMonth() + 1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+// 助理看得到的：給她的一對一留言，以及她建立帳號之後的全員公告
+function msgForAsst(a) {
+    if (!a) return [];
+    const since = a.createdAt || '';
+    return msgs.filter(m => m.to === a.id || (m.to === 'all' && (m.createdAt || '') >= since));
+}
+function msgUnreadFor(a) { return a ? msgForAsst(a).filter(m => !(m.acks || {})[a.id]) : []; }
+function msgTag(m) { return m.to === 'all' ? '<span class="msg-tag all">全員公告</span>' : '<span class="msg-tag">給你</span>'; }
+
+// ── 助理：登入後跳出 ──
+function msgPopRender() {
+    const list = viewMode === 'assistant' ? msgUnreadFor(currentAssistantView).slice().reverse() : [];
+    let p = document.getElementById('msg-pop');
+    if (!list.length) { p?.remove(); return; }
+    if (!p) { p = document.createElement('div'); p.id = 'msg-pop'; p.className = 'modal-overlay'; document.body.appendChild(p); }
+    p.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="msg-pop-t">
+        <div class="modal-hd"><div class="modal-title" id="msg-pop-t">院長留言${list.length > 1 ? `（${list.length} 則）` : ''}</div></div>
+        <div class="modal-body">${list.map(m => `<div class="msg-item">
+            <div class="msg-meta">${msgTag(m)}<span>${msgTime(m.createdAt)}</span></div>
+            <div class="msg-text">${esc(m.text)}</div>
+            <div style="text-align:right"><button class="btn btn-primary btn-sm" onclick="msgAck('${m.id}')">收到</button></div>
+        </div>`).join('')}</div>
+        ${list.length > 1 ? '<div class="modal-ft"><button class="btn btn-outline" onclick="msgAckAll()">全部收到</button></div>' : ''}
+    </div>`;
+}
+async function msgAck(id) {
+    const a = currentAssistantView; if (!a) return;
+    try { await db.collection(col('messages')).doc(id).update({ ['acks.' + a.id]: new Date().toISOString() }); }
+    catch (e) { toast('更新失敗：' + e.message); }
+}
+async function msgAckAll() {
+    const a = currentAssistantView; if (!a) return;
+    const at = new Date().toISOString(), batch = db.batch();
+    msgUnreadFor(a).forEach(m => batch.update(db.collection(col('messages')).doc(m.id), { ['acks.' + a.id]: at }));
+    try { await batch.commit(); } catch (e) { toast('更新失敗：' + e.message); }
+}
+
+// ── 助理：個人點數頁上方的留言紀錄 ──
+function msgMyCardRender() {
+    const el = document.getElementById('myview-msgs'); if (!el) return;
+    const a = currentAssistantView, list = msgForAsst(a).slice(0, 10);
+    el.innerHTML = list.length ? `<div class="card section"><div class="card-title">院長留言</div>${list.map(m => `<div class="msg-item">
+        <div class="msg-meta">${msgTag(m)}<span>${msgTime(m.createdAt)}</span>${(m.acks || {})[a.id] ? '<span class="msg-ok">已收到</span>' : ''}</div>
+        <div class="msg-text">${esc(m.text)}</div></div>`).join('')}</div>` : '';
+}
+
+// ── 院長：留言頁 ──
+function renderMessages() {
+    const actives = state.assistants.filter(a => a.active);
+    const opts = `<option value="all">全員公告</option>` + actives.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join('');
+    const toSel = document.getElementById('msg-to'), fSel = document.getElementById('msg-filter');
+    if (toSel) { const v = toSel.value; toSel.innerHTML = opts; if (v && toSel.querySelector(`option[value="${v}"]`)) toSel.value = v; }
+    if (fSel) { const v = fSel.value; fSel.innerHTML = '<option value="">全部</option>' + opts; if (v && fSel.querySelector(`option[value="${v}"]`)) fSel.value = v; }
+    const el = document.getElementById('msg-list'); if (!el) return;
+    const f = fSel?.value || '';
+    const name = id => state.assistants.find(a => a.id === id)?.name || '（已刪除的助理）';
+    const list = msgs.filter(m => !f || m.to === f);
+    if (!list.length) { el.innerHTML = '<div style="padding:16px 0;color:var(--text-muted)">還沒有留言</div>'; return; }
+    el.innerHTML = list.map(m => {
+        const acks = m.acks || {};
+        let status;
+        if (m.to === 'all') {
+            const should = actives.filter(a => (a.createdAt || '') <= (m.createdAt || ''));
+            const unread = should.filter(a => !acks[a.id]);
+            status = `<span class="${unread.length ? 'msg-no' : 'msg-ok'}">已收到 ${should.length - unread.length}/${should.length}</span>`
+                + (unread.length ? `<span>未讀：${unread.map(a => esc(a.name)).join('、')}</span>` : '');
+        } else {
+            status = acks[m.to] ? `<span class="msg-ok">✓ 已收到 ${msgTime(acks[m.to])}</span>` : '<span class="msg-no">未讀</span>';
+        }
+        return `<div class="msg-item">
+            <div class="msg-row-hd"><div class="msg-meta" style="margin:0">${m.to === 'all' ? '<span class="msg-tag all">全員公告</span>' : `<span class="msg-tag">給 ${esc(name(m.to))}</span>`}<span>${msgTime(m.createdAt)}</span>${status}</div>
+            <button class="btn btn-outline btn-sm" style="white-space:nowrap;flex-shrink:0" onclick="msgDelete('${m.id}')">刪除</button></div>
+            <div class="msg-text" style="margin-top:6px">${esc(m.text)}</div></div>`;
+    }).join('');
+}
+async function msgSend() {
+    const to = document.getElementById('msg-to').value, ta = document.getElementById('msg-text'), text = ta.value.trim();
+    if (!text) { toast('請輸入內容'); ta.focus(); return; }
+    const btn = document.getElementById('msg-send'); btn.disabled = true;
+    try {
+        await db.collection(col('messages')).add({ to, text, by: currentOperator || '院長', createdAt: new Date().toISOString(), acks: {} });
+        ta.value = ''; toast('已送出');
+    } catch (e) { toast('送出失敗：' + e.message); }
+    finally { btn.disabled = false; }
+}
+async function msgDelete(id) {
+    if (!confirm('刪除這則留言？助理那邊也會看不到。')) return;
+    try { await db.collection(col('messages')).doc(id).delete(); toast('已刪除'); }
+    catch (e) { toast('刪除失敗：' + e.message); }
+}
+
 function renderMyView() {
     const a = currentAssistantView; if (!a) return;
     document.getElementById('myview-title').textContent = a.name;
@@ -5642,6 +5801,7 @@ function renderMyView() {
         : '';
 
     document.getElementById('myview-content').innerHTML = `
+        <div id="myview-msgs"></div>
         ${sigHtml}
         <!-- 當月點數摘要 -->
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">
@@ -7474,6 +7634,7 @@ function applyViewMode() {
     if (canUseSchedule()) { schedStartSwaps(); msEnsureSched(); }
     updateSwapBadge();
     ntApplyAccess();
+    msgApplyAccess();
 
     document.getElementById('btn-settings').classList.toggle('hidden', !isPrincipal);
     document.getElementById('btn-logout').classList.toggle('hidden', !loggedIn);
@@ -7490,7 +7651,7 @@ function applyViewMode() {
         chip.className = 'mode-chip' + (isPrincipal||isManager?' admin':isAsst||isDoctor?' assistant':'');
     }
 
-    if (isPrincipal) { if (!['record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report','leave','leave-approve','attendance','schedule','dashboard','todo'].includes(currentPage)) navigate('dashboard'); else refreshPage(); return; }
+    if (isPrincipal) { if (!['record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report','leave','leave-approve','attendance','schedule','dashboard','todo','messages'].includes(currentPage)) navigate('dashboard'); else refreshPage(); return; }
     if (isManager)   { if (!['overview','record','leave-approve','todo'].concat(canUseSchedule()?['schedule']:[]).includes(currentPage)) navigate('overview'); else refreshPage(); return; }
     if (isDoctor)    { if (!['record','overtime-approve','myshift'].includes(currentPage)) navigate('record'); else refreshPage(); return; }
     if (isAsst)      { if (!['myview','overtime-apply','preleave','myshift'].concat(canUseTodo()?['todo']:[]).includes(currentPage)) navigate('myview'); else refreshPage(); return; }
@@ -7498,6 +7659,7 @@ function applyViewMode() {
 }
 
 function adminLogout() {
+    msgStop();
     viewMode = 'viewer'; currentOperator = '';
     currentDoctor = null; currentAssistantView = null;
     navigate('overview');
@@ -7506,7 +7668,7 @@ function adminLogout() {
 }
 
 function logoutAll() {
-    ntClose(); document.body.classList.remove('todo-access','nt-access');
+    msgStop(); ntClose(); document.body.classList.remove('todo-access','nt-access');
     viewMode = 'viewer'; currentOperator = ''; currentAssistantView = null;
     currentDoctor = null;
     navigate('overview');
