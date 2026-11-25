@@ -636,9 +636,8 @@
            這裡的可見頁面完全落在 navigate() 允許的範圍內。 */
         .mnb-overview,.mnb-record,.mnb-settlement,.mnb-attendance,.mnb-schedule,
         .mnb-myview,.mnb-otapply,.mnb-otapprove,.mnb-lvapprove{display:none!important}
-        /* 院長：助理排班 / 記錄點數 / 假勤管理（月結算改走左上角選單） */
+        /* 院長：雙向溝通 / 假勤管理 / 助理排班（記錄點數、月結算改走左上角選單） */
         body.principal-mode .mnb-schedule,
-        body.principal-mode .mnb-record,
         body.principal-mode .mnb-attendance{display:flex!important}
         /* 管理者：本月總覽 / 記錄點數 / 假勤簽核 */
         body.manager-mode .mnb-overview,
@@ -1514,6 +1513,112 @@
 #sched-root .content{padding:12px}
 #sched-root .tab-btn{padding:6px 0}
 }
+        /* ══ 1125-2：手機版收緊、年假表格、月份收合、雙向溝通回覆 ══ */
+        /* 總覽 KPI：三格一列 */
+        .dash-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+        .dash-kpis .dk{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);min-width:0;}
+        .dash-kpis .dk.link{cursor:pointer;}
+        .dash-kpis .lb{font-size:var(--fs-sm);color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .dash-kpis .val{font-size:var(--fs-disp);font-weight:700;line-height:1.15;margin-top:4px;white-space:nowrap;}
+        .dash-kpis .sub{font-size:var(--fs-xs);color:var(--text-muted);margin-top:3px;white-space:nowrap;}
+        /* 加班時數總覽表、年假表 */
+        .cmp-tbl{width:100%;border-collapse:collapse;font-size:var(--fs-base);}
+        .cmp-tbl th{font-size:var(--fs-xs);font-weight:600;color:var(--text-muted);text-align:right;padding:6px 8px;border-bottom:1.5px solid var(--text-primary);white-space:nowrap;}
+        .cmp-tbl th:first-child,.cmp-tbl td:first-child{text-align:left;}
+        .cmp-tbl td{padding:7px 8px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+        .cmp-tbl tr.tot td{font-weight:700;background:var(--accent-light);color:var(--accent);}
+        .cmp-tbl td.z{color:#c4c4c4;}
+        .cmp-tbl .g{color:var(--green);font-weight:700;}
+        .cmp-tbl .a{color:var(--accent);font-weight:700;}
+        .pen-btn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;margin-left:2px;border:none;border-radius:6px;background:none;color:var(--text-muted);cursor:pointer;vertical-align:middle;-webkit-tap-highlight-color:transparent;}
+        .pen-btn:hover{background:var(--surface-alt);color:var(--text-primary);}
+        .pen-btn svg{width:13px;height:13px;}
+        /* 簽核頁的 加班／請假 切換：電腦版貼合按鈕，手機版撐滿 */
+        .att-subtab{display:inline-flex;}
+        /* 依月份收合 */
+        .mg{border:1px solid var(--border);border-radius:var(--r);background:var(--surface);margin-bottom:8px;overflow:hidden;}
+        .mg > summary{list-style:none;display:flex;align-items:center;gap:8px;padding:11px 14px;cursor:pointer;font-weight:700;font-size:var(--fs-base);-webkit-tap-highlight-color:transparent;}
+        .mg > summary::-webkit-details-marker{display:none;}
+        .mg > summary em{font-style:normal;font-weight:500;font-size:var(--fs-sm);color:var(--text-muted);}
+        .mg > summary svg{margin-left:auto;transition:transform .2s;color:var(--text-muted);}
+        .mg[open] > summary svg{transform:rotate(180deg);}
+        .mg[open] > summary{border-bottom:1px solid var(--border);}
+        .mg-body{padding:10px 10px 2px;}
+        .mg-more{width:100%;padding:10px;border:1px dashed var(--border-strong);border-radius:var(--r);background:none;font-family:inherit;font-size:var(--fs-sm);color:var(--text-secondary);cursor:pointer;margin-bottom:8px;}
+        /* 雙向溝通回覆：對話框 */
+        .chat-wrap{display:grid;grid-template-columns:300px 1fr;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);overflow:hidden;height:calc(100vh - 170px);min-height:460px;}
+        .chat-list{border-right:1px solid var(--border);overflow-y:auto;}
+        .chat-li{display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;border:none;border-bottom:1px solid var(--border);background:none;font-family:inherit;text-align:left;cursor:pointer;color:var(--text-primary);-webkit-tap-highlight-color:transparent;}
+        .chat-li:hover{background:var(--surface-alt);}
+        .chat-li.on{background:var(--surface-alt);}
+        .chat-av{flex-shrink:0;width:38px;height:38px;border-radius:50%;background:var(--surface-alt);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:var(--fs-sm);font-weight:700;color:var(--text-secondary);}
+        .chat-av.all{background:var(--accent);border-color:var(--accent);color:#fff;}
+        .chat-li-main{flex:1;min-width:0;display:block;overflow:hidden;}
+        .chat-li-top{display:flex;align-items:baseline;gap:6px;}
+        .chat-li-name{font-weight:700;font-size:var(--fs-base);}
+        .chat-li-time{margin-left:auto;font-size:var(--fs-xs);color:var(--text-muted);flex-shrink:0;}
+        .chat-li-prev{display:block;font-size:var(--fs-sm);color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+        .chat-li-prev.none{color:#c4c4c4;}
+        .chat-pill{flex-shrink:0;font-size:var(--fs-xs);font-weight:700;padding:1px 7px;border-radius:999px;background:var(--red-light);color:var(--red);}
+        .chat-pane{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--bg);}
+        .chat-hd{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface);}
+        .chat-hd b{font-size:var(--fs-sub);}
+        .chat-hd span{font-size:var(--fs-xs);color:var(--text-muted);}
+        .chat-back{display:none;border:none;background:none;font-size:26px;line-height:1;padding:0 8px 2px 0;cursor:pointer;color:var(--text-primary);font-family:inherit;}
+        .chat-msgs{flex:1;overflow-y:auto;padding:12px 14px;}
+        .chat-day{text-align:center;font-size:var(--fs-xs);color:var(--text-muted);margin:10px 0 8px;}
+        .chat-b{display:flex;flex-direction:column;align-items:flex-end;margin-bottom:10px;}
+        .chat-bub{max-width:82%;background:var(--text-primary);color:#fff;padding:9px 12px;border-radius:14px 14px 4px 14px;white-space:pre-wrap;word-break:break-word;line-height:1.6;font-size:var(--fs-base);}
+        .chat-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;font-size:var(--fs-xs);color:var(--text-muted);margin-top:3px;max-width:90%;}
+        .chat-meta .ok{color:var(--green);font-weight:700;}
+        .chat-meta .no{color:var(--red);font-weight:700;}
+        .chat-del{border:none;background:none;padding:0;font-family:inherit;font-size:var(--fs-xs);color:var(--text-muted);text-decoration:underline;cursor:pointer;}
+        .chat-empty{text-align:center;color:var(--text-muted);font-size:var(--fs-sm);margin-top:40px;}
+        .chat-comp{display:flex;gap:8px;align-items:flex-end;padding:10px 12px;border-top:1px solid var(--border);background:var(--surface);}
+        .chat-comp textarea{flex:1;resize:none;min-height:40px;max-height:140px;padding:9px 12px;border:1px solid var(--border);border-radius:18px;font-family:inherit;font-size:16px;line-height:1.4;background:var(--surface);}
+        .chat-comp .btn{border-radius:18px;height:40px;flex-shrink:0;}
+        .chat-ph{flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:var(--fs-sm);}
+        .mnb-msg{display:none!important;}
+        body.principal-mode .mnb-msg{display:flex!important;}
+
+        @media(max-width:700px){
+            .dash-kpis{gap:8px;margin-bottom:10px;}
+            .dash-kpis .dk{padding:10px 10px;}
+            .dash-kpis .lb{font-size:var(--fs-xs);}
+            .dash-kpis .val{font-size:22px;}
+            .dash-kpis .val.dur{font-size:19px;}
+            .dash-kpis .val.dur small{margin:0 2px 0 1px;}
+            #dash-content .card{padding:12px 12px 6px;}
+            #dash-content .card-title{margin-bottom:6px;padding-bottom:6px;}
+            .dash-pie-wrap{gap:4px;}
+            .dash-pie{width:260px;}
+            .dash-legend{min-width:0;width:100%;}
+            .dash-legend thead th{padding:4px 6px;}
+            .dash-legend tbody td{padding:4px 6px;}
+            .cmp-tbl{font-size:var(--fs-cap);}
+            .cmp-tbl th{padding:5px 4px;}
+            .cmp-tbl td{padding:4px 4px;height:32px;}
+            #att-leave-overview .card,#att-ot-content .card{padding:12px;}
+            #att-leave-overview .card-title{margin-bottom:6px;}
+            #att-ot-content .section{margin-bottom:14px;}
+            #att-ot-content .sec-header{margin-bottom:8px;padding-bottom:8px;}
+            #att-ot-content .ot-chart-wrap{padding:8px 6px;}
+            #att-ot-trend-chart{height:220px!important;}
+            .att-subtab{display:flex;width:100%;}
+            .att-subtab .tbb{flex:1;text-align:center;padding:8px 0;}
+            #att-tab-approval .ot-record,#att-tab-approval .leave-card{padding:10px 12px;margin-bottom:8px;}
+            #att-tab-approval .ot-record > div > div:last-child{line-height:1.65!important;}
+            #att-tab-approval .section{margin-bottom:14px;}
+            .mg-body{padding:8px 6px 0;}
+            /* 對話框：手機版一次只看一邊；進入對話時鋪滿畫面（保留底部功能列） */
+            #page-messages .page-content{padding:0;padding-bottom:var(--mnav);}
+            .chat-wrap{display:block;border:none;border-radius:0;height:auto;min-height:0;}
+            .chat-list{border-right:none;}
+            .chat-pane{display:none;}
+            .chat-wrap.in-thread .chat-pane{display:flex;position:fixed;top:0;left:0;right:0;bottom:var(--mnav);z-index:950;}
+            .chat-back{display:block;}
+            .chat-hd{padding:10px 12px;min-height:53px;}
+        }
     </style>
 </head>
 <body>
@@ -1727,7 +1832,7 @@ appId: "..."'></textarea>
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zM5 17a5 5 0 0110 0H5z"/></svg>助理管理
         </button>
         <button class="nav-item nfull" onclick="navigate('messages')">
-            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.84 8.84 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zm-6 0h2v2H9V9z" clip-rule="evenodd"/></svg>院長留言
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.84 8.84 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zm-6 0h2v2H9V9z" clip-rule="evenodd"/></svg>雙向溝通回覆
         </button>
         <!-- 個人 -->
         <div class="nav-sec-label nasst-lbl">個人</div>
@@ -1784,7 +1889,7 @@ appId: "..."'></textarea>
         <button class="btn-sidebar hidden" id="btn-settings" onclick="openSettings()">系統設定</button>
         <button class="btn-sidebar hidden" id="btn-logout" onclick="logoutAll()">登出</button>
         <button class="btn-sidebar" onclick="showSetup()">重新設定連線</button>
-        <div class="app-ver">版本 1125-1</div>
+        <div class="app-ver">版本 1125-2</div>
     </div>
 </nav>
 
@@ -2009,8 +2114,8 @@ appId: "..."'></textarea>
         <!-- 簽核頁面 -->
         <div id="att-tab-approval" class="page-content">
             <div id="att-leave-overview"></div>
-            <div style="margin-bottom:16px">
-                <div class="tab-btn-group">
+            <div style="margin-bottom:14px">
+                <div class="tab-btn-group att-subtab">
                     <button class="tbb active" id="tbb-att-appr-ot" onclick="setAttendanceApprovalSubTab('ot')">加班</button>
                     <button class="tbb" id="tbb-att-appr-lv" onclick="setAttendanceApprovalSubTab('leave')">請假</button>
                 </div>
@@ -2035,22 +2140,10 @@ appId: "..."'></textarea>
         </div>
     </div>
 
-    <!-- ── 院長留言（院長） ── -->
+    <!-- ── 雙向溝通回覆（院長） ── -->
     <div id="page-messages" class="page">
-        <div class="page-header"><h2>院長留言</h2><p>一對一留言只顯示給那位助理；全員公告每位助理都會看到。助理登入後會跳出，按「收到」才會關掉。</p></div>
-        <div class="page-content">
-            <div class="card section">
-                <div class="card-title">新增留言</div>
-                <div class="form-group"><label class="form-label" for="msg-to">對象</label><select class="form-select" id="msg-to" style="max-width:260px"></select></div>
-                <div class="form-group"><label class="form-label" for="msg-text">內容</label><textarea class="form-textarea" id="msg-text" rows="4" placeholder="例如：謝謝你上次主動去支援院外塗氟，還先發現人數超過上限。"></textarea></div>
-                <div style="display:flex;justify-content:flex-end"><button class="btn btn-primary" id="msg-send" onclick="msgSend()">送出</button></div>
-            </div>
-            <div class="card">
-                <div class="card-title msg-row-hd" style="display:flex"><span>已送出</span>
-                    <select class="form-select" id="msg-filter" onchange="renderMessages()" style="max-width:180px;font-weight:400" aria-label="篩選對象"></select></div>
-                <div id="msg-list"></div>
-            </div>
-        </div>
+        <div class="page-header"><h2>雙向溝通回覆</h2><p>點助理看對話紀錄</p></div>
+        <div class="page-content"><div class="chat-wrap" id="chat-wrap"><div class="chat-list" id="chat-list"></div><div class="chat-pane" id="chat-pane"></div></div></div>
     </div>
 
     <!-- ── 規定管理 ── -->
@@ -2190,6 +2283,10 @@ appId: "..."'></textarea>
     <button class="mn-item mnb-record" onclick="navigate('record')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
       記錄點數
+    </button>
+    <button class="mn-item mnb-msg" onclick="navigate('messages')">
+      <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/></svg>
+      雙向溝通
     </button>
     <button class="mn-item mnb-attendance" onclick="navigate('attendance')">
       <svg class="mn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -4314,10 +4411,10 @@ function renderDashboard() {
     }).join('');
 
     el.innerHTML = `
-        <div class="grid-3 section">
-            <div class="stat-card"><div class="lb">${mk === currentMonth() ? '本月' : monthLabel(mk)}加班總時數</div><div class="val dur">${durHTML(totalMin)}</div><div class="sub">已核准 ${approved.length} 筆・共 ${totalMin} 分鐘</div></div>
-            <div class="stat-card dash-link" onclick="navigate('attendance')"><div class="lb">待簽核加班</div><div class="val">${pendingOT}</div><div class="sub">前往假勤管理</div></div>
-            <div class="stat-card dash-link" onclick="navigate('attendance')"><div class="lb">待簽核請假</div><div class="val">${pendingLV}</div><div class="sub">前往假勤管理</div></div>
+        <div class="dash-kpis">
+            <div class="dk"><div class="lb">${mk === currentMonth() ? '本月' : monthLabel(mk)}加班</div><div class="val dur">${durHTML(totalMin)}</div><div class="sub">已核准 ${approved.length} 筆</div></div>
+            <div class="dk link" onclick="navigate('attendance');setAttendanceTab('approval');setAttendanceApprovalSubTab('ot')"><div class="lb">待簽核加班</div><div class="val">${pendingOT}</div><div class="sub">前往簽核 ›</div></div>
+            <div class="dk link" onclick="navigate('attendance');setAttendanceTab('approval');setAttendanceApprovalSubTab('leave')"><div class="lb">待簽核請假</div><div class="val">${pendingLV}</div><div class="sub">前往簽核 ›</div></div>
         </div>
         <div class="card">
             <div class="card-title">加班時數分布</div>
@@ -4365,7 +4462,7 @@ function renderDashboard() {
         data: { labels: slices.map(s => s.name), datasets: [{ data: slices.map(s => Math.round(s.min / 6) / 10), backgroundColor: slices.map(s => s.color), borderColor: '#ffffff', borderWidth: 2, hoverOffset: 6 }] },
         options: {
             responsive: true, maintainAspectRatio: true, animation: { duration: 300 },
-            layout: { padding: { left: 34, right: 34, top: 22, bottom: 22 } },
+            layout: { padding: window.innerWidth <= 700 ? { left: 40, right: 40, top: 14, bottom: 14 } : { left: 34, right: 34, top: 22, bottom: 22 } },
             plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.label}：${durShort(slices[c.dataIndex].min)}（${(slices[c.dataIndex].min / totalMin * 100).toFixed(1)}%）` } } },
         },
         plugins: [sliceLabels],
@@ -4376,6 +4473,19 @@ function renderDashboard() {
 function calcLeaveDaysWhere(asstId, year, pred) {
     return state.leaveRequests.filter(r => r.assistantId === asstId && r.status === 'approved' && pred(r))
         .reduce((sum, r) => sum + (r.dates || []).filter(d => d.startsWith(String(year))).length, 0);
+}
+function annualLeaveTableHTML(asts, year) {
+    const rows = asts.map(a => {
+        const entitled = calcAnnualLeaveEntitlement(a, year);
+        const remaining = Math.max(0, entitled - calcAnnualLeaveUsed(a.id, year));
+        const total = calcTotalLeaveDays(a.id, year);
+        const sick = calcLeaveDaysWhere(a.id, year, r => r.leaveType === 'sick');
+        const men = calcLeaveDaysWhere(a.id, year, r => r.leaveType === 'other' && r.leaveSubType === 'menstrual');
+        const n = v => `<td class="${v ? '' : 'z'}">${v}</td>`;
+        return `<tr><td>${esc(a.name)}<button class="pen-btn" onclick="adjustAnnualLeave('${a.id}','${a.name}',${year},${entitled})" aria-label="調整${esc(a.name)}天數">${PENCIL_ICON}</button></td>
+            <td class="a">${entitled}</td><td class="g">${remaining}</td>${n(total)}${n(sick)}${n(men)}</tr>`;
+    }).join('');
+    return `<div style="overflow-x:auto"><table class="cmp-tbl"><thead><tr><th>助理</th><th>特休</th><th>特休剩餘</th><th>總請假</th><th>病假</th><th>生理假</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 function annualLeaveCardHTML(a, year, hoverable) {
     const entitled = calcAnnualLeaveEntitlement(a, year);
@@ -5691,7 +5801,7 @@ function msgPopRender() {
     if (!list.length) { p?.remove(); return; }
     if (!p) { p = document.createElement('div'); p.id = 'msg-pop'; p.className = 'modal-overlay'; document.body.appendChild(p); }
     p.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="msg-pop-t">
-        <div class="modal-hd"><div class="modal-title" id="msg-pop-t">院長留言${list.length > 1 ? `（${list.length} 則）` : ''}</div></div>
+        <div class="modal-hd"><div class="modal-title" id="msg-pop-t">院長回覆${list.length > 1 ? `（${list.length} 則）` : ''}</div></div>
         <div class="modal-body">${list.map(m => `<div class="msg-item">
             <div class="msg-meta">${msgTag(m)}<span>${msgTime(m.createdAt)}</span></div>
             <div class="msg-text">${esc(m.text)}</div>
@@ -5716,52 +5826,97 @@ async function msgAckAll() {
 function msgMyCardRender() {
     const el = document.getElementById('myview-msgs'); if (!el) return;
     const a = currentAssistantView, list = msgForAsst(a).slice(0, 10);
-    el.innerHTML = list.length ? `<div class="card section"><div class="card-title">院長留言</div>${list.map(m => `<div class="msg-item">
+    el.innerHTML = list.length ? `<div class="card section"><div class="card-title">院長回覆</div>${list.map(m => `<div class="msg-item">
         <div class="msg-meta">${msgTag(m)}<span>${msgTime(m.createdAt)}</span>${(m.acks || {})[a.id] ? '<span class="msg-ok">已收到</span>' : ''}</div>
         <div class="msg-text">${esc(m.text)}</div></div>`).join('')}</div>` : '';
 }
 
-// ── 院長：留言頁 ──
-function renderMessages() {
-    const actives = state.assistants.filter(a => a.active);
-    const opts = `<option value="all">全員公告</option>` + actives.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join('');
-    const toSel = document.getElementById('msg-to'), fSel = document.getElementById('msg-filter');
-    if (toSel) { const v = toSel.value; toSel.innerHTML = opts; if (v && toSel.querySelector(`option[value="${v}"]`)) toSel.value = v; }
-    if (fSel) { const v = fSel.value; fSel.innerHTML = '<option value="">全部</option>' + opts; if (v && fSel.querySelector(`option[value="${v}"]`)) fSel.value = v; }
-    const el = document.getElementById('msg-list'); if (!el) return;
-    const f = fSel?.value || '';
-    const name = id => state.assistants.find(a => a.id === id)?.name || '（已刪除的助理）';
-    const list = msgs.filter(m => !f || m.to === f);
-    if (!list.length) { el.innerHTML = '<div style="padding:16px 0;color:var(--text-muted)">還沒有留言</div>'; return; }
-    el.innerHTML = list.map(m => {
-        const acks = m.acks || {};
-        let status;
-        if (m.to === 'all') {
-            const should = actives.filter(a => (a.createdAt || '') <= (m.createdAt || ''));
-            const unread = should.filter(a => !acks[a.id]);
-            status = `<span class="${unread.length ? 'msg-no' : 'msg-ok'}">已收到 ${should.length - unread.length}/${should.length}</span>`
-                + (unread.length ? `<span>未讀：${unread.map(a => esc(a.name)).join('、')}</span>` : '');
-        } else {
-            status = acks[m.to] ? `<span class="msg-ok">✓ 已收到 ${msgTime(acks[m.to])}</span>` : '<span class="msg-no">未讀</span>';
-        }
-        return `<div class="msg-item">
-            <div class="msg-row-hd"><div class="msg-meta" style="margin:0">${m.to === 'all' ? '<span class="msg-tag all">全員公告</span>' : `<span class="msg-tag">給 ${esc(name(m.to))}</span>`}<span>${msgTime(m.createdAt)}</span>${status}</div>
-            <button class="btn btn-outline btn-sm" style="white-space:nowrap;flex-shrink:0" onclick="msgDelete('${m.id}')">刪除</button></div>
-            <div class="msg-text" style="margin-top:6px">${esc(m.text)}</div></div>`;
-    }).join('');
+// ── 院長：雙向溝通回覆（對話框；一位助理一串，全員公告一串）──
+let _chatWith = null;
+function chatName(id) { return id === 'all' ? '全員公告' : (state.assistants.find(a => a.id === id)?.name || '（已刪除的助理）'); }
+function chatAv(id) { return id === 'all' ? '全' : chatName(id).slice(-2); }
+function chatDay(iso) { const d = new Date(iso); return `${d.getMonth() + 1}月${d.getDate()}日`; }
+function chatListTime(iso) {
+    if (!iso) return '';
+    const d = new Date(iso), n = new Date();
+    if (d.toDateString() === n.toDateString()) return msgTime(iso).split(' ')[1];
+    return `${d.getMonth() + 1}/${d.getDate()}`;
 }
-async function msgSend() {
-    const to = document.getElementById('msg-to').value, ta = document.getElementById('msg-text'), text = ta.value.trim();
+function chatShouldRead(m) {
+    return state.assistants.filter(a => a.active && (a.createdAt || '') <= (m.createdAt || ''));
+}
+function chatUnreadCount(m) {
+    const acks = m.acks || {};
+    return m.to === 'all' ? chatShouldRead(m).filter(a => !acks[a.id]).length : (acks[m.to] ? 0 : 1);
+}
+function renderMessages() {
+    const wrap = document.getElementById('chat-wrap'); if (!wrap) return;
+    if (_chatWith && _chatWith !== 'all' && !state.assistants.some(a => a.id === _chatWith)) _chatWith = null;
+    wrap.classList.toggle('in-thread', !!_chatWith);
+    // 對話清單
+    const actives = state.assistants.filter(a => a.active).sort((a, b) => a.name.localeCompare(b.name, 'zh-TW'));
+    const last = id => msgs.find(m => m.to === id);   // msgs 已依時間新→舊
+    const ids = ['all', ...actives.map(a => a.id).sort((x, y) => {
+        const lx = last(x)?.createdAt || '', ly = last(y)?.createdAt || '';
+        return lx === ly ? 0 : (lx < ly ? 1 : -1);
+    })];
+    document.getElementById('chat-list').innerHTML = ids.map(id => {
+        const l = last(id);
+        const un = l ? chatUnreadCount(l) : 0;
+        const pill = l && un ? `<span class="chat-pill">${id === 'all' ? `未讀 ${un}` : '未讀'}</span>` : '';
+        return `<button class="chat-li${_chatWith === id ? ' on' : ''}" onclick="chatOpen('${id}')">
+            <span class="chat-av${id === 'all' ? ' all' : ''}">${esc(chatAv(id))}</span>
+            <span class="chat-li-main"><span class="chat-li-top"><span class="chat-li-name">${esc(chatName(id))}</span><span class="chat-li-time">${l ? chatListTime(l.createdAt) : ''}</span></span>
+            <span class="chat-li-prev${l ? '' : ' none'}">${l ? esc(l.text.replace(/\s+/g, ' ')) : '尚無對話'}</span></span>${pill}
+        </button>`;
+    }).join('');
+    // 對話內容
+    const pane = document.getElementById('chat-pane');
+    if (!_chatWith) { pane.dataset.thread = ''; pane.innerHTML = '<div class="chat-ph">點左邊的助理開始對話</div>'; return; }
+    if (pane.dataset.thread !== _chatWith) {
+        pane.dataset.thread = _chatWith;
+        pane.innerHTML = `<div class="chat-hd"><button class="chat-back" onclick="chatOpen(null)" aria-label="返回">‹</button><b>${esc(chatName(_chatWith))}</b><span>${_chatWith === 'all' ? '每位助理都會收到' : '只有她看得到'}</span></div>
+            <div class="chat-msgs" id="chat-msgs"></div>
+            <div class="chat-comp"><textarea id="chat-input" rows="1" placeholder="${_chatWith === 'all' ? '輸入全員公告…' : '輸入回覆…'}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,140)+'px'"></textarea><button class="btn btn-primary" id="chat-send" onclick="chatSend()">送出</button></div>`;
+        pane._stick = true;
+    }
+    const box = document.getElementById('chat-msgs');
+    const atBottom = pane._stick || box.scrollHeight - box.scrollTop - box.clientHeight < 40;
+    pane._stick = false;
+    const list = msgs.filter(m => m.to === _chatWith).slice().reverse();
+    let day = '';
+    box.innerHTML = list.length ? list.map(m => {
+        const acks = m.acks || {}, d = chatDay(m.createdAt);
+        let st;
+        if (m.to === 'all') {
+            const should = chatShouldRead(m), unread = should.filter(a => !acks[a.id]);
+            st = `<span class="${unread.length ? 'no' : 'ok'}">已收到 ${should.length - unread.length}/${should.length}</span>${unread.length ? `<span>未讀：${unread.map(a => esc(a.name)).join('、')}</span>` : ''}`;
+        } else st = acks[m.to] ? `<span class="ok">✓ 已收到 ${msgTime(acks[m.to])}</span>` : '<span class="no">未讀</span>';
+        const sep = d !== day ? `<div class="chat-day">${d}</div>` : ''; day = d;
+        return `${sep}<div class="chat-b"><div class="chat-bub">${esc(m.text)}</div>
+            <div class="chat-meta"><span>${msgTime(m.createdAt).split(' ')[1]}</span>${st}<button class="chat-del" onclick="msgDelete('${m.id}')">刪除</button></div></div>`;
+    }).join('') : `<div class="chat-empty">還沒有對話<br>在下面輸入，${_chatWith === 'all' ? '每位助理' : chatName(_chatWith)}登入時會跳出</div>`;
+    if (atBottom) box.scrollTop = box.scrollHeight;
+}
+function chatOpen(id) {
+    _chatWith = id;
+    renderMessages();
+    if (id && window.innerWidth > 700) document.getElementById('chat-input')?.focus();
+}
+async function chatSend() {
+    const ta = document.getElementById('chat-input'), text = ta.value.trim(), to = _chatWith;
+    if (!to) return;
     if (!text) { toast('請輸入內容'); ta.focus(); return; }
-    const btn = document.getElementById('msg-send'); btn.disabled = true;
+    const btn = document.getElementById('chat-send'); btn.disabled = true;
     try {
         await db.collection(col('messages')).add({ to, text, by: currentOperator || '院長', createdAt: new Date().toISOString(), acks: {} });
-        ta.value = ''; toast('已送出');
+        ta.value = ''; ta.style.height = '';
+        document.getElementById('chat-pane')._stick = true;
     } catch (e) { toast('送出失敗：' + e.message); }
     finally { btn.disabled = false; }
 }
 async function msgDelete(id) {
-    if (!confirm('刪除這則留言？助理那邊也會看不到。')) return;
+    if (!confirm('刪除這則訊息？助理那邊也會看不到。')) return;
     try { await db.collection(col('messages')).doc(id).delete(); toast('已刪除'); }
     catch (e) { toast('刪除失敗：' + e.message); }
 }
@@ -8333,10 +8488,31 @@ function renderAttendanceOTApproval() {
         </div>
         ${approved.length||rejected.length ? `<div class="section">
             <div class="sec-title" style="margin-bottom:10px;color:var(--text-muted)">加班紀錄（${approved.length+rejected.length}）</div>
-            ${[...approved,...rejected].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(r=>renderOTCard(r,true)).join('')}
+            ${monthGroupsHTML('ot', [...approved,...rejected].sort((a,b)=>new Date(b.date)-new Date(a.date)), r => r.date, r => renderOTCard(r,true))}
         </div>` : ''}`;
     updateAttOTSelBar();
 }
+
+// 依月份收合：近 3 個月各一組（預設收合），更早的月份要按「完整記錄」才展開
+const _mgOpen = new Set(), _mgAll = {};
+function monthGroupsHTML(key, items, monthOf, render) {
+    const groups = {};
+    items.forEach(r => { const m = (monthOf(r) || '').slice(0, 7) || '未知'; (groups[m] = groups[m] || []).push(r); });
+    const months = Object.keys(groups).sort().reverse();
+    const [cy, cm] = currentMonth().split('-').map(Number);
+    const d = new Date(cy, cm - 3, 1), cutoff = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const recent = months.filter(m => m >= cutoff), older = months.filter(m => m < cutoff);
+    const chev = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+    const grp = m => `<details class="mg"${_mgOpen.has(key + m) ? ' open' : ''} ontoggle="mgToggle('${key}${m}',this.open)"><summary>${m === '未知' ? '日期不明' : monthLabel(m)}<em>${groups[m].length} 筆</em>${chev}</summary><div class="mg-body">${groups[m].map(render).join('')}</div></details>`;
+    const olderN = older.reduce((s, m) => s + groups[m].length, 0);
+    return recent.map(grp).join('')
+        + (older.length ? (_mgAll[key]
+            ? older.map(grp).join('') + `<button class="mg-more" onclick="mgAll('${key}',false)">收起較早的記錄</button>`
+            : `<button class="mg-more" onclick="mgAll('${key}',true)">完整記錄（較早 ${older.length} 個月・${olderN} 筆）</button>`) : '')
+        || '<div class="empty-state"><p>沒有記錄</p></div>';
+}
+function mgToggle(k, open) { if (open) _mgOpen.add(k); else _mgOpen.delete(k); }
+function mgAll(key, on) { _mgAll[key] = on; refreshPage(); }
 
 function updateAttOTSelBar() {
     const bar = document.getElementById('att-ot-sel-bar');
@@ -8348,6 +8524,7 @@ function updateAttOTSelBar() {
 function toggleAllAttOT() {
     const checked = document.getElementById('att-ot-chk-all').checked;
     document.querySelectorAll('.att-ot-chk').forEach(cb => {
+        if (cb.closest('details:not([open])') || cb.offsetParent === null) return;
         cb.checked = checked;
         if (checked) otSelected.add(cb.dataset.id); else otSelected.delete(cb.dataset.id);
     });
@@ -8387,7 +8564,7 @@ function renderAttendanceLeaveApproval() {
                     <button class="btn btn-outline btn-sm" onclick="clearLeaveSelectionAndRefreshAtt()">取消</button>`:'<button class="btn btn-outline btn-sm" onclick="toggleLeaveSelModeAtt()">多選刪除</button>'}
                 </div>
             </div>
-            <div style="margin-top:10px">${others.map(r => renderLeaveCard(r, true)).join('')}</div>
+            <div style="margin-top:10px">${monthGroupsHTML('lv', others, r => r.dates?.[0], r => renderLeaveCard(r, true))}</div>
         </div>` : ''}`;
 }
 
@@ -8403,8 +8580,15 @@ function renderAttendanceOTMgmt() {
     const totalMins = monthApproved.reduce((s,r) => s + r.overtimeMinutes, 0);
     const byAsstId = {};
     monthApproved.forEach(r => { byAsstId[r.assistantId] = (byAsstId[r.assistantId]||0) + r.overtimeMinutes; });
-    const asstCards = state.assistants.filter(a=>a.active).sort((a,b)=>a.name.localeCompare(b.name,'zh-TW')).map(a => {
-        const mins = byAsstId[a.id] || 0;
+    const cntBy = {};
+    monthApproved.forEach(r => { cntBy[r.assistantId] = (cntBy[r.assistantId]||0) + 1; });
+    const otRows = state.assistants.filter(a=>a.active).sort((a,b)=>a.name.localeCompare(b.name,'zh-TW')).map(a => {
+        const mins = byAsstId[a.id] || 0, c = cntBy[a.id] || 0;
+        return `<tr><td>${esc(a.name)}<button class="pen-btn" onclick="openOTHistory('${a.id}','${a.name}','${m}')" aria-label="查看／調整${esc(a.name)}加班">${PENCIL_ICON}</button></td>
+            <td class="${mins ? '' : 'z'}">${mins ? durShort(mins) : '—'}</td><td class="${mins ? '' : 'z'}">${mins}</td><td class="${c ? '' : 'z'}">${c}</td></tr>`;
+    }).join('');
+    const asstCards = [].map(a => {
+        const mins = 0;
         return `<div class="ot-stat-card" style="position:relative">
             <div class="sc-name">${a.name}</div>
             <div class="sc-val dur" style="font-size:22px">${durHTML(mins)}</div>
@@ -8419,14 +8603,10 @@ function renderAttendanceOTMgmt() {
                 <div class="sec-title">加班時數總覽</div>
                 ${monthNavHTML(m, 'setAttOTMonth', { year: true, min: (state.overtime.map(r => (r.date || '').slice(0, 7)).filter(Boolean).sort()[0] || currentMonth()).slice(0, 4) + '-01' })}
             </div>
-            <div class="ot-stat-grid" style="margin-bottom:14px;margin-top:12px">
-                <div class="ot-stat-card total-card">
-                    <div class="sc-name">所有助理合計</div>
-                    <div class="sc-val dur">${durHTML(totalMins)}</div>
-                    <div class="sc-sub">${totalMins} 分鐘</div>
-                </div>
-                ${asstCards}
-            </div>
+            <div style="overflow-x:auto"><table class="cmp-tbl">
+                <thead><tr><th>助理</th><th>加班時數</th><th>分鐘</th><th>筆數</th></tr></thead>
+                <tbody><tr class="tot"><td>全部合計</td><td>${durShort(totalMins)}</td><td>${totalMins}</td><td>${monthApproved.length}</td></tr>${otRows}</tbody>
+            </table></div>
         </div>
         <div class="section">
             <div class="sec-title" style="margin-bottom:12px">加班趨勢（近 6 個月）</div>
@@ -8479,7 +8659,7 @@ function buildLeaveMgmtParts() {
     const increment = ls.annualLeaveIncrement ?? 1;
     const activeAsts = state.assistants.filter(a=>a.active).sort((a,b)=>a.name.localeCompare(b.name,'zh-TW'));
 
-    const annualCards = activeAsts.map(a => annualLeaveCardHTML(a, year, false)).join('');
+    const annualCards = annualLeaveTableHTML(activeAsts, year);
 
     const lp = settings.leavePolicy || {};
     const bp = lp.baseParams || {};
@@ -8582,7 +8762,7 @@ function buildLeaveMgmtParts() {
                     <button class="btn btn-outline btn-sm al-save" onclick="saveLeaveIncrementAtt()">儲存</button>
                 </div>
             </div>
-            <div class="annual-grid">${annualCards}</div>
+            ${annualCards}
         </div>`;
     const policy = `
         <div class="card section">
@@ -8944,7 +9124,7 @@ function renderLeavePrincipal(el, year) {
     const increment = ls.annualLeaveIncrement ?? 1;
     const activeAsts = state.assistants.filter(a=>a.active).sort((a,b)=>a.name.localeCompare(b.name,'zh-TW'));
 
-    const annualCards = activeAsts.map(a => annualLeaveCardHTML(a, year, true)).join('');
+    const annualCards = annualLeaveTableHTML(activeAsts, year);
 
     const sortedReqs = [...state.leaveRequests].sort((a,b)=>(b.dates?.[0]||'')>(a.dates?.[0]||'')?1:-1);
     const pending  = sortedReqs.filter(r => r.status === 'pending_principal');
@@ -8960,7 +9140,7 @@ function renderLeavePrincipal(el, year) {
                     <button class="btn btn-outline btn-sm al-save" onclick="saveLeaveIncrement()">儲存</button>
                 </div>
             </div>
-            <div class="annual-grid">${annualCards}</div>
+            ${annualCards}
         </div>
         ${pending.length ? `<div class="section">
             <div class="sec-title" style="margin-bottom:10px">待院長批核（${pending.length}）</div>
