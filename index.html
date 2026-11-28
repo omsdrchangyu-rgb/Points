@@ -1632,8 +1632,8 @@
         .vb-name{font-size:24px;font-weight:800;letter-spacing:.2em;padding-left:14px;font-family:"Noto Serif TC","PMingLiU",serif;}
         .vb-box{position:relative;width:56px;height:56px;border:2px solid #3a3a3a;background:#fff;justify-self:center;}
         .vb-row.done .vb-box{animation:vbThump .35s ease-out;}
-        .vb-stamp{position:absolute;left:3px;top:3px;width:46px;height:46px;border:3px solid #d0021b;border-radius:50%;color:#d0021b;display:flex;align-items:center;justify-content:center;font:900 26px/1 "Noto Serif TC","PMingLiU",serif;transform:rotate(-12deg);opacity:.88;animation:vbStamp .45s cubic-bezier(.2,.9,.3,1.2);box-shadow:inset 0 0 0 1px rgba(208,2,27,.25);}
-        @keyframes vbStamp{0%{transform:scale(2.6) rotate(-35deg);opacity:0}55%{transform:scale(.88) rotate(-10deg);opacity:1}75%{transform:scale(1.06) rotate(-13deg)}100%{transform:scale(1) rotate(-12deg);opacity:.88}}
+        .vb-stamp{position:absolute;left:4px;top:4px;width:44px;height:44px;transform:rotate(-8deg);opacity:.9;animation:vbStamp .45s cubic-bezier(.2,.9,.3,1.2);}
+        @keyframes vbStamp{0%{transform:scale(2.6) rotate(-35deg);opacity:0}55%{transform:scale(.88) rotate(-10deg);opacity:1}75%{transform:scale(1.06) rotate(-13deg)}100%{transform:scale(1) rotate(-8deg);opacity:.9}}
         @keyframes vbThump{0%{transform:translateY(0)}40%{transform:translateY(3px)}100%{transform:translateY(0)}}
         .vb-ft{margin-top:16px;text-align:center;}
         .vb-ft .btn{width:100%;height:48px;justify-content:center;font-size:var(--fs-sub);font-weight:700;}
@@ -5966,6 +5966,7 @@ async function msgDelete(id) {
 // 臨床小組長投票：一人一票、匿名（同仁互相看不到，院長看得到）、投出後不能改
 // 資料：elections/{VOTE.id} = 名單設定；elections/{VOTE.id}_{助理id} = 一張票
 // ================================================================
+const VOTE_STAMP = '<svg viewBox="0 0 100 100" width="100%" height="100%"><defs><clipPath id="vbc"><circle cx="50" cy="50" r="42"/></clipPath></defs><circle cx="50" cy="50" r="42" fill="none" stroke="#d0021b" stroke-width="8"/><g clip-path="url(#vbc)" stroke="#d0021b" stroke-width="8" stroke-linecap="butt"><line x1="50" y1="0" x2="50" y2="100"/><line x1="50" y1="46" x2="6" y2="100"/></g></svg>';
 const VOTE = {
     id: 'lead-202611', title: '臨床小組長選舉', dateLabel: '2026 年 11 月 28 日',
     start: '2026-11-28T12:00:00+08:00', end: '2026-11-28T21:00:00+08:00', timeLabel: '12:00–21:00',
@@ -6044,7 +6045,7 @@ function renderVote() {
         <div class="vb-tip">請在一位候選人的方格內蓋章（點一下即可，可以改選）</div>
         ${cs.map((a, i) => `<div class="vb-row${_vSel === a.id ? ' done' : ''}" onclick="voteStamp('${a.id}')" role="button" aria-label="圈選 ${esc(a.name)}">
             <div class="vb-no">${i + 1}</div><div class="vb-name">${esc(a.name)}</div>
-            <div class="vb-box">${_vSel === a.id ? '<div class="vb-stamp">正</div>' : ''}</div></div>`).join('')}
+            <div class="vb-box">${_vSel === a.id ? '<div class="vb-stamp">'+VOTE_STAMP+'</div>' : ''}</div></div>`).join('')}
         <div class="vb-ft"><button class="btn btn-primary" ${_vSel ? '' : 'disabled'} onclick="voteConfirm()">確認投票完成</button>
             <div class="vb-note">※ 投票後無法修改，請確認後再送出</div></div>
     </div>`;
