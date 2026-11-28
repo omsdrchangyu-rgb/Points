@@ -1619,6 +1619,36 @@
             .chat-back{display:block;}
             .chat-hd{padding:10px 12px;min-height:53px;}
         }
+        /* ══ 臨床小組長投票 ══ */
+        .vb{max-width:460px;margin:0 auto;background:#fffdf6;border:3px double #3a3a3a;border-radius:4px;padding:18px 16px 16px;box-shadow:0 4px 18px rgba(0,0,0,.08);}
+        .vb-hd{text-align:center;border-bottom:2px solid #3a3a3a;padding-bottom:10px;margin-bottom:6px;}
+        .vb-hd .t1{font-size:var(--fs-xs);letter-spacing:.3em;color:#555;}
+        .vb-hd .t2{font-size:22px;font-weight:900;letter-spacing:.12em;margin-top:4px;font-family:"Noto Serif TC","PMingLiU",serif;}
+        .vb-hd .t3{font-size:var(--fs-xs);color:#666;margin-top:4px;}
+        .vb-tip{font-size:var(--fs-xs);color:#666;text-align:center;margin:8px 0 6px;}
+        .vb-row{display:grid;grid-template-columns:40px 1fr 70px;align-items:center;border-bottom:1px solid #cfc8b8;min-height:76px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+        .vb-row:last-of-type{border-bottom:2px solid #3a3a3a;}
+        .vb-no{font-size:20px;font-weight:800;text-align:center;color:#333;border-right:1px solid #cfc8b8;align-self:stretch;display:flex;align-items:center;justify-content:center;}
+        .vb-name{font-size:24px;font-weight:800;letter-spacing:.2em;padding-left:14px;font-family:"Noto Serif TC","PMingLiU",serif;}
+        .vb-box{position:relative;width:56px;height:56px;border:2px solid #3a3a3a;background:#fff;justify-self:center;}
+        .vb-row.done .vb-box{animation:vbThump .35s ease-out;}
+        .vb-stamp{position:absolute;left:3px;top:3px;width:46px;height:46px;border:3px solid #d0021b;border-radius:50%;color:#d0021b;display:flex;align-items:center;justify-content:center;font:900 26px/1 "Noto Serif TC","PMingLiU",serif;transform:rotate(-12deg);opacity:.88;animation:vbStamp .45s cubic-bezier(.2,.9,.3,1.2);box-shadow:inset 0 0 0 1px rgba(208,2,27,.25);}
+        @keyframes vbStamp{0%{transform:scale(2.6) rotate(-35deg);opacity:0}55%{transform:scale(.88) rotate(-10deg);opacity:1}75%{transform:scale(1.06) rotate(-13deg)}100%{transform:scale(1) rotate(-12deg);opacity:.88}}
+        @keyframes vbThump{0%{transform:translateY(0)}40%{transform:translateY(3px)}100%{transform:translateY(0)}}
+        .vb-ft{margin-top:16px;text-align:center;}
+        .vb-ft .btn{width:100%;height:48px;justify-content:center;font-size:var(--fs-sub);font-weight:700;}
+        .vb-note{font-size:var(--fs-xs);color:var(--red);margin-top:8px;}
+        .vb-done{text-align:center;padding:26px 10px;}
+        .vb-done .ck{width:64px;height:64px;border-radius:50%;background:var(--green);color:#fff;font-size:34px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+        .vb-done b{font-size:var(--fs-sub);}
+        .vb-done p{font-size:var(--fs-sm);color:var(--text-muted);margin-top:6px;}
+        .vote-banner{display:flex;align-items:center;gap:10px;background:#fff4f4;border:1.5px solid var(--red);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;cursor:pointer;}
+        .vote-banner b{color:var(--red);}
+        .vote-banner span{font-size:var(--fs-sm);color:var(--text-secondary);}
+        .vote-banner .btn{margin-left:auto;flex-shrink:0;}
+        .vt-bar{height:10px;border-radius:5px;background:var(--accent);}
+        .vt-chk{display:flex;flex-wrap:wrap;gap:6px 14px;margin:6px 0 12px;}
+        .vt-chk label{display:flex;align-items:center;gap:5px;font-size:var(--fs-sm);}
     </style>
 </head>
 <body>
@@ -1831,6 +1861,9 @@ appId: "..."'></textarea>
         <button class="nav-item nfull" onclick="navigate('assistants')">
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zM5 17a5 5 0 0110 0H5z"/></svg>助理管理
         </button>
+        <button class="nav-item nfull" onclick="navigate('vote')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1zm2.3 7.3L5 11.6l3 3 7-7-1.3-1.3L8 12l-1.7-1.7z"/></svg>小組長投票
+        </button>
         <button class="nav-item nfull" onclick="navigate('messages')">
             <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.84 8.84 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zm-6 0h2v2H9V9z" clip-rule="evenodd"/></svg>雙向溝通回覆
         </button>
@@ -1889,7 +1922,7 @@ appId: "..."'></textarea>
         <button class="btn-sidebar hidden" id="btn-settings" onclick="openSettings()">系統設定</button>
         <button class="btn-sidebar hidden" id="btn-logout" onclick="logoutAll()">登出</button>
         <button class="btn-sidebar" onclick="showSetup()">重新設定連線</button>
-        <div class="app-ver">版本 1125-2</div>
+        <div class="app-ver">版本 1128-1</div>
     </div>
 </nav>
 
@@ -2138,6 +2171,12 @@ appId: "..."'></textarea>
         <div class="page-content">
             <div id="myview-content"></div>
         </div>
+    </div>
+
+    <!-- ── 臨床小組長投票 ── -->
+    <div id="page-vote" class="page">
+        <div class="page-header"><h2>臨床小組長投票</h2><p>今天 12:00–21:00・一人一票・匿名</p></div>
+        <div class="page-content"><div id="vote-content"></div></div>
     </div>
 
     <!-- ── 雙向溝通回覆（院長） ── -->
@@ -3634,7 +3673,7 @@ function todoStart() {
     }
 }
 function ntApplyAccess() {
-    const td = canUseTodo(), nt = td || isTodoAdmin();
+    const td = canUseTodo(), nt = td || isTodoAdmin() || voteNeedsMe();
     document.body.classList.toggle('todo-access', td);
     document.body.classList.toggle('nt-access', nt);
     if (nt) { todoStart(); if (isTodoAdmin()) msEnsureSched(); }
@@ -3692,7 +3731,7 @@ async function todoMarkSeen(t) {
 let _ntOpen = false;
 function ntRefresh() {
     const btn = document.getElementById('nt-bell'); if (!btn) return;
-    const n = reminderList().length + todoNotifs().length;
+    const n = ntReminders().length + todoNotifs().length;
     const c = btn.querySelector('.nt-count');
     c.textContent = n; c.classList.toggle('hidden', !n);
     const tb = document.getElementById('todo-badge');
@@ -3704,7 +3743,7 @@ function ntClose() { _ntOpen = false; document.getElementById('nt-panel')?.remov
 function ntRender() {
     let p = document.getElementById('nt-panel');
     if (!p) { p = document.createElement('div'); p.id = 'nt-panel'; document.body.appendChild(p); }
-    const rems = reminderList(), ns = todoNotifs();
+    const rems = ntReminders(), ns = todoNotifs();
     const evText = t => {
         const e = t.lastEvent;
         if (e.type === 'completed') return `<b>${esc(e.byName)}</b> 完成了`;
@@ -3726,7 +3765,8 @@ function ntRender() {
     else { p.style.left = '12px'; p.style.right = '12px'; }
     p.style.top = (b.bottom + 8) + 'px';
 }
-function ntGo(id) { const r = reminderList().find(x => x.id === id); ntClose(); r?.go?.(); }
+function ntReminders() { return [...voteReminders(), ...reminderList()]; }
+function ntGo(id) { const r = ntReminders().find(x => x.id === id); ntClose(); r?.go?.(); }
 function ntOpenTodo(id) { ntClose(); _tdView = 'all'; navigate('todo'); openTodo(id); }
 document.addEventListener('pointerdown', e => {
     if (_ntOpen && !e.target.closest('#nt-panel') && !e.target.closest('#nt-bell')) ntClose();
@@ -5199,7 +5239,7 @@ function navigate(p) {
     if (viewMode === 'viewer' && p !== 'overview') { showLoginScreen(); return; }
     if (viewMode === 'manager'   && !['overview','record','leave-approve','todo'].concat(canUseSchedule()?['schedule']:[]).includes(p)) return;
     if (viewMode === 'doctor'    && !['overview','record','overtime-approve','myshift'].includes(p)) return;
-    if (viewMode === 'assistant' && !['overview','myview','overtime-apply','preleave','myshift'].concat(canUseTodo()?['todo']:[]).includes(p)) return;
+    if (viewMode === 'assistant' && !['overview','myview','overtime-apply','preleave','myshift','vote'].concat(canUseTodo()?['todo']:[]).includes(p)) return;
     // principal can go anywhere
     const el = document.getElementById('page-'+p);
     if (!el) return;
@@ -5245,7 +5285,8 @@ function updateMenuBadge() {
 function renderPage(p) {
     ({overview:renderOverview,record:renderRecord,history:renderHistory,
       settlement:renderSettlementPage,salary:renderSalaryPage,assistants:renderAssistants,rules:renderRules,
-      myview:()=>{ renderMyView(); msgMyCardRender(); },
+      myview:()=>{ renderMyView(); msgMyCardRender(); voteBanner(); },
+      vote:renderVote,
       messages:renderMessages,'overtime-apply':renderOvertimeApply,
       'overtime-approve':renderOvertimeApprove,
       attendance:renderAttendance,
@@ -5921,6 +5962,170 @@ async function msgDelete(id) {
     catch (e) { toast('刪除失敗：' + e.message); }
 }
 
+// ================================================================
+// 臨床小組長投票：一人一票、匿名（同仁互相看不到，院長看得到）、投出後不能改
+// 資料：elections/{VOTE.id} = 名單設定；elections/{VOTE.id}_{助理id} = 一張票
+// ================================================================
+const VOTE = {
+    id: 'lead-202611', title: '臨床小組長選舉', dateLabel: '2026 年 11 月 28 日',
+    start: '2026-11-28T12:00:00+08:00', end: '2026-11-28T21:00:00+08:00', timeLabel: '12:00–21:00',
+    cand: ['金', '宣', '盧', '霓', '茵'],          // 候選人（名字裡的字）
+    noVote: ['莉', '璇', '季', '測試'],             // 沒有投票權（櫃檯、測試帳號）
+};
+let _vCfg = null, _vVotes = [], _vMine = null, _vMineLoaded = false, _vUnsubs = [], _vSel = null, _vShowResult = false, _vTimer = null;
+function voteActives() { return state.assistants.filter(a => a.active); }
+function voteCands() {
+    if (_vCfg?.candidates) return _vCfg.candidates.map(id => state.assistants.find(a => a.id === id)).filter(Boolean);
+    const out = [];
+    VOTE.cand.forEach(ch => { const a = voteActives().find(x => x.name.includes(ch) && !out.includes(x)); if (a) out.push(a); });
+    return out;
+}
+function voteVoters() {
+    if (_vCfg?.voters) return _vCfg.voters.map(id => state.assistants.find(a => a.id === id)).filter(Boolean);
+    return voteActives().filter(a => !VOTE.noVote.some(ch => a.name.includes(ch)));
+}
+function voteState() { const n = Date.now(); return n < Date.parse(VOTE.start) ? 'before' : n > Date.parse(VOTE.end) ? 'after' : 'open'; }
+function voteIsVoter(a) { return !!a && voteVoters().some(v => v.id === a.id); }
+function voteNeedsMe() {
+    return viewMode === 'assistant' && voteIsVoter(currentAssistantView) && _vMineLoaded && !_vMine && voteState() !== 'after'
+        && Date.now() > Date.parse(VOTE.start) - 3 * 3600e3;
+}
+function voteStart() {
+    if (_vUnsubs.length) return;
+    const c = db.collection(col('elections'));
+    _vUnsubs.push(c.doc(VOTE.id).onSnapshot(d => { _vCfg = d.exists ? d.data() : null; voteAfter(); }, e => console.error('vote cfg', e)));
+    if (viewMode === 'principal') {
+        _vUnsubs.push(c.onSnapshot(s => { _vVotes = s.docs.map(d => ({ id: d.id, ...d.data() })).filter(v => v.type === 'vote' && v.election === VOTE.id); voteAfter(); }, e => console.error('votes', e)));
+    } else if (viewMode === 'assistant' && currentAssistantView) {
+        _vUnsubs.push(c.doc(VOTE.id + '_' + currentAssistantView.id).onSnapshot(d => { _vMine = d.exists ? d.data() : null; _vMineLoaded = true; voteAfter(); }, e => console.error('my vote', e)));
+    }
+    _vTimer = setInterval(() => { ntApplyAccess(); if (currentPage === 'vote' && !document.querySelector('.modal-overlay.vote-cf')) renderVote(); }, 30000);
+}
+function voteStop() {
+    _vUnsubs.forEach(u => u?.()); _vUnsubs = []; clearInterval(_vTimer); _vTimer = null;
+    _vCfg = null; _vVotes = []; _vMine = null; _vMineLoaded = false; _vSel = null; _vShowResult = false;
+}
+function voteApplyAccess() {
+    voteStop();
+    if (viewMode === 'principal' || viewMode === 'assistant') voteStart();
+}
+function voteAfter() {
+    ntApplyAccess();
+    if (currentPage === 'vote') renderVote();
+    if (currentPage === 'myview') voteBanner();
+}
+function voteReminders() {
+    const st = voteState();
+    if (viewMode === 'principal' && Date.now() > Date.parse(VOTE.start) - 3 * 3600e3 && Date.now() < Date.parse(VOTE.end) + 3 * 86400e3) {
+        const vs = voteVoters();
+        return [{ id: 'vote', title: `臨床小組長投票${st === 'before' ? '（' + VOTE.timeLabel + '）' : st === 'open' ? '進行中' : '已結束'}`, sub: `已投 ${_vVotes.length}/${vs.length} 人`, go: () => navigate('vote'), goLabel: '查看', noDone: true }];
+    }
+    if (voteNeedsMe()) return [{ id: 'vote', title: '臨床小組長投票', sub: st === 'before' ? `今天 ${VOTE.timeLabel}，時間到就可以投` : `進行中・今天 21:00 截止`, go: () => navigate('vote'), goLabel: '去投票', noDone: true }];
+    return [];
+}
+function voteBanner() {
+    const el = document.getElementById('myview-vote'); if (!el) return;
+    el.innerHTML = voteNeedsMe() ? `<div class="vote-banner" onclick="navigate('vote')"><div><b>臨床小組長投票</b><br><span>今天 ${VOTE.timeLabel}，一人一票</span></div><button class="btn btn-primary btn-sm">去投票</button></div>` : '';
+}
+
+// ── 助理：選票 ──
+function renderVote() {
+    const el = document.getElementById('vote-content'); if (!el) return;
+    if (viewMode === 'principal') return renderVoteAdmin(el);
+    const me = currentAssistantView, st = voteState();
+    if (!voteIsVoter(me)) { el.innerHTML = '<div class="card"><p style="color:var(--text-muted)">這次投票對象是臨床助理，你不需要投票。</p></div>'; return; }
+    if (!_vMineLoaded) { el.innerHTML = '<div class="card"><p style="color:var(--text-muted)">讀取中…</p></div>'; return; }
+    if (_vMine) { el.innerHTML = `<div class="vb"><div class="vb-done"><div class="ck">✓</div><b>你已完成投票</b><p>投票時間 ${msgTime(_vMine.at)}<br>謝謝你的參與，結果由院長確認後公布。</p></div></div>`; return; }
+    if (st === 'before') { el.innerHTML = `<div class="vb"><div class="vb-done"><b>投票還沒開始</b><p>今天 ${VOTE.timeLabel} 開放投票</p></div></div>`; return; }
+    if (st === 'after') { el.innerHTML = `<div class="vb"><div class="vb-done"><b>投票已結束</b><p>結果由院長確認後公布。</p></div></div>`; return; }
+    const cs = voteCands();
+    el.innerHTML = `<div class="vb">
+        <div class="vb-hd"><div class="t1">立馥牙醫診所</div><div class="t2">${VOTE.title}選票</div><div class="t3">${VOTE.dateLabel}　投票時間 ${VOTE.timeLabel}</div></div>
+        <div class="vb-tip">請在一位候選人的方格內蓋章（點一下即可，可以改選）</div>
+        ${cs.map((a, i) => `<div class="vb-row${_vSel === a.id ? ' done' : ''}" onclick="voteStamp('${a.id}')" role="button" aria-label="圈選 ${esc(a.name)}">
+            <div class="vb-no">${i + 1}</div><div class="vb-name">${esc(a.name)}</div>
+            <div class="vb-box">${_vSel === a.id ? '<div class="vb-stamp">正</div>' : ''}</div></div>`).join('')}
+        <div class="vb-ft"><button class="btn btn-primary" ${_vSel ? '' : 'disabled'} onclick="voteConfirm()">確認投票完成</button>
+            <div class="vb-note">※ 投票後無法修改，請確認後再送出</div></div>
+    </div>`;
+}
+function voteStamp(id) {
+    if (_vSel === id) return;
+    _vSel = id; renderVote();
+    try { navigator.vibrate?.(30); } catch (e) {}
+}
+function voteConfirm() {
+    const a = voteCands().find(x => x.id === _vSel); if (!a) return;
+    const o = document.createElement('div'); o.className = 'modal-overlay vote-cf';
+    o.innerHTML = `<div class="modal" role="dialog" aria-modal="true" style="max-width:360px">
+        <div class="modal-hd"><div class="modal-title">確定投出這一票？</div></div>
+        <div class="modal-body" style="text-align:center;padding:22px 20px">
+            <div style="font-size:var(--fs-sm);color:var(--text-muted)">你圈選的是</div>
+            <div style="font-size:26px;font-weight:900;letter-spacing:.2em;margin:8px 0 12px">${esc(a.name)}</div>
+            <div class="vb-note">送出後就不能修改</div></div>
+        <div class="modal-ft"><button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">返回修改</button>
+            <button class="btn btn-primary" id="vote-go" onclick="voteSubmit()">確定投出</button></div></div>`;
+    document.body.appendChild(o);
+}
+async function voteSubmit() {
+    const me = currentAssistantView, a = voteCands().find(x => x.id === _vSel);
+    if (!me || !a) return;
+    if (voteState() !== 'open') { toast('目前不是投票時間'); document.querySelector('.vote-cf')?.remove(); renderVote(); return; }
+    const btn = document.getElementById('vote-go'); if (btn) btn.disabled = true;
+    const ref = db.collection(col('elections')).doc(VOTE.id + '_' + me.id);
+    try {
+        await db.runTransaction(async tx => {
+            const d = await tx.get(ref);
+            if (d.exists) throw new Error('你已經投過票了');
+            tx.set(ref, { type: 'vote', election: VOTE.id, voterId: me.id, voterName: me.name, candId: a.id, candName: a.name, at: new Date().toISOString() });
+        });
+        document.querySelector('.vote-cf')?.remove();
+        toast('投票完成');
+    } catch (e) {
+        toast(e.message.includes('投過') ? e.message : '投票失敗：' + e.message);
+        if (btn) btn.disabled = false;
+    }
+}
+
+// ── 院長：進度、開票、名單 ──
+function renderVoteAdmin(el) {
+    const cs = voteCands(), vs = voteVoters(), st = voteState();
+    const voted = new Set(_vVotes.map(v => v.voterId));
+    const notYet = vs.filter(a => !voted.has(a.id));
+    const tally = cs.map(a => ({ a, n: _vVotes.filter(v => v.candId === a.id).length })).sort((x, y) => y.n - x.n);
+    const max = Math.max(1, ...tally.map(t => t.n));
+    const chk = (list, sel, name) => list.map(a => `<label><input type="checkbox" name="${name}" value="${a.id}" ${sel.some(s => s.id === a.id) ? 'checked' : ''}>${esc(a.name)}</label>`).join('');
+    el.innerHTML = `
+        <div class="card section">
+            <div class="card-title">投票進度</div>
+            <p>時間：今天 ${VOTE.timeLabel}・<b>${st === 'before' ? '尚未開始' : st === 'open' ? '進行中' : '已結束'}</b></p>
+            <p style="margin-top:6px">已投 <b>${_vVotes.length}</b> / ${vs.length} 人</p>
+            ${notYet.length ? `<p style="margin-top:6px;color:var(--text-muted);font-size:var(--fs-sm)">還沒投：${notYet.map(a => esc(a.name)).join('、')}</p>` : ''}
+        </div>
+        <div class="card section">
+            <div class="card-title" style="display:flex;justify-content:space-between;align-items:center"><span>開票結果（只有院長看得到）</span>
+                <button class="btn btn-outline btn-sm" onclick="_vShowResult=!_vShowResult;renderVote()">${_vShowResult ? '隱藏' : '顯示'}</button></div>
+            ${_vShowResult ? `<table class="cmp-tbl"><tbody>${tally.map((t, i) => `<tr${i < 2 && t.n ? ' class="tot"' : ''}><td>${esc(t.a.name)}</td><td style="width:50%"><div class="vt-bar" style="width:${t.n / max * 100}%;${t.n ? '' : 'background:transparent'}"></div></td><td>${t.n} 票</td></tr>`).join('')}</tbody></table>
+                <details style="margin-top:10px"><summary style="cursor:pointer;font-size:var(--fs-sm);color:var(--text-muted)">投票明細</summary>
+                <div style="font-size:var(--fs-sm);margin-top:6px;line-height:1.9">${_vVotes.slice().sort((x, y) => (x.at || '').localeCompare(y.at || '')).map(v => `${msgTime(v.at)}　${esc(v.voterName)} → ${esc(v.candName)}`).join('<br>') || '尚無'}</div></details>`
+            : '<p style="color:var(--text-muted);font-size:var(--fs-sm)">按「顯示」查看票數</p>'}
+        </div>
+        <div class="card section">
+            <div class="card-title">名單（名字自動對應，有錯可以改）</div>
+            <div style="font-size:var(--fs-sm);font-weight:700">候選人</div><div class="vt-chk" id="vt-cands">${chk(voteActives(), cs, 'vc')}</div>
+            <div style="font-size:var(--fs-sm);font-weight:700">有投票權</div><div class="vt-chk" id="vt-voters">${chk(voteActives(), vs, 'vv')}</div>
+            <div style="display:flex;justify-content:flex-end"><button class="btn btn-primary btn-sm" onclick="voteSaveCfg()">儲存名單</button></div>
+        </div>`;
+}
+async function voteSaveCfg() {
+    const ids = n => [...document.querySelectorAll(`input[name="${n}"]:checked`)].map(i => i.value);
+    const candidates = voteActives().filter(a => ids('vc').includes(a.id)).map(a => a.id);
+    const order = VOTE.cand.map(ch => candidates.find(id => state.assistants.find(a => a.id === id)?.name.includes(ch))).filter(Boolean);
+    const cands = [...order, ...candidates.filter(id => !order.includes(id))];
+    try { await db.collection(col('elections')).doc(VOTE.id).set({ type: 'config', candidates: cands, voters: ids('vv'), updatedAt: new Date().toISOString() }); toast('名單已儲存'); }
+    catch (e) { toast('儲存失敗：' + e.message); }
+}
+
 function renderMyView() {
     const a = currentAssistantView; if (!a) return;
     document.getElementById('myview-title').textContent = a.name;
@@ -5956,6 +6161,7 @@ function renderMyView() {
         : '';
 
     document.getElementById('myview-content').innerHTML = `
+        <div id="myview-vote"></div>
         <div id="myview-msgs"></div>
         ${sigHtml}
         <!-- 當月點數摘要 -->
@@ -7788,6 +7994,7 @@ function applyViewMode() {
     document.body.classList.toggle('sched-access', canUseSchedule());
     if (canUseSchedule()) { schedStartSwaps(); msEnsureSched(); }
     updateSwapBadge();
+    voteApplyAccess();
     ntApplyAccess();
     msgApplyAccess();
 
@@ -7806,15 +8013,15 @@ function applyViewMode() {
         chip.className = 'mode-chip' + (isPrincipal||isManager?' admin':isAsst||isDoctor?' assistant':'');
     }
 
-    if (isPrincipal) { if (!['record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report','leave','leave-approve','attendance','schedule','dashboard','todo','messages'].includes(currentPage)) navigate('dashboard'); else refreshPage(); return; }
+    if (isPrincipal) { if (!['record','history','settlement','salary','assistants','rules','overtime-apply','overtime-approve','support-report','leave','leave-approve','attendance','schedule','dashboard','todo','messages','vote'].includes(currentPage)) navigate('dashboard'); else refreshPage(); return; }
     if (isManager)   { if (!['overview','record','leave-approve','todo'].concat(canUseSchedule()?['schedule']:[]).includes(currentPage)) navigate('overview'); else refreshPage(); return; }
     if (isDoctor)    { if (!['record','overtime-approve','myshift'].includes(currentPage)) navigate('record'); else refreshPage(); return; }
-    if (isAsst)      { if (!['myview','overtime-apply','preleave','myshift'].concat(canUseTodo()?['todo']:[]).includes(currentPage)) navigate('myview'); else refreshPage(); return; }
+    if (isAsst)      { if (!['myview','overtime-apply','preleave','myshift','vote'].concat(canUseTodo()?['todo']:[]).includes(currentPage)) navigate('myview'); else refreshPage(); return; }
     if (currentPage !== 'overview') navigate('overview'); else refreshPage();
 }
 
 function adminLogout() {
-    msgStop();
+    msgStop(); voteStop();
     viewMode = 'viewer'; currentOperator = '';
     currentDoctor = null; currentAssistantView = null;
     navigate('overview');
@@ -7823,7 +8030,7 @@ function adminLogout() {
 }
 
 function logoutAll() {
-    msgStop(); ntClose(); document.body.classList.remove('todo-access','nt-access');
+    msgStop(); voteStop(); ntClose(); document.body.classList.remove('todo-access','nt-access');
     viewMode = 'viewer'; currentOperator = ''; currentAssistantView = null;
     currentDoctor = null;
     navigate('overview');
